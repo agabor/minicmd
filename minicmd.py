@@ -155,8 +155,45 @@ def edit_prompt_file():
         print("Error: vim not found. Please install vim or ensure it's in your PATH.")
         sys.exit(1)
 
+def add_file_to_prompt(file_path):
+    """Add a file reference to the prompt file"""
+    prompt_file = Path.home() / ".minicmd" / "prompt"
+    
+    # Create directory if it doesn't exist
+    prompt_file.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Create empty file if it doesn't exist
+    if not prompt_file.exists():
+        prompt_file.touch()
+    
+    # Add the file reference
+    file_reference = f"[[ {file_path} ]]"
+    
+    try:
+        # Read existing content
+        existing_content = ""
+        if prompt_file.exists():
+            with open(prompt_file, 'r', encoding='utf-8') as f:
+                existing_content = f.read().rstrip()
+        
+        # Append the file reference
+        if existing_content:
+            new_content = existing_content + "\n" + file_reference
+        else:
+            new_content = file_reference
+        
+        # Write back to file
+        with open(prompt_file, 'w', encoding='utf-8') as f:
+            f.write(new_content + "\n")
+        
+        print(f"Added file reference to prompt: {file_reference}")
+        
+    except IOError as e:
+        print(f"Error updating prompt file: {e}")
+        sys.exit(1)
+
 def get_prompt_from_file():
-    """Read prompt from the prompt file"""
+    """Read prompt from the prompt file and resolve file references"""
     prompt_file = Path.home() / ".minicmd" / "prompt"
     
     if not prompt_file.exists():
@@ -173,10 +210,40 @@ def get_prompt_from_file():
             print("Please run 'python3 minicmd.py edit' to add content to your prompt.")
             sys.exit(1)
         
-        return content
+        # Resolve file references
+        resolved_content = resolve_file_references(content)
+        return resolved_content
+        
     except IOError as e:
         print(f"Error reading prompt file: {e}")
         sys.exit(1)
+
+def resolve_file_references(content):
+    """Resolve [[ file_path ]] references in the content"""
+    import re
+    
+    def replace_file_reference(match):
+        file_path = match.group(1).strip()
+        try:
+            # Check if file exists
+            if not Path(file_path).exists():
+                return f"// {file_path}\n// Error: File not found"
+            
+            # Read file content
+            with open(file_path, 'r', encoding='utf-8') as f:
+                file_content = f.read().rstrip()
+            
+            # Return formatted content
+            return f"// {file_path}\n{file_content}"
+            
+        except IOError as e:
+            return f"// {file_path}\n// Error reading file: {e}"
+    
+    # Replace all [[ file_path ]] patterns
+    pattern = r'\[\[\s*([^\]]+)\s*\]\]'
+    resolved = re.sub(pattern, replace_file_reference, content)
+    
+    return resolved
 
 def main():
     # Check if user wants to edit the prompt file
@@ -184,11 +251,18 @@ def main():
         edit_prompt_file()
         return
     
+    # Check if user wants to add a file to the prompt
+    if len(sys.argv) > 2 and sys.argv[1] == "add":
+        file_path = sys.argv[2]
+        add_file_to_prompt(file_path)
+        return
+    
     # Check for unexpected arguments
     if len(sys.argv) > 1:
         print("Usage:")
-        print("  python3 minicmd.py       # Use prompt from ~/.minicmd/prompt")
-        print("  python3 minicmd.py edit  # Edit the prompt file")
+        print("  python3 minicmd.py           # Use prompt from ~/.minicmd/prompt")
+        print("  python3 minicmd.py edit      # Edit the prompt file")
+        print("  python3 minicmd.py add <file> # Add file reference to prompt")
         sys.exit(1)
     
     # Get prompt from file
