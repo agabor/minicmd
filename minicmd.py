@@ -4,6 +4,7 @@ import requests
 import json
 import re
 import sys
+import subprocess
 from pathlib import Path
 
 # Configuration
@@ -132,13 +133,66 @@ def create_file(file_path, content):
     except IOError as e:
         print(f"Error creating file {file_path}: {e}")
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: python3 minicmd.py \"<your prompt>\"")
-        print("Example: python3 minicmd.py \"Create a Python hello world script\"")
+def edit_prompt_file():
+    """Launch vim to edit the prompt file"""
+    prompt_file = Path.home() / ".minicmd" / "prompt"
+    
+    # Create directory if it doesn't exist
+    prompt_file.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Create empty file if it doesn't exist
+    if not prompt_file.exists():
+        prompt_file.touch()
+    
+    # Launch vim to edit the file
+    try:
+        subprocess.run(["vim", str(prompt_file)], check=True)
+        print(f"Prompt file edited: {prompt_file}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error launching vim: {e}")
+        sys.exit(1)
+    except FileNotFoundError:
+        print("Error: vim not found. Please install vim or ensure it's in your PATH.")
+        sys.exit(1)
+
+def get_prompt_from_file():
+    """Read prompt from the prompt file"""
+    prompt_file = Path.home() / ".minicmd" / "prompt"
+    
+    if not prompt_file.exists():
+        print("Error: Prompt file does not exist.")
+        print("Please run 'python3 minicmd.py edit' to create and edit your prompt.")
         sys.exit(1)
     
-    prompt = ' '.join(sys.argv[1:])
+    try:
+        with open(prompt_file, 'r', encoding='utf-8') as f:
+            content = f.read().strip()
+        
+        if not content:
+            print("Error: Prompt file is empty.")
+            print("Please run 'python3 minicmd.py edit' to add content to your prompt.")
+            sys.exit(1)
+        
+        return content
+    except IOError as e:
+        print(f"Error reading prompt file: {e}")
+        sys.exit(1)
+
+def main():
+    # Check if user wants to edit the prompt file
+    if len(sys.argv) > 1 and sys.argv[1] == "edit":
+        edit_prompt_file()
+        return
+    
+    # Check for unexpected arguments
+    if len(sys.argv) > 1:
+        print("Usage:")
+        print("  python3 minicmd.py       # Use prompt from ~/.minicmd/prompt")
+        print("  python3 minicmd.py edit  # Edit the prompt file")
+        sys.exit(1)
+    
+    # Get prompt from file
+    prompt = get_prompt_from_file()
     
     print("Sending request to Ollama...")
     print(f"Model: {MODEL}")
