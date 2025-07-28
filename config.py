@@ -6,7 +6,9 @@ from pathlib import Path
 # Default configuration values
 OLLAMA_URL = "http://localhost:11434/api/generate"
 OLLAMA_MODEL = "deepseek-coder-v2:16b"
-CLAUDE_MODEL = "claude-sonnet-4-2025051"
+CLAUDE_MODEL = "claude-sonnet-4-20250514"
+DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions"
+DEEPSEEK_MODEL = "deepseek-coder"
 SYSTEM_PROMPT = "IMPORTANT: answer with one or more code blocks only without explanation. The first line should be a comment containing the file path and name. When updating an existing source file, leave comments, identation and white spaces unchanged. Always respond with the complete file content."
 CONFIG_DIR = Path.home() / ".minicmd"
 CONFIG_FILE = CONFIG_DIR / "config"
@@ -16,9 +18,12 @@ def load_config():
     default_config = {
         "default_provider": "ollama",
         "anthropic_api_key": "",
+        "deepseek_api_key": "",
         "ollama_url": OLLAMA_URL,
         "ollama_model": OLLAMA_MODEL,
-        "claude_model": CLAUDE_MODEL
+        "claude_model": CLAUDE_MODEL,
+        "deepseek_url": DEEPSEEK_URL,
+        "deepseek_model": DEEPSEEK_MODEL
     }
     
     if not CONFIG_FILE.exists():

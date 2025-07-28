@@ -3,15 +3,16 @@
 import sys
 from pathlib import Path
 from config import load_config, save_config
-from api_clients import call_claude, call_ollama
+from api_clients import call_claude, call_ollama, call_deepseek
 from file_processor import process_code_blocks
 from prompt_manager import edit_prompt_file, add_file_to_prompt, get_prompt_from_file, get_resolved_prompt_from_file
 
-def handle_run_command(args, claude_flag, ollama_flag, verbose):
+def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose):
     """Handle run command with optional prompt content parameter"""
     # Check for conflicting provider options
-    if claude_flag and ollama_flag:
-        print("Error: Cannot specify both --claude and --ollama")
+    provider_flags = [claude_flag, ollama_flag, deepseek_flag]
+    if sum(provider_flags) > 1:
+        print("Error: Cannot specify multiple provider flags")
         sys.exit(1)
     
     # Load configuration
@@ -22,6 +23,8 @@ def handle_run_command(args, claude_flag, ollama_flag, verbose):
         provider = "claude"
     elif ollama_flag:
         provider = "ollama"
+    elif deepseek_flag:
+        provider = "deepseek"
     else:
         provider = config["default_provider"]
     
@@ -46,6 +49,9 @@ def handle_run_command(args, claude_flag, ollama_flag, verbose):
     if provider == "claude":
         print(f"Model: {config['claude_model']}")
         response = call_claude(resolved_prompt, config)
+    elif provider == "deepseek":
+        print(f"Model: {config['deepseek_model']}")
+        response = call_deepseek(resolved_prompt, config)
     else:
         print(f"Model: {config['ollama_model']}")
         response = call_ollama(resolved_prompt, config)
@@ -80,7 +86,7 @@ def handle_config_command(args):
         # Show current config
         print("Current configuration:")
         for key, value in config.items():
-            if key == "anthropic_api_key" and value:
+            if key in ["anthropic_api_key", "deepseek_api_key"] and value:
                 print(f"  {key}: {'*' * len(value)}")  # Hide API key
             else:
                 print(f"  {key}: {value}")
@@ -91,7 +97,7 @@ def handle_config_command(args):
         if key in config:
             config[key] = value
             save_config(config)
-            if key == "anthropic_api_key":
+            if key in ["anthropic_api_key", "deepseek_api_key"]:
                 print(f"Set {key} to {'*' * len(value)}")
             else:
                 print(f"Set {key} to {value}")

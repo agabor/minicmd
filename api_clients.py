@@ -67,3 +67,52 @@ def call_claude(user_prompt, config):
     except Exception as e:
         print(f"Error calling Claude API: {e}")
         return None
+
+def call_deepseek(user_prompt, config):
+    """Make API call to DeepSeek"""
+    if not config["deepseek_api_key"]:
+        print("Error: DeepSeek API key not configured.")
+        print("Please set your API key with: python3 minicmd.py config deepseek_api_key YOUR_API_KEY")
+        return None
+    
+    start_time = time.time()
+    
+    headers = {
+        "Authorization": f"Bearer {config['deepseek_api_key']}",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "model": config["deepseek_model"],
+        "messages": [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt}
+        ],
+        "max_tokens": 4000,
+        "temperature": 0.1,
+        "stream": False
+    }
+    
+    try:
+        response = requests.post(config["deepseek_url"], json=payload, headers=headers, timeout=60)
+        response.raise_for_status()
+        data = response.json()
+        
+        end_time = time.time()
+        print(f"DeepSeek API call took {end_time - start_time:.2f} seconds")
+        
+        if 'choices' in data and len(data['choices']) > 0:
+            return data['choices'][0]['message']['content']
+        else:
+            print("Error: Unexpected response format from DeepSeek API")
+            return None
+            
+    except requests.exceptions.RequestException as e:
+        print(f"Error calling DeepSeek API: {e}")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"Error parsing JSON response: {e}")
+        return None
+    except KeyError as e:
+        print(f"Error parsing response structure: {e}")
+        return None
