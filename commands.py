@@ -2,6 +2,7 @@
 
 import sys
 from pathlib import Path
+from glob import glob
 from config import load_config, save_config
 from api_clients import call_claude, call_ollama, call_deepseek
 from file_processor import process_code_blocks
@@ -116,10 +117,11 @@ def handle_edit_command():
 def handle_add_command(args):
     """Handle add command"""
     if len(args) >= 1:
-        file_path = args[0]
-        add_file_to_prompt(file_path)
+        for pattern in args:
+            for file_path in glob(pattern):
+                add_file_to_prompt(file_path)
     else:
-        print("Usage: python3 minicmd.py add <file>")
+        print("Usage: python3 minicmd.py add <file> [<file2> ...]")
         sys.exit(1)
 
 def handle_clear_command():
