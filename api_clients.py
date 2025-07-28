@@ -2,10 +2,13 @@
 
 import requests
 import json
+import time
 from config import SYSTEM_PROMPT
 
 def call_ollama(user_prompt, config):
     """Make API call to Ollama"""
+    start_time = time.time()
+    
     payload = {
         "model": config["ollama_model"],
         "prompt": user_prompt,
@@ -17,6 +20,10 @@ def call_ollama(user_prompt, config):
         response = requests.post(config["ollama_url"], json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
+        
+        end_time = time.time()
+        print(f"Ollama API call took {end_time - start_time:.2f} seconds")
+        
         return data.get('response', '')
     except requests.exceptions.RequestException as e:
         print(f"Error calling Ollama API: {e}")
@@ -39,6 +46,8 @@ def call_claude(user_prompt, config):
         print("Install with: pip install anthropic")
         return None
     
+    start_time = time.time()
+    
     try:
         client = anthropic.Anthropic(api_key=config["claude_api_key"])
         
@@ -50,6 +59,9 @@ def call_claude(user_prompt, config):
                 {"role": "user", "content": user_prompt}
             ]
         )
+        
+        end_time = time.time()
+        print(f"Claude API call took {end_time - start_time:.2f} seconds")
         
         return response.content[0].text
     except Exception as e:
