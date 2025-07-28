@@ -59,9 +59,7 @@ def process_markdown_blocks(lines):
                 if extracted_path:
                     file_path = extracted_path
                     continue
-            
-            # Add to content (skip the filename comment line)
-            if file_path and not extract_filename_from_comment(line):
+            else:
                 content_lines.append(line)
 
 def process_raw_code(lines):
