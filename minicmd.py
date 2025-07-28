@@ -2,7 +2,8 @@
 
 import sys
 import argparse
-from commands import handle_run_command, handle_config_command, handle_edit_command, handle_add_command, show_help
+from commands import handle_run_command, handle_config_command, handle_edit_command, handle_add_command
+from help import show_help
 
 def main():
     parser = argparse.ArgumentParser(description='AI-powered code generation tool', add_help=False)
