@@ -118,7 +118,11 @@ def handle_add_command(args):
     """Handle add command"""
     if len(args) >= 1:
         for pattern in args:
-            for file_path in glob(pattern):
+            files = glob(pattern)
+            if not files:
+                print(f"No files found matching pattern: {pattern}")
+                continue
+            for file_path in files:
                 add_file_to_prompt(file_path)
     else:
         print("Usage: python3 minicmd.py add <file> [<file2> ...]")
