@@ -9,7 +9,6 @@ from prompt_manager import edit_prompt_file, add_file_to_prompt, get_prompt_from
 
 def handle_run_command(args, claude_flag, ollama_flag, verbose):
     """Handle run command with optional prompt content parameter"""
-    edit_prompt_file()
     # Check for conflicting provider options
     if claude_flag and ollama_flag:
         print("Error: Cannot specify both --claude and --ollama")
@@ -34,6 +33,7 @@ def handle_run_command(args, claude_flag, ollama_flag, verbose):
         print("Using provided prompt content")
     else:
         # Use default prompt file
+        edit_prompt_file()
         prompt = get_prompt_from_file()
         resolved_prompt = get_resolved_prompt_from_file()
         print("Using default prompt file")
