@@ -64,19 +64,13 @@ def add_file_to_prompt(file_path):
         print(f"Error updating prompt file: {e}")
         sys.exit(1)
 
-def get_prompt_from_file(prompt_file_path=None):
+def get_prompt_from_file():
     """Read prompt from the prompt file and resolve file references"""
-    if prompt_file_path:
-        prompt_file = Path(prompt_file_path)
-    else:
-        prompt_file = Path.home() / ".minicmd" / "prompt"
+    prompt_file = Path.home() / ".minicmd" / "prompt"
     
     if not prompt_file.exists():
-        if prompt_file_path:
-            print(f"Error: Prompt file '{prompt_file_path}' does not exist.")
-        else:
-            print("Error: Prompt file does not exist.")
-            print("Please run 'python3 minicmd.py edit' to create and edit your prompt.")
+        print("Error: Prompt file does not exist.")
+        print("Please run 'python3 minicmd.py edit' to create and edit your prompt.")
         sys.exit(1)
     
     try:
@@ -84,11 +78,8 @@ def get_prompt_from_file(prompt_file_path=None):
             content = f.read().strip()
         
         if not content:
-            if prompt_file_path:
-                print(f"Error: Prompt file '{prompt_file_path}' is empty.")
-            else:
-                print("Error: Prompt file is empty.")
-                print("Please run 'python3 minicmd.py edit' to add content to your prompt.")
+            print("Error: Prompt file is empty.")
+            print("Please run 'python3 minicmd.py edit' to add content to your prompt.")
             sys.exit(1)
         
         # Resolve file references
