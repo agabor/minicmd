@@ -9,6 +9,7 @@ def extract_filename_from_comment(line):
     patterns = [
         r'^\s*//\s*(.+?)(?:\s*//.*)?$',  # // filename
         r'^\s*#\s*(.+?)(?:\s*#.*)?$',    # # filename
+        r'^\s*#\s*//\s*(.+?)(?:\s*#.*)?$',    # # // filename
         r'^\s*/\*\s*(.+?)\s*\*/$',       # /* filename */
         r'^\s*--\s*(.+?)(?:\s*--.*)?$',  # -- filename (SQL)
         r'^\s*<!--\s*(.+?)\s*-->$',      # <!-- filename --> (HTML)
