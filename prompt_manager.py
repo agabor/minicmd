@@ -65,7 +65,7 @@ def add_file_to_prompt(file_path):
         sys.exit(1)
 
 def get_prompt_from_file():
-    """Read prompt from the prompt file and resolve file references"""
+    """Read raw prompt from the prompt file without resolving references"""
     prompt_file = Path.home() / ".minicmd" / "prompt"
     
     if not prompt_file.exists():
@@ -81,14 +81,17 @@ def get_prompt_from_file():
             print("Error: Prompt file is empty.")
             print("Please run 'python3 minicmd.py edit' to add content to your prompt.")
             sys.exit(1)
-        
-        # Resolve file references
-        resolved_content = resolve_file_references(content)
-        return resolved_content
+            
+        return content
         
     except IOError as e:
         print(f"Error reading prompt file: {e}")
         sys.exit(1)
+
+def get_resolved_prompt_from_file():
+    """Read prompt from file and resolve all file references"""
+    content = get_prompt_from_file()
+    return resolve_file_references(content)
 
 def resolve_file_references(content):
     """Resolve [[ file_path ]] references in the content"""

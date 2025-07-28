@@ -5,7 +5,7 @@ from pathlib import Path
 from config import load_config, save_config
 from api_clients import call_claude, call_ollama
 from file_processor import process_code_blocks
-from prompt_manager import edit_prompt_file, add_file_to_prompt, get_prompt_from_file
+from prompt_manager import edit_prompt_file, add_file_to_prompt, get_prompt_from_file, get_resolved_prompt_from_file
 
 def handle_run_command(args, claude_flag, ollama_flag, verbose):
     """Handle run command with optional prompt content parameter"""
@@ -30,23 +30,25 @@ def handle_run_command(args, claude_flag, ollama_flag, verbose):
     if len(args) > 0:
         # Use provided prompt content directly
         prompt = " ".join(args)
+        resolved_prompt = prompt
         print("Using provided prompt content")
     else:
         # Use default prompt file
         prompt = get_prompt_from_file()
+        resolved_prompt = get_resolved_prompt_from_file()
         print("Using default prompt file")
-    
-    print(f"Sending request to {provider.title()}...")
-    if provider == "claude":
-        print(f"Model: {config['claude_model']}")
-        response = call_claude(prompt, config)
-    else:
-        print(f"Model: {config['ollama_model']}")
-        response = call_ollama(prompt, config)
     
     if verbose:
         print(f"Prompt: {prompt}")
         print("---")
+    
+    print(f"Sending request to {provider.title()}...")
+    if provider == "claude":
+        print(f"Model: {config['claude_model']}")
+        response = call_claude(resolved_prompt, config)
+    else:
+        print(f"Model: {config['ollama_model']}")
+        response = call_ollama(resolved_prompt, config)
     
     if response is None:
         print(f"Error: No response from {provider.title()} API")
