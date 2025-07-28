@@ -1,6 +1,6 @@
 # MiniCmd - AI-Powered Code Generation Tool
 
-MiniCmd is a command-line tool that uses AI (Ollama or Claude) to generate code files based on prompts.
+MiniCmd is a command-line tool that uses AI (Ollama, Claude, or DeepSeek) to generate code files based on prompts.
 
 ## Project Structure
 
@@ -10,7 +10,7 @@ The project has been refactored into modular components for better maintainabili
 
 - **`minicmd.py`** - Main application entry point and argument parsing
 - **`config.py`** - Configuration management (loading/saving settings)
-- **`api_clients.py`** - API client implementations for Ollama and Claude
+- **`api_clients.py`** - API client implementations for Ollama, Claude, and DeepSeek
 - **`file_processor.py`** - Code block processing and file creation
 - **`prompt_manager.py`** - Prompt file management and file reference resolution
 - **`commands.py`** - Command handlers for different operations
@@ -33,6 +33,7 @@ python3 minicmd.py config
 python3 minicmd.py edit
 python3 minicmd.py run "create a hello world function"
 python3 minicmd.py --claude
+python3 minicmd.py --deepseek
 ```
 
 ## Commands
@@ -47,16 +48,20 @@ python3 minicmd.py --claude
 
 - **`--claude`** - Use Claude API
 - **`--ollama`** - Use Ollama API (default)
+- **`--deepseek`** - Use DeepSeek API
 
 ## Configuration
 
 Configuration is stored in `~/.minicmd/config` and includes:
 
-- `default_provider` - Default AI provider (claude or ollama)
+- `default_provider` - Default AI provider (claude, ollama, or deepseek)
 - `anthropic_api_key` - Claude API key
+- `deepseek_api_key` - DeepSeek API key
 - `claude_model` - Claude model name
 - `ollama_url` - Ollama API URL
 - `ollama_model` - Ollama model name
+- `deepseek_url` - DeepSeek API URL
+- `deepseek_model` - DeepSeek model name
 
 ## Dependencies
 
