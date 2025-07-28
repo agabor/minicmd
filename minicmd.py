@@ -81,7 +81,8 @@ def call_claude(user_prompt, config):
     try:
         import anthropic
     except ImportError:
-        print("Error: anthropic library is required for Claude API. Install with: pip install anthropic")
+        print("Error: anthropic library is required for Claude API.")
+        print("Install with: pip install anthropic")
         return None
     
     try:
@@ -493,7 +494,8 @@ if __name__ == "__main__":
     try:
         import requests
     except ImportError:
-        print("Error: requests library is required. Install with: pip install requests")
+        print("Error: requests library is required.")
+        print("Install with: pip install requests")
         sys.exit(1)
     
     main()
