@@ -5,24 +5,62 @@ import json
 import re
 import sys
 import subprocess
+import argparse
 from pathlib import Path
 
 # Configuration
 OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "deepseek-coder-v2:16b"
+OLLAMA_MODEL = "deepseek-coder-v2:16b"
+CLAUDE_MODEL = "claude-3-5-sonnet-20241022"
 SYSTEM_PROMPT = "IMPORTANT: answer with one or more code blocks only without explanation. The first line should be a comment containing the file path and name."
+CONFIG_DIR = Path.home() / ".minicmd"
+CONFIG_FILE = CONFIG_DIR / "config"
 
-def call_ollama(user_prompt):
+def load_config():
+    """Load configuration from config file"""
+    default_config = {
+        "default_provider": "ollama",
+        "claude_api_key": "",
+        "ollama_url": OLLAMA_URL,
+        "ollama_model": OLLAMA_MODEL,
+        "claude_model": CLAUDE_MODEL
+    }
+    
+    if not CONFIG_FILE.exists():
+        return default_config
+    
+    try:
+        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        # Merge with defaults to handle missing keys
+        for key, value in default_config.items():
+            if key not in config:
+                config[key] = value
+        return config
+    except (IOError, json.JSONDecodeError) as e:
+        print(f"Error loading config: {e}")
+        return default_config
+
+def save_config(config):
+    """Save configuration to config file"""
+    try:
+        CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(config, f, indent=2)
+    except IOError as e:
+        print(f"Error saving config: {e}")
+
+def call_ollama(user_prompt, config):
     """Make API call to Ollama"""
     payload = {
-        "model": MODEL,
+        "model": config["ollama_model"],
         "prompt": user_prompt,
         "system": SYSTEM_PROMPT,
         "stream": False
     }
     
     try:
-        response = requests.post(OLLAMA_URL, json=payload, timeout=60)
+        response = requests.post(config["ollama_url"], json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
         return data.get('response', '')
@@ -31,6 +69,36 @@ def call_ollama(user_prompt):
         return None
     except json.JSONDecodeError as e:
         print(f"Error parsing JSON response: {e}")
+        return None
+
+def call_claude(user_prompt, config):
+    """Make API call to Claude"""
+    if not config["claude_api_key"]:
+        print("Error: Claude API key not configured.")
+        print("Please set your API key with: python3 minicmd.py config claude_api_key YOUR_API_KEY")
+        return None
+    
+    try:
+        import anthropic
+    except ImportError:
+        print("Error: anthropic library is required for Claude API. Install with: pip install anthropic")
+        return None
+    
+    try:
+        client = anthropic.Anthropic(api_key=config["claude_api_key"])
+        
+        response = client.messages.create(
+            model=config["claude_model"],
+            max_tokens=4000,
+            system=SYSTEM_PROMPT,
+            messages=[
+                {"role": "user", "content": user_prompt}
+            ]
+        )
+        
+        return response.content[0].text
+    except Exception as e:
+        print(f"Error calling Claude API: {e}")
         return None
 
 def extract_filename_from_comment(line):
@@ -192,13 +260,19 @@ def add_file_to_prompt(file_path):
         print(f"Error updating prompt file: {e}")
         sys.exit(1)
 
-def get_prompt_from_file():
+def get_prompt_from_file(prompt_file_path=None):
     """Read prompt from the prompt file and resolve file references"""
-    prompt_file = Path.home() / ".minicmd" / "prompt"
+    if prompt_file_path:
+        prompt_file = Path(prompt_file_path)
+    else:
+        prompt_file = Path.home() / ".minicmd" / "prompt"
     
     if not prompt_file.exists():
-        print("Error: Prompt file does not exist.")
-        print("Please run 'python3 minicmd.py edit' to create and edit your prompt.")
+        if prompt_file_path:
+            print(f"Error: Prompt file '{prompt_file_path}' does not exist.")
+        else:
+            print("Error: Prompt file does not exist.")
+            print("Please run 'python3 minicmd.py edit' to create and edit your prompt.")
         sys.exit(1)
     
     try:
@@ -206,8 +280,11 @@ def get_prompt_from_file():
             content = f.read().strip()
         
         if not content:
-            print("Error: Prompt file is empty.")
-            print("Please run 'python3 minicmd.py edit' to add content to your prompt.")
+            if prompt_file_path:
+                print(f"Error: Prompt file '{prompt_file_path}' is empty.")
+            else:
+                print("Error: Prompt file is empty.")
+                print("Please run 'python3 minicmd.py edit' to add content to your prompt.")
             sys.exit(1)
         
         # Resolve file references
@@ -245,43 +322,51 @@ def resolve_file_references(content):
     
     return resolved
 
-def main():
-    # Check if user wants to edit the prompt file
-    if len(sys.argv) > 1 and sys.argv[1] == "edit":
-        edit_prompt_file()
-        return
-    
-    # Check if user wants to add a file to the prompt
-    if len(sys.argv) > 2 and sys.argv[1] == "add":
-        file_path = sys.argv[2]
-        add_file_to_prompt(file_path)
-        return
-    
-    # Check for unexpected arguments
-    if len(sys.argv) > 1:
-        print("Usage:")
-        print("  python3 minicmd.py           # Use prompt from ~/.minicmd/prompt")
-        print("  python3 minicmd.py edit      # Edit the prompt file")
-        print("  python3 minicmd.py add <file> # Add file reference to prompt")
+def handle_run_command(args, claude_flag, ollama_flag):
+    """Handle run command with optional prompt content parameter"""
+    # Check for conflicting provider options
+    if claude_flag and ollama_flag:
+        print("Error: Cannot specify both --claude and --ollama")
         sys.exit(1)
     
-    # Get prompt from file
-    prompt = get_prompt_from_file()
+    # Load configuration
+    config = load_config()
     
-    print("Sending request to Ollama...")
-    print(f"Model: {MODEL}")
+    # Determine which provider to use
+    if claude_flag:
+        provider = "claude"
+    elif ollama_flag:
+        provider = "ollama"
+    else:
+        provider = config["default_provider"]
+    
+    # Get prompt content from args if provided, otherwise use default prompt file
+    if len(args) > 0:
+        # Use provided prompt content directly
+        prompt = " ".join(args)
+        print("Using provided prompt content")
+    else:
+        # Use default prompt file
+        prompt = get_prompt_from_file()
+        print("Using default prompt file")
+    
+    print(f"Sending request to {provider.title()}...")
+    if provider == "claude":
+        print(f"Model: {config['claude_model']}")
+        response = call_claude(prompt, config)
+    else:
+        print(f"Model: {config['ollama_model']}")
+        response = call_ollama(prompt, config)
+    
     print(f"Prompt: {prompt}")
     print("---")
     
-    # Get response from Ollama
-    response = call_ollama(prompt)
-    
     if response is None:
-        print("Error: No response from Ollama API")
+        print(f"Error: No response from {provider.title()} API")
         sys.exit(1)
     
     if not response.strip():
-        print("Error: Empty response from Ollama API")
+        print(f"Error: Empty response from {provider.title()} API")
         sys.exit(1)
     
     # Echo the response to see what we got
@@ -296,6 +381,112 @@ def main():
     process_code_blocks(response)
     
     print("Done!")
+
+def handle_config_command(args):
+    """Handle config command"""
+    config = load_config()
+    
+    if len(args) == 0:
+        # Show current config
+        print("Current configuration:")
+        for key, value in config.items():
+            if key == "claude_api_key" and value:
+                print(f"  {key}: {'*' * len(value)}")  # Hide API key
+            else:
+                print(f"  {key}: {value}")
+        return
+    
+    if len(args) == 2:
+        key, value = args
+        if key in config:
+            config[key] = value
+            save_config(config)
+            if key == "claude_api_key":
+                print(f"Set {key} to {'*' * len(value)}")
+            else:
+                print(f"Set {key} to {value}")
+        else:
+            print(f"Error: Unknown config key '{key}'")
+            print("Available keys:", ", ".join(config.keys()))
+    else:
+        print("Usage:")
+        print("  python3 minicmd.py config                    # Show current config")
+        print("  python3 minicmd.py config <key> <value>      # Set config value")
+
+def show_help():
+    """Show help message"""
+    print("minicmd - AI-powered code generation tool")
+    print()
+    print("Usage:")
+    print("  python3 minicmd.py [--claude|--ollama]       # Generate code using AI (default prompt)")
+    print("  python3 minicmd.py run [prompt_content] [--claude|--ollama]  # Generate code with optional custom prompt content")
+    print("  python3 minicmd.py edit                      # Edit the prompt file")
+    print("  python3 minicmd.py add <file>                # Add file reference to prompt")
+    print("  python3 minicmd.py config                    # Show current configuration")
+    print("  python3 minicmd.py config <key> <value>      # Set configuration value")
+    print()
+    print("Options:")
+    print("  --claude    Use Claude API (requires API key)")
+    print("  --ollama    Use Ollama API (requires local Ollama)")
+    print()
+    print("Configuration keys:")
+    print("  default_provider    Default AI provider (claude or ollama)")
+    print("  claude_api_key      Claude API key")
+    print("  claude_model        Claude model name")
+    print("  ollama_url          Ollama API URL")
+    print("  ollama_model        Ollama model name")
+    print()
+    print("Examples:")
+    print("  python3 minicmd.py config claude_api_key sk-ant-...")
+    print("  python3 minicmd.py config default_provider claude")
+    print("  python3 minicmd.py --claude")
+    print("  python3 minicmd.py run")
+    print("  python3 minicmd.py run \"create a hello world function\"")
+    print("  python3 minicmd.py run \"write a Python calculator\" --claude")
+    print("  python3 minicmd.py add main.py")
+
+def main():
+    parser = argparse.ArgumentParser(description='AI-powered code generation tool', add_help=False)
+    parser.add_argument('--claude', action='store_true', help='Use Claude API')
+    parser.add_argument('--ollama', action='store_true', help='Use Ollama API')
+    parser.add_argument('--help', '-h', action='store_true', help='Show help message')
+    parser.add_argument('command', nargs='?', help='Command to execute')
+    parser.add_argument('args', nargs='*', help='Command arguments')
+    
+    args = parser.parse_args()
+    
+    # Show help if requested
+    if args.help or (args.command == "help"):
+        show_help()
+        return
+    
+    # Handle special commands
+    if args.command == "edit":
+        edit_prompt_file()
+        return
+    
+    if args.command == "add" and len(args.args) >= 1:
+        file_path = args.args[0]
+        add_file_to_prompt(file_path)
+        return
+    
+    if args.command == "config":
+        handle_config_command(args.args)
+        return
+    
+    if args.command == "run":
+        handle_run_command(args.args, args.claude, args.ollama)
+        return
+    
+    # If no command specified, use the default behavior (backward compatibility)
+    if args.command is None:
+        handle_run_command([], args.claude, args.ollama)
+        return
+    
+    # Unknown command
+    print(f"Error: Unknown command '{args.command}'")
+    print("Run 'python3 minicmd.py --help' for usage information.")
+    sys.exit(1)
 
 if __name__ == "__main__":
     # Check if requests is available
