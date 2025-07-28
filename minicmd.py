@@ -17,7 +17,7 @@ def main():
     
     args = parser.parse_args()
     
-    if args.help or (args.command == "help"):
+    if args.help or (args.command == "help") or (args.command is None):
         show_help()
         return
     
@@ -40,10 +40,6 @@ def main():
 
     if args.command == "clear":
         handle_clear_command()
-        return
-        
-    if args.command is None:
-        handle_run_command([], args.claude, args.ollama, args.verbose)
         return
     
     # Unknown command
