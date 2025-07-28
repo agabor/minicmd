@@ -109,3 +109,15 @@ def handle_add_command(args):
     else:
         print("Usage: python3 minicmd.py add <file>")
         sys.exit(1)
+
+def handle_clear_command():
+    """Handle clear command"""
+    prompt_file = Path.home() / ".minicmd" / "prompt"
+    
+    try:
+        prompt_file.parent.mkdir(parents=True, exist_ok=True)
+        prompt_file.write_text('')
+        print("Prompt file cleared")
+    except IOError as e:
+        print(f"Error clearing prompt file: {e}")
+        sys.exit(1)

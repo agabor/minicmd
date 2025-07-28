@@ -2,7 +2,7 @@
 
 import sys
 import argparse
-from commands import handle_run_command, handle_config_command, handle_edit_command, handle_add_command
+from commands import handle_run_command, handle_config_command, handle_edit_command, handle_add_command, handle_clear_command
 from help import show_help
 
 def main():
@@ -15,7 +15,6 @@ def main():
     
     args = parser.parse_args()
     
-    # Show help if requested
     if args.help or (args.command == "help"):
         show_help()
         return
@@ -36,8 +35,11 @@ def main():
     if args.command == "run":
         handle_run_command(args.args, args.claude, args.ollama)
         return
-    
-    # If no command specified, use the default behavior (backward compatibility)
+
+    if args.command == "clear":
+        handle_clear_command()
+        return
+        
     if args.command is None:
         handle_run_command([], args.claude, args.ollama)
         return
