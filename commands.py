@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+from pathlib import Path
 from config import load_config, save_config
 from api_clients import call_claude, call_ollama
 from file_processor import process_code_blocks
