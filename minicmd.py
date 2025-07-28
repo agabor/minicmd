@@ -9,6 +9,7 @@ def main():
     parser = argparse.ArgumentParser(description='AI-powered code generation tool', add_help=False)
     parser.add_argument('--claude', action='store_true', help='Use Claude API')
     parser.add_argument('--ollama', action='store_true', help='Use Ollama API')
+    parser.add_argument('--deepseek', action='store_true', help='Use DeepSeek API')
     parser.add_argument('--help', '-h', action='store_true', help='Show help message')
     parser.add_argument('--verbose', '-v', action='store_true', help='Print verbose output')
     parser.add_argument('command', nargs='?', help='Command to execute')
@@ -34,7 +35,7 @@ def main():
         return
     
     if args.command == "run":
-        handle_run_command(args.args, args.claude, args.ollama, args.verbose)
+        handle_run_command(args.args, args.claude, args.ollama, args.deepseek, args.verbose)
         return
 
     if args.command == "clear":
