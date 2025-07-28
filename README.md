@@ -53,7 +53,7 @@ python3 minicmd.py --claude
 Configuration is stored in `~/.minicmd/config` and includes:
 
 - `default_provider` - Default AI provider (claude or ollama)
-- `claude_api_key` - Claude API key
+- `anthropic_api_key` - Claude API key
 - `claude_model` - Claude model name
 - `ollama_url` - Ollama API URL
 - `ollama_model` - Ollama model name

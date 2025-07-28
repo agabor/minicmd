@@ -34,9 +34,9 @@ def call_ollama(user_prompt, config):
 
 def call_claude(user_prompt, config):
     """Make API call to Claude"""
-    if not config["claude_api_key"]:
+    if not config["anthropic_api_key"]:
         print("Error: Claude API key not configured.")
-        print("Please set your API key with: python3 minicmd.py config claude_api_key YOUR_API_KEY")
+        print("Please set your API key with: python3 minicmd.py config anthropic_api_key YOUR_API_KEY")
         return None
     
     try:
@@ -49,7 +49,7 @@ def call_claude(user_prompt, config):
     start_time = time.time()
     
     try:
-        client = anthropic.Anthropic(api_key=config["claude_api_key"])
+        client = anthropic.Anthropic(api_key=config["anthropic_api_key"])
         
         response = client.messages.create(
             model=config["claude_model"],

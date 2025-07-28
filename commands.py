@@ -80,7 +80,7 @@ def handle_config_command(args):
         # Show current config
         print("Current configuration:")
         for key, value in config.items():
-            if key == "claude_api_key" and value:
+            if key == "anthropic_api_key" and value:
                 print(f"  {key}: {'*' * len(value)}")  # Hide API key
             else:
                 print(f"  {key}: {value}")
@@ -91,7 +91,7 @@ def handle_config_command(args):
         if key in config:
             config[key] = value
             save_config(config)
-            if key == "claude_api_key":
+            if key == "anthropic_api_key":
                 print(f"Set {key} to {'*' * len(value)}")
             else:
                 print(f"Set {key} to {value}")

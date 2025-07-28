@@ -15,7 +15,7 @@ def load_config():
     """Load configuration from config file"""
     default_config = {
         "default_provider": "ollama",
-        "claude_api_key": "",
+        "anthropic_api_key": "",
         "ollama_url": OLLAMA_URL,
         "ollama_model": OLLAMA_MODEL,
         "claude_model": CLAUDE_MODEL
