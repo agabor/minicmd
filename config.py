@@ -7,7 +7,7 @@ from pathlib import Path
 OLLAMA_URL = "http://localhost:11434/api/generate"
 OLLAMA_MODEL = "deepseek-coder-v2:16b"
 CLAUDE_MODEL = "claude-3-5-sonnet-20241022"
-SYSTEM_PROMPT = "IMPORTANT: answer with one or more code blocks only without explanation. The first line should be a comment containing the file path and name."
+SYSTEM_PROMPT = "IMPORTANT: answer with one or more code blocks only without explanation. The first line should be a comment containing the file path and name. When updating an existing source file, leave comments, identation and white spaces unchanged. Always respond with the complete file content."
 CONFIG_DIR = Path.home() / ".minicmd"
 CONFIG_FILE = CONFIG_DIR / "config"
 
