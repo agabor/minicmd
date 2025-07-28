@@ -89,9 +89,20 @@ def process_raw_code(lines):
 def create_file(file_path, content):
     """Create file with given content"""
     try:
-        # Treat paths starting with '/' as relative to current working directory
+        # Handle absolute paths
         if file_path.startswith('/'):
-            file_path = file_path[1:]  # Remove leading slash
+            # First check if file exists as absolute path within working directory
+            rel_path = file_path[1:]  # Remove leading slash
+            if Path(rel_path).exists():
+                file_path = rel_path
+            else:
+                # Try using absolute path if file exists
+                abs_path = Path(file_path)
+                if abs_path.exists():
+                    file_path = str(abs_path)
+                else:
+                    # Default to relative path if file doesn't exist
+                    file_path = rel_path
         
         # Create directory if it doesn't exist
         path_obj = Path(file_path)
