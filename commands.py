@@ -123,7 +123,10 @@ def handle_add_command(args):
                 print(f"No files found matching pattern: {pattern}")
                 continue
             for file_path in files:
-                add_file_to_prompt(file_path)
+                if Path(file_path).is_file():
+                    add_file_to_prompt(file_path)
+                else:
+                    print(f"Skipping directory: {file_path}")
     else:
         print("Usage: python3 minicmd.py add <file> [<file2> ...]")
         sys.exit(1)
