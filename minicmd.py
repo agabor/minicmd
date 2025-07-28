@@ -187,6 +187,10 @@ def process_raw_code(lines):
 def create_file(file_path, content):
     """Create file with given content"""
     try:
+        # Treat paths starting with '/' as relative to current working directory
+        if file_path.startswith('/'):
+            file_path = file_path[1:]  # Remove leading slash
+        
         # Create directory if it doesn't exist
         path_obj = Path(file_path)
         path_obj.parent.mkdir(parents=True, exist_ok=True)
