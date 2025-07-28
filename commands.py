@@ -7,7 +7,7 @@ from api_clients import call_claude, call_ollama
 from file_processor import process_code_blocks
 from prompt_manager import edit_prompt_file, add_file_to_prompt, get_prompt_from_file
 
-def handle_run_command(args, claude_flag, ollama_flag):
+def handle_run_command(args, claude_flag, ollama_flag, verbose):
     """Handle run command with optional prompt content parameter"""
     # Check for conflicting provider options
     if claude_flag and ollama_flag:
@@ -43,8 +43,9 @@ def handle_run_command(args, claude_flag, ollama_flag):
         print(f"Model: {config['ollama_model']}")
         response = call_ollama(prompt, config)
     
-    print(f"Prompt: {prompt}")
-    print("---")
+    if verbose:
+        print(f"Prompt: {prompt}")
+        print("---")
     
     if response is None:
         print(f"Error: No response from {provider.title()} API")
@@ -55,11 +56,12 @@ def handle_run_command(args, claude_flag, ollama_flag):
         sys.exit(1)
     
     # Echo the response to see what we got
-    print("Raw response:")
-    print("==============")
-    print(response)
-    print("==============")
-    print()
+    if verbose:
+        print("Raw response:")
+        print("==============")
+        print(response)
+        print("==============")
+        print()
     
     # Process the response and create files
     print("Processing response...")
