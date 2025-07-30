@@ -1,3 +1,7 @@
 pip install requests
 pip install anthropic
-echo "export PATH=\"$(pwd):\$PATH"\" >> ~/.zshrc
+if [ -n "$ZSH_VERSION" ]; then
+    echo "export PATH=\"$(pwd):\$PATH\"" >> ~/.zshrc
+elif [ -n "$BASH_VERSION" ]; then
+    echo "export PATH=\"$(pwd):\$PATH\"" >> ~/.bashrc
+fi
