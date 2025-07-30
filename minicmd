@@ -12,10 +12,15 @@ def main():
     parser.add_argument('--deepseek', action='store_true', help='Use DeepSeek API')
     parser.add_argument('--help', '-h', action='store_true', help='Show help message')
     parser.add_argument('--verbose', '-v', action='store_true', help='Print verbose output')
+    parser.add_argument('--debug', '-d', action='store_true', help='Print debug output (includes verbose and raw API response)')
     parser.add_argument('command', nargs='?', help='Command to execute')
     parser.add_argument('args', nargs='*', help='Command arguments')
     
     args = parser.parse_args()
+    
+    # Debug mode implies verbose mode
+    if args.debug:
+        args.verbose = True
     
     if args.help or (args.command == "help") or (args.command is None):
         show_help()
@@ -35,7 +40,7 @@ def main():
         return
     
     if args.command == "run":
-        handle_run_command(args.args, args.claude, args.ollama, args.deepseek, args.verbose)
+        handle_run_command(args.args, args.claude, args.ollama, args.deepseek, args.verbose, args.debug)
         return
 
     if args.command == "clear":

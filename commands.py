@@ -19,7 +19,7 @@ def show_progress():
         idx += 1
         time.sleep(0.1)
 
-def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose):
+def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose, debug):
     """Handle run command with optional prompt content parameter"""
     # Check for conflicting provider options
     provider_flags = [claude_flag, ollama_flag, deepseek_flag]
@@ -71,11 +71,11 @@ def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose):
     
     try:
         if provider == "claude":
-            response = call_claude(resolved_prompt, config)
+            response, raw_response = call_claude(resolved_prompt, config, debug)
         elif provider == "deepseek":
-            response = call_deepseek(resolved_prompt, config)
+            response, raw_response = call_deepseek(resolved_prompt, config, debug)
         else:
-            response = call_ollama(resolved_prompt, config)
+            response, raw_response = call_ollama(resolved_prompt, config, debug)
     finally:
         # Clear progress indicator
         print("\r ", end="", flush=True)
@@ -95,6 +95,14 @@ def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose):
         print("==============")
         print(response)
         print("==============")
+        print()
+    
+    # In debug mode, also show the complete API response as JSON
+    if debug and raw_response is not None:
+        print("Complete API response (JSON):")
+        print("=============================")
+        print(raw_response)
+        print("=============================")
         print()
     
     # Process the response and create files
