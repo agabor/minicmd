@@ -85,13 +85,8 @@ def get_prompt_from_file():
         print(f"Error reading prompt file: {e}")
         sys.exit(1)
 
-def get_resolved_prompt_from_file():
-    """Read prompt from file and resolve all file references"""
-    content = get_prompt_from_file()
-    return resolve_file_references(content)
-
-def resolve_file_references(content):
-    """Read attachments.json and add file contents to the beginning of the prompt"""
+def get_attachments():
+    """Get attachment file contents as a list of strings"""
     attachments_file = Path.home() / ".minicmd" / "attachments.json"
     
     # Read attachments
@@ -103,7 +98,7 @@ def resolve_file_references(content):
         except (json.JSONDecodeError, IOError):
             attachments = []
     
-    # Build file contents section
+    # Build file contents list
     file_contents = []
     
     for file_path in attachments:
@@ -123,8 +118,4 @@ def resolve_file_references(content):
         except IOError as e:
             file_contents.append(f"// {file_path}\n// Error reading file: {e}")
     
-    # Combine file contents with original prompt
-    if file_contents:
-        return "\n\n".join(file_contents) + "\n\n" + content
-    else:
-        return content
+    return file_contents

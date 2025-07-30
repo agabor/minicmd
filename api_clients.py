@@ -5,13 +5,18 @@ import json
 import time
 from config import SYSTEM_PROMPT
 
-def call_ollama(user_prompt, config, debug=False):
+def call_ollama(user_prompt, config, debug=False, attachments=None):
     """Make API call to Ollama"""
     start_time = time.time()
     
+    # For Ollama, combine attachments with user prompt as it doesn't support multiple messages
+    full_prompt = user_prompt
+    if attachments:
+        full_prompt = "\n\n".join(attachments) + "\n\n" + user_prompt
+    
     payload = {
         "model": config["ollama_model"],
-        "prompt": user_prompt,
+        "prompt": full_prompt,
         "system": SYSTEM_PROMPT,
         "stream": False
     }
@@ -33,7 +38,7 @@ def call_ollama(user_prompt, config, debug=False):
         print(f"Error parsing JSON response: {e}")
         return None, None
 
-def call_claude(user_prompt, config, debug=False):
+def call_claude(user_prompt, config, debug=False, attachments=None):
     """Make API call to Claude"""
     if not config["anthropic_api_key"]:
         print("Error: Claude API key not configured.")
@@ -52,13 +57,22 @@ def call_claude(user_prompt, config, debug=False):
     try:
         client = anthropic.Anthropic(api_key=config["anthropic_api_key"])
         
+        # Build messages array
+        messages = []
+        
+        # Add attachment files as separate messages
+        if attachments:
+            for attachment in attachments:
+                messages.append({"role": "user", "content": attachment})
+        
+        # Add main user prompt
+        messages.append({"role": "user", "content": user_prompt})
+        
         response = client.messages.create(
             model=config["claude_model"],
             max_tokens=4000,
             system=SYSTEM_PROMPT,
-            messages=[
-                {"role": "user", "content": user_prompt}
-            ]
+            messages=messages
         )
         
         end_time = time.time()
@@ -75,7 +89,7 @@ def call_claude(user_prompt, config, debug=False):
         print(f"Error calling Claude API: {e}")
         return None, None
 
-def call_deepseek(user_prompt, config, debug=False):
+def call_deepseek(user_prompt, config, debug=False, attachments=None):
     """Make API call to DeepSeek"""
     if not config["deepseek_api_key"]:
         print("Error: DeepSeek API key not configured.")
@@ -89,12 +103,22 @@ def call_deepseek(user_prompt, config, debug=False):
         "Content-Type": "application/json"
     }
     
+    # Build messages array
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT}
+    ]
+    
+    # Add attachment files as separate messages
+    if attachments:
+        for attachment in attachments:
+            messages.append({"role": "user", "content": attachment})
+    
+    # Add main user prompt
+    messages.append({"role": "user", "content": user_prompt})
+    
     payload = {
         "model": config["deepseek_model"],
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_prompt}
-        ],
+        "messages": messages,
         "max_tokens": 4000,
         "temperature": 0.1,
         "stream": False

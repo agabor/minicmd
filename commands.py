@@ -9,7 +9,7 @@ from glob import glob
 from config import load_config, save_config
 from api_clients import call_claude, call_ollama, call_deepseek
 from file_processor import process_code_blocks
-from prompt_manager import edit_prompt_file, add_file_to_prompt, get_prompt_from_file, get_resolved_prompt_from_file
+from prompt_manager import edit_prompt_file, add_file_to_prompt, get_prompt_from_file, get_attachments
 
 def show_progress():
     """Show a simple progress indicator"""
@@ -45,13 +45,11 @@ def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose, d
     if len(args) > 0:
         # Use provided prompt content directly
         prompt = " ".join(args)
-        resolved_prompt = prompt
         print("Using provided prompt content")
     else:
         # Use default prompt file
         edit_prompt_file()
         prompt = get_prompt_from_file()
-        resolved_prompt = get_resolved_prompt_from_file()
         print("Using default prompt file")
     
     if verbose:
@@ -72,11 +70,11 @@ def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose, d
     
     try:
         if provider == "claude":
-            response, raw_response = call_claude(resolved_prompt, config, debug)
+            response, raw_response = call_claude(prompt, config, debug, get_attachments())
         elif provider == "deepseek":
-            response, raw_response = call_deepseek(resolved_prompt, config, debug)
+            response, raw_response = call_deepseek(prompt, config, debug, get_attachments())
         else:
-            response, raw_response = call_ollama(resolved_prompt, config, debug)
+            response, raw_response = call_ollama(prompt, config, debug, get_attachments())
     finally:
         # Clear progress indicator
         print("\r ", end="", flush=True)
