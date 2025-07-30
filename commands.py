@@ -1,12 +1,23 @@
 #!/usr/bin/env python3
 
 import sys
+import time
+import threading
 from pathlib import Path
 from glob import glob
 from config import load_config, save_config
 from api_clients import call_claude, call_ollama, call_deepseek
 from file_processor import process_code_blocks
 from prompt_manager import edit_prompt_file, add_file_to_prompt, get_prompt_from_file, get_resolved_prompt_from_file
+
+def show_progress():
+    """Show a simple progress indicator"""
+    chars = "|/-\\"
+    idx = 0
+    while True:
+        print(f"\r{chars[idx % len(chars)]}", end="", flush=True)
+        idx += 1
+        time.sleep(0.1)
 
 def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose):
     """Handle run command with optional prompt content parameter"""
@@ -49,13 +60,26 @@ def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose):
     print(f"Sending request to {provider.title()}...")
     if provider == "claude":
         print(f"Model: {config['claude_model']}")
-        response = call_claude(resolved_prompt, config)
     elif provider == "deepseek":
         print(f"Model: {config['deepseek_model']}")
-        response = call_deepseek(resolved_prompt, config)
     else:
         print(f"Model: {config['ollama_model']}")
-        response = call_ollama(resolved_prompt, config)
+    
+    # Start progress indicator
+    progress_thread = threading.Thread(target=show_progress, daemon=True)
+    progress_thread.start()
+    
+    try:
+        if provider == "claude":
+            response = call_claude(resolved_prompt, config)
+        elif provider == "deepseek":
+            response = call_deepseek(resolved_prompt, config)
+        else:
+            response = call_ollama(resolved_prompt, config)
+    finally:
+        # Clear progress indicator
+        print("\r ", end="", flush=True)
+        print("\r", end="", flush=True)
     
     if response is None:
         print(f"Error: No response from {provider.title()} API")
