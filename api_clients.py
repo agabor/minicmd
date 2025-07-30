@@ -62,6 +62,7 @@ def call_claude(user_prompt, config):
         
         end_time = time.time()
         print(f"Claude API call took {end_time - start_time:.2f} seconds")
+        print(f"Token usage - Input: {response.usage.input_tokens}, Output: {response.usage.output_tokens}")
         
         return response.content[0].text
     except Exception as e:
@@ -100,6 +101,7 @@ def call_deepseek(user_prompt, config):
         
         end_time = time.time()
         print(f"DeepSeek API call took {end_time - start_time:.2f} seconds")
+        print(f"Token usage - Total: {data['usage']['total_tokens']}")
         
         if 'choices' in data and len(data['choices']) > 0:
             return data['choices'][0]['message']['content']
