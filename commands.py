@@ -12,7 +12,7 @@ from prompt_manager import edit_prompt_file, add_file_to_prompt, get_prompt_from
 
 def show_progress():
     """Show a simple progress indicator"""
-    chars = "|/-\\"
+    chars = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
     idx = 0
     while True:
         print(f"\r{chars[idx % len(chars)]}", end="", flush=True)
