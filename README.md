@@ -63,22 +63,10 @@ Configuration is stored in `~/.minicmd/config` and includes:
 - `deepseek_url` - DeepSeek API URL
 - `deepseek_model` - DeepSeek model name
 
-## Dependencies
 
-- `requests` - For HTTP API calls
-- `anthropic` - For Claude API (optional, only needed if using Claude)
+## Install
 
-Install dependencies:
 ```bash
-pip install requests
-pip install anthropic  # Only if using Claude
+chmod +x install.sh
+./install.sh
 ```
-
-## Migration from Original
-
-The new modular structure maintains full backward compatibility. You can:
-
-1. Continue using `python3 minicmd.py` (original version)
-2. Switch to `python3 minicmd.py` (new modular version)
-
-Both versions provide identical functionality.
