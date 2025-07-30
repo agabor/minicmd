@@ -8,6 +8,7 @@ def show_help():
     print("  python3 minicmd.py run [prompt_content] [--claude|--ollama|--deepseek]  # Generate code with optional custom prompt content")
     print("  python3 minicmd.py edit                      # Edit the prompt file")
     print("  python3 minicmd.py add <file>                # Add file reference to prompt")
+    print("  python3 minicmd.py list                      # List current attachments")
     print("  python3 minicmd.py config                    # Show current configuration")
     print("  python3 minicmd.py config <key> <value>      # Set configuration value")
     print()
@@ -35,3 +36,4 @@ def show_help():
     print("  python3 minicmd.py run \"create a hello world function\"")
     print("  python3 minicmd.py run \"write a Python calculator\" --deepseek")
     print("  python3 minicmd.py add minicmd.py")
+    print("  python3 minicmd.py list")

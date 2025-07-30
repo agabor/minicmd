@@ -2,7 +2,7 @@
 
 import sys
 import argparse
-from commands import handle_run_command, handle_config_command, handle_edit_command, handle_add_command, handle_clear_command
+from commands import handle_run_command, handle_config_command, handle_edit_command, handle_add_command, handle_list_command, handle_clear_command
 from help import show_help
 
 def main():
@@ -33,6 +33,10 @@ def main():
     
     if args.command == "add":
         handle_add_command(args.args)
+        return
+    
+    if args.command == "list":
+        handle_list_command()
         return
     
     if args.command == "config":
