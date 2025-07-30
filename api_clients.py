@@ -63,12 +63,12 @@ def call_claude(user_prompt, config, debug=False):
         
         end_time = time.time()
         print(f"Claude API call took {end_time - start_time:.2f} seconds")
-        print(f"Token usage - Input: {response.usage.input_tokens}, Output: {response.usage.output_tokens}")
+        print(f"Token usage - Input: {response.usage.input_tokens}, Output: {response.usage.output_tokens}, Cache Create: {response.usage.cache_creation_input_tokens}, Cache Read: {response.usage.cache_read_input_tokens}")
         
         # For debug mode, convert the response object to a JSON-serializable format
         raw_response = None
         if debug:
-            raw_response = json.dumps(response, indent=2)
+            raw_response = vars(response)
         
         return response.content[0].text, raw_response
     except Exception as e:
@@ -107,7 +107,7 @@ def call_deepseek(user_prompt, config, debug=False):
         
         end_time = time.time()
         print(f"DeepSeek API call took {end_time - start_time:.2f} seconds")
-        print(f"Token usage - Total: {data['usage']['total_tokens']}")
+        print(f"Token usage - Input: {data['usage']['prompt_tokens']}, Output: {data['usage']['completion_tokens']}, Cached: {data['usage']['prompt_tokens_details']['cached_tokens']}")
         
         raw_response = json.dumps(data, indent=2) if debug else None
         
