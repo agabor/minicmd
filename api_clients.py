@@ -57,22 +57,22 @@ def call_claude(user_prompt, config, debug=False, attachments=None):
     try:
         client = anthropic.Anthropic(api_key=config["anthropic_api_key"])
         
-        # Build messages array
-        messages = []
+        # Build content array
+        content = []
         
         # Add attachment files as separate messages
         if attachments:
             for attachment in attachments:
-                messages.append({"role": "user", "content": attachment})
+                content.append({"type": "text", "text": attachment, "cache_control": {"type": "ephemeral"}})
         
         # Add main user prompt
-        messages.append({"role": "user", "content": user_prompt})
+        content.append({"type": "text", "text": user_prompt})
         
         response = client.messages.create(
             model=config["claude_model"],
             max_tokens=4000,
             system=SYSTEM_PROMPT,
-            messages=messages
+            messages=[{"role": "user", "content": content}]
         )
         
         end_time = time.time()
