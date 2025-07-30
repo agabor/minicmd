@@ -82,6 +82,8 @@ def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose, d
         print("\r ", end="", flush=True)
         print("\r", end="", flush=True)
     
+    handle_clear_command()
+
     if response is None:
         print(f"Error: No response from {provider.title()} API")
         sys.exit(1)
@@ -109,7 +111,7 @@ def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose, d
     # Process the response and create files
     print("Processing response...")
     process_code_blocks(response)
-    
+     
     print("Done!")
 
 def handle_config_command(args):
