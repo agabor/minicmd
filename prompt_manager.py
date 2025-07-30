@@ -2,6 +2,7 @@
 
 import re
 import sys
+import json
 import subprocess
 from pathlib import Path
 
@@ -28,41 +29,37 @@ def edit_prompt_file():
         sys.exit(1)
 
 def add_file_to_prompt(file_path):
-    """Add a file reference to the prompt file"""
-    prompt_file = Path.home() / ".minicmd" / "prompt"
+    """Add a file reference to attachments.json"""
+    attachments_file = Path.home() / ".minicmd" / "attachments.json"
     
     # Create directory if it doesn't exist
-    prompt_file.parent.mkdir(parents=True, exist_ok=True)
+    attachments_file.parent.mkdir(parents=True, exist_ok=True)
     
-    # Create empty file if it doesn't exist
-    if not prompt_file.exists():
-        prompt_file.touch()
+    # Load existing attachments
+    attachments = []
+    if attachments_file.exists():
+        try:
+            with open(attachments_file, 'r', encoding='utf-8') as f:
+                attachments = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            attachments = []
     
-    # Add the file reference
-    file_reference = f"[[ {file_path} ]]"
-    
-    try:
-        # Read existing content
-        existing_content = ""
-        if prompt_file.exists():
-            with open(prompt_file, 'r', encoding='utf-8') as f:
-                existing_content = f.read().rstrip()
+    # Add file if not already present
+    if file_path not in attachments:
+        attachments.append(file_path)
         
-        # Append the file reference
-        if existing_content:
-            new_content = existing_content + "\n" + file_reference
-        else:
-            new_content = file_reference
-        
-        # Write back to file
-        with open(prompt_file, 'w', encoding='utf-8') as f:
-            f.write(new_content + "\n")
-        
-        print(f"Added file reference to prompt: {file_reference}")
-        
-    except IOError as e:
-        print(f"Error updating prompt file: {e}")
-        sys.exit(1)
+        # Save updated attachments
+        try:
+            with open(attachments_file, 'w', encoding='utf-8') as f:
+                json.dump(attachments, f, indent=2)
+            
+            print(f"Added file to attachments: {file_path}")
+            
+        except IOError as e:
+            print(f"Error updating attachments file: {e}")
+            sys.exit(1)
+    else:
+        print(f"File already in attachments: {file_path}")
 
 def get_prompt_from_file():
     """Read raw prompt from the prompt file without resolving references"""
@@ -94,26 +91,40 @@ def get_resolved_prompt_from_file():
     return resolve_file_references(content)
 
 def resolve_file_references(content):
-    """Resolve [[ file_path ]] references in the content"""
-    def replace_file_reference(match):
-        file_path = match.group(1).strip()
+    """Read attachments.json and add file contents to the beginning of the prompt"""
+    attachments_file = Path.home() / ".minicmd" / "attachments.json"
+    
+    # Read attachments
+    attachments = []
+    if attachments_file.exists():
+        try:
+            with open(attachments_file, 'r', encoding='utf-8') as f:
+                attachments = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            attachments = []
+    
+    # Build file contents section
+    file_contents = []
+    
+    for file_path in attachments:
         try:
             # Check if file exists
             if not Path(file_path).exists():
-                return f"// {file_path}\n// Error: File not found"
+                file_contents.append(f"// {file_path}\n// Error: File not found")
+                continue
             
             # Read file content
             with open(file_path, 'r', encoding='utf-8') as f:
                 file_content = f.read().rstrip()
             
-            # Return formatted content
-            return f"// {file_path}\n{file_content}"
+            # Add formatted content
+            file_contents.append(f"// {file_path}\n{file_content}")
             
         except IOError as e:
-            return f"// {file_path}\n// Error reading file: {e}"
+            file_contents.append(f"// {file_path}\n// Error reading file: {e}")
     
-    # Replace all [[ file_path ]] patterns
-    pattern = r'\[\[\s*([^\]]+)\s*\]\]'
-    resolved = re.sub(pattern, replace_file_reference, content)
-    
-    return resolved
+    # Combine file contents with original prompt
+    if file_contents:
+        return "\n\n".join(file_contents) + "\n\n" + content
+    else:
+        return content
