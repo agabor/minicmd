@@ -19,6 +19,8 @@ def extract_filename_from_comment(line):
         match = re.match(pattern, line)
         if match:
             filename = match.group(1).strip()
+            if "!" in filename:
+                continue
             # Remove any trailing comment markers
             filename = re.sub(r'\s*\*+/$', '', filename)
             return filename
@@ -59,8 +61,7 @@ def process_markdown_blocks(lines):
                 if extracted_path:
                     file_path = extracted_path
                     continue
-            else:
-                content_lines.append(line)
+            content_lines.append(line)
 
 def process_raw_code(lines):
     """Process raw code (no markdown blocks)"""
