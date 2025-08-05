@@ -6,7 +6,7 @@ import threading
 import json
 from pathlib import Path
 from glob import glob
-from config import load_config, save_config
+from config import load_config, save_config, SYSTEM_PROMPT
 from api_clients import call_claude, call_ollama, call_deepseek
 from file_processor import process_code_blocks
 from prompt_manager import edit_prompt_file, add_file_to_prompt, get_prompt_from_file, get_attachments
@@ -70,11 +70,11 @@ def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose, d
     
     try:
         if provider == "claude":
-            response, raw_response = call_claude(prompt, config, debug, get_attachments())
+            response, raw_response = call_claude(prompt, config, SYSTEM_PROMPT, debug, get_attachments())
         elif provider == "deepseek":
-            response, raw_response = call_deepseek(prompt, config, debug, get_attachments())
+            response, raw_response = call_deepseek(prompt, config, SYSTEM_PROMPT, debug, get_attachments())
         else:
-            response, raw_response = call_ollama(prompt, config, debug, get_attachments())
+            response, raw_response = call_ollama(prompt, config, SYSTEM_PROMPT, debug, get_attachments())
     finally:
         # Clear progress indicator
         print("\r ", end="", flush=True)

@@ -2,9 +2,8 @@
 import requests
 import json
 import time
-from config import SYSTEM_PROMPT
 
-def call_ollama(user_prompt, config, debug=False, attachments=None):
+def call_ollama(user_prompt, config, system_prompt, debug=False, attachments=None):
     """Make API call to Ollama"""
     start_time = time.time()
     
@@ -16,7 +15,7 @@ def call_ollama(user_prompt, config, debug=False, attachments=None):
     payload = {
         "model": config["ollama_model"],
         "prompt": full_prompt,
-        "system": SYSTEM_PROMPT,
+        "system": system_prompt,
         "stream": False
     }
     

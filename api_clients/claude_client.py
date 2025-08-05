@@ -1,7 +1,7 @@
 
 import time
 
-def call_claude(user_prompt, config, debug=False, attachments=None):
+def call_claude(user_prompt, config, system_prompt, debug=False, attachments=None):
     """Make API call to Claude"""
     if not config["anthropic_api_key"]:
         print("Error: Claude API key not configured.")
@@ -34,7 +34,7 @@ def call_claude(user_prompt, config, debug=False, attachments=None):
         response = client.messages.create(
             model=config["claude_model"],
             max_tokens=4000,
-            system=SYSTEM_PROMPT,
+            system=system_prompt,
             messages=[{"role": "user", "content": content}]
         )
         

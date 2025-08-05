@@ -2,9 +2,8 @@
 import requests
 import json
 import time
-from config import SYSTEM_PROMPT
 
-def call_deepseek(user_prompt, config, debug=False, attachments=None):
+def call_deepseek(user_prompt, config, system_prompt, debug=False, attachments=None):
     """Make API call to DeepSeek"""
     if not config["deepseek_api_key"]:
         print("Error: DeepSeek API key not configured.")
@@ -20,7 +19,7 @@ def call_deepseek(user_prompt, config, debug=False, attachments=None):
     
     # Build messages array
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT}
+        {"role": "system", "content": system_prompt}
     ]
     
     # Add attachment files as separate messages
