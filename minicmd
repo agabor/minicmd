@@ -13,6 +13,7 @@ def main():
     parser.add_argument('--help', '-h', action='store_true', help='Show help message')
     parser.add_argument('--verbose', '-v', action='store_true', help='Print verbose output')
     parser.add_argument('--debug', '-d', action='store_true', help='Print debug output (includes verbose and raw API response)')
+    parser.add_argument('--safe', '-s', action='store_true', help='Add .new suffix to generated files')
     parser.add_argument('command', nargs='?', help='Command to execute')
     parser.add_argument('args', nargs='*', help='Command arguments')
     
@@ -44,7 +45,7 @@ def main():
         return
     
     if args.command == "run":
-        handle_run_command(args.args, args.claude, args.ollama, args.deepseek, args.verbose, args.debug)
+        handle_run_command(args.args, args.claude, args.ollama, args.deepseek, args.verbose, args.debug, args.safe)
         return
 
     if args.command == "clear":

@@ -26,17 +26,13 @@ def extract_filename_from_comment(line):
             return filename
     return None
 
-def process_code_blocks(response):
+def process_code_blocks(response, safe=False):
     """Extract code blocks and create files"""
     lines = response.split('\n')
     
-    # Check if response has markdown code blocks
-    if '```' in response:
-        process_markdown_blocks(lines)
-    else:
-        process_raw_code(lines)
+    process_markdown_blocks(lines, safe)
 
-def process_markdown_blocks(lines):
+def process_markdown_blocks(lines, safe):
     """Process markdown code blocks"""
     in_code_block = False
     file_path = ""
@@ -47,7 +43,7 @@ def process_markdown_blocks(lines):
             if in_code_block:
                 # End of code block - create file
                 if file_path and content_lines:
-                    create_file(file_path, '\n'.join(content_lines))
+                    create_file(file_path + '.new' if safe else file_path, '\n'.join(content_lines))
                 in_code_block = False
                 file_path = ""
                 content_lines = []
@@ -62,28 +58,6 @@ def process_markdown_blocks(lines):
                     file_path = extracted_path
                     continue
             content_lines.append(line)
-
-def process_raw_code(lines):
-    """Process raw code (no markdown blocks)"""
-    file_path = ""
-    content_lines = []
-    
-    for i, line in enumerate(lines):
-        if i == 0 or not file_path:
-            # Check if this line contains the filename
-            extracted_path = extract_filename_from_comment(line)
-            if extracted_path:
-                file_path = extracted_path
-                continue
-        
-        # Add all other lines to content
-        content_lines.append(line)
-    
-    if file_path and content_lines:
-        # Remove empty lines from the end
-        while content_lines and not content_lines[-1].strip():
-            content_lines.pop()
-        create_file(file_path, '\n'.join(content_lines))
 
 def create_file(file_path, content):
     """Create file with given content"""

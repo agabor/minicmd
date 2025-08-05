@@ -20,7 +20,7 @@ def show_progress():
         idx += 1
         time.sleep(0.1)
 
-def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose, debug):
+def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose, debug, safe):
     """Handle run command with optional prompt content parameter"""
     # Check for conflicting provider options
     provider_flags = [claude_flag, ollama_flag, deepseek_flag]
@@ -108,7 +108,7 @@ def handle_run_command(args, claude_flag, ollama_flag, deepseek_flag, verbose, d
     
     # Process the response and create files
     print("Processing response...")
-    process_code_blocks(response)
+    process_code_blocks(response, safe)
      
     print("Done!")
 
