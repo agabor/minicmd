@@ -12,7 +12,7 @@ DEEPSEEK_MODEL = "deepseek-coder"
 SYSTEM_PROMPT = "IMPORTANT: answer with one or more code blocks only without explanation. The first line should be a comment containing the file path and name. " \
 "When updating an existing source file, leave comments, identation and white spaces unchanged. Always respond with the complete file content. " \
 "Code blocks should always be delimited by triple backticks (```). Do not use any other formatting or text outside of code blocks. " \
-"Each file content should be placed in a separate code block. If you need to delete or rename a file return a bash script named minicmd_run.sh with the necesarry rm and mv commands."
+"Each file content should be placed in a separate code block. If you need to delete a file return a bash script named minicmd_rm.sh with the necesarry rm commands."
 CONFIG_DIR = Path.home() / ".minicmd"
 CONFIG_FILE = CONFIG_DIR / "config"
 
