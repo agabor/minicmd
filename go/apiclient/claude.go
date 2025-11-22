@@ -20,16 +20,12 @@ func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, debu
 
 	client := anthropic.NewClient(option.WithAPIKey(cfg.AnthropicAPIKey))
 
-	// Build content array
-	var content []anthropic.MessageParamContentUnion
-
-	// Add attachment files as separate messages with cache control
-	for _, attachment := range attachments {
-		content = append(content, anthropic.NewTextBlock(attachment, anthropic.EphemeralCacheControlParam()))
+	// Build content array - combine attachments and prompt
+	fullPrompt := userPrompt
+	if len(attachments) > 0 {
+		parts := append(attachments, userPrompt)
+		fullPrompt = joinStrings(parts, "\n\n")
 	}
-
-	// Add main user prompt
-	content = append(content, anthropic.NewTextBlock(userPrompt))
 
 	// Create message
 	message, err := client.Messages.New(context.Background(), anthropic.MessageNewParams{
@@ -39,7 +35,7 @@ func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, debu
 			anthropic.NewTextBlock(systemPrompt),
 		}),
 		Messages: anthropic.F([]anthropic.MessageParam{
-			anthropic.NewUserMessage(content...),
+			anthropic.NewUserMessage(anthropic.NewTextBlock(fullPrompt)),
 		}),
 	})
 
@@ -49,18 +45,14 @@ func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, debu
 
 	duration := time.Since(startTime)
 	fmt.Printf("Claude API call took %.2f seconds\n", duration.Seconds())
-	fmt.Printf("Token usage - Input: %d, Output: %d, Cache Create: %d, Cache Read: %d\n",
+	fmt.Printf("Token usage - Input: %d, Output: %d\n",
 		message.Usage.InputTokens,
-		message.Usage.OutputTokens,
-		message.Usage.CacheCreationInputTokens,
-		message.Usage.CacheReadInputTokens)
+		message.Usage.OutputTokens)
 
 	// Extract text from response
 	var responseText string
 	for _, block := range message.Content {
-		if textBlock, ok := block.AsUnion().(anthropic.ContentBlockText); ok {
-			responseText += textBlock.Text
-		}
+		responseText += block.Text
 	}
 
 	rawResponse := ""
@@ -69,4 +61,15 @@ func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, debu
 	}
 
 	return responseText, rawResponse, nil
+}
+
+func joinStrings(strs []string, sep string) string {
+	if len(strs) == 0 {
+		return ""
+	}
+	result := strs[0]
+	for i := 1; i < len(strs); i++ {
+		result += sep + strs[i]
+	}
+	return result
 }
