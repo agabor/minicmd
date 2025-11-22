@@ -1,0 +1,119 @@
+package fileprocessor
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
+)
+
+func extractFilenameFromComment(line string) string {
+	patterns := []string{
+		`^\s*//\s*(.+?)(?:\s*//.*)?$`,     // // filename
+		`^\s*#\s*(.+?)(?:\s*#.*)?$`,       // # filename
+		`^\s*#\s*//\s*(.+?)(?:\s*#.*)?$`,  // # // filename
+		`^\s*/\*\s*(.+?)\s*\*/$`,          // /* filename */
+		`^\s*--\s*(.+?)(?:\s*--.*)?$`,     // -- filename (SQL)
+		`^\s*<!--\s*(.+?)\s*-->$`,         // <!-- filename --> (HTML)
+	}
+
+	for _, pattern := range patterns {
+		re := regexp.MustCompile(pattern)
+		matches := re.FindStringSubmatch(line)
+		if len(matches) > 1 {
+			filename := strings.TrimSpace(matches[1])
+			if strings.Contains(filename, "!") {
+				continue
+			}
+			// Remove any trailing comment markers
+			filename = regexp.MustCompile(`\s*\*+/$`).ReplaceAllString(filename, "")
+			return filename
+		}
+	}
+	return ""
+}
+
+func createFile(filePath, content string) error {
+	// Handle absolute paths
+	if strings.HasPrefix(filePath, "/") {
+		// First check if file exists as absolute path within working directory
+		relPath := filePath[1:] // Remove leading slash
+		if _, err := os.Stat(relPath); err == nil {
+			filePath = relPath
+		} else {
+			// Try using absolute path if file exists
+			if _, err := os.Stat(filePath); err == nil {
+				// Use absolute path
+			} else {
+				// Default to relative path if file doesn't exist
+				filePath = relPath
+			}
+		}
+	}
+
+	// Create directory if it doesn't exist
+	dir := filepath.Dir(filePath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("error creating directory %s: %w", dir, err)
+	}
+
+	// Write content to file
+	if !strings.HasSuffix(content, "\n") && content != "" {
+		content += "\n"
+	}
+
+	if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
+		return fmt.Errorf("error writing file %s: %w", filePath, err)
+	}
+
+	fmt.Printf("Created/Updated: %s\n", filePath)
+	return nil
+}
+
+func processMarkdownBlocks(lines []string, safe bool) error {
+	inCodeBlock := false
+	filePath := ""
+	var contentLines []string
+
+	for _, line := range lines {
+		if strings.Contains(line, "```") {
+			if inCodeBlock {
+				// End of code block - create file
+				if filePath != "" && len(contentLines) > 0 {
+					content := strings.Join(contentLines, "\n")
+					finalPath := filePath
+					if safe {
+						finalPath += ".new"
+					}
+					if err := createFile(finalPath, content); err != nil {
+						return err
+					}
+				}
+				inCodeBlock = false
+				filePath = ""
+				contentLines = nil
+			} else {
+				// Start of code block
+				inCodeBlock = true
+			}
+		} else if inCodeBlock {
+			if filePath == "" {
+				// Check if this line contains the filename
+				extractedPath := extractFilenameFromComment(line)
+				if extractedPath != "" {
+					filePath = extractedPath
+					continue
+				}
+			}
+			contentLines = append(contentLines, line)
+		}
+	}
+
+	return nil
+}
+
+func ProcessCodeBlocks(response string, safe bool) error {
+	lines := strings.Split(response, "\n")
+	return processMarkdownBlocks(lines, safe)
+}
