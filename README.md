@@ -64,7 +64,7 @@ minicmd run "create a hello world function"
 minicmd edit
 
 # Add files to context
-minicmd add file.go
+minicmd read file.go
 
 # List attachments
 minicmd list

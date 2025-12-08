@@ -45,7 +45,7 @@ func main() {
 	switch command {
 	case "edit":
 		err = commands.HandleEditCommand()
-	case "add":
+	case "read":
 		err = commands.HandleAddCommand(commandArgs)
 	case "list":
 		err = commands.HandleListCommand()

@@ -243,7 +243,7 @@ func HandleEditCommand() error {
 
 func HandleAddCommand(args []string) error {
 	if len(args) < 1 {
-		fmt.Println("Usage: minicmd add <file> [<file2> ...]")
+		fmt.Println("Usage: minicmd read <file> [<file2> ...]")
 		return fmt.Errorf("missing file argument")
 	}
 
@@ -293,7 +293,7 @@ func ShowHelp() {
 	fmt.Println("Usage:")
 	fmt.Println("  minicmd run [prompt_content] [--claude|--ollama|--deepseek]  # Generate code with optional custom prompt content")
 	fmt.Println("  minicmd edit                      # Edit the prompt file")
-	fmt.Println("  minicmd add <file>                # Add file reference to prompt")
+	fmt.Println("  minicmd read <file>                # Add file reference to prompt")
 	fmt.Println("  minicmd list                      # List current attachments")
 	fmt.Println("  minicmd config                    # Show current configuration")
 	fmt.Println("  minicmd config <key> <value>      # Set configuration value")
@@ -327,6 +327,6 @@ func ShowHelp() {
 	fmt.Println("  minicmd run --verbose")
 	fmt.Println("  minicmd run --debug")
 	fmt.Println("  minicmd run --safe")
-	fmt.Println("  minicmd add minicmd.go")
+	fmt.Println("  minicmd read minicmd.go")
 	fmt.Println("  minicmd list")
 }
