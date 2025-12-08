@@ -29,6 +29,21 @@ func showProgress(done chan bool) {
 	}
 }
 
+func saveLastResponse(response string) error {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	
+	minicmdDir := filepath.Join(homeDir, ".minicmd")
+	if err := os.MkdirAll(minicmdDir, 0755); err != nil {
+		return err
+	}
+	
+	responseFile := filepath.Join(minicmdDir, "last_response")
+	return os.WriteFile(responseFile, []byte(response), 0644)
+}
+
 func HandleRunCommand(args []string, claudeFlag, ollamaFlag, deepseekFlag, verbose, debug, safe bool) error {
 	// Check for conflicting provider options
 	providerFlags := 0
@@ -136,6 +151,11 @@ func HandleRunCommand(args []string, claudeFlag, ollamaFlag, deepseekFlag, verbo
 
 	if strings.TrimSpace(response) == "" {
 		return fmt.Errorf("error: empty response from %s API", strings.Title(provider))
+	}
+
+	// Save the response to last_response file
+	if err := saveLastResponse(response); err != nil {
+		fmt.Printf("Warning: could not save response to last_response file: %v\n", err)
 	}
 
 	// Echo the response to see what we got
@@ -287,14 +307,35 @@ func HandleClearCommand() error {
 	return promptmanager.ClearPrompt()
 }
 
+func HandleShowLastCommand() error {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("error getting home directory: %w", err)
+	}
+	
+	responseFile := filepath.Join(homeDir, ".minicmd", "last_response")
+	content, err := os.ReadFile(responseFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return fmt.Errorf("no previous response found")
+		}
+		return fmt.Errorf("error reading last response: %w", err)
+	}
+	
+	fmt.Print(string(content))
+	return nil
+}
+
 func ShowHelp() {
 	fmt.Println("minicmd - AI-powered code generation tool")
 	fmt.Println()
 	fmt.Println("Usage:")
 	fmt.Println("  minicmd run [prompt_content] [--claude|--ollama|--deepseek]  # Generate code with optional custom prompt content")
 	fmt.Println("  minicmd edit                      # Edit the prompt file")
-	fmt.Println("  minicmd read <file>                # Add file reference to prompt")
+	fmt.Println("  minicmd read <file>               # Add file reference to prompt")
 	fmt.Println("  minicmd list                      # List current attachments")
+	fmt.Println("  minicmd clear                     # Clear prompt and attachments")
+	fmt.Println("  minicmd showlast                  # Show last AI response")
 	fmt.Println("  minicmd config                    # Show current configuration")
 	fmt.Println("  minicmd config <key> <value>      # Set configuration value")
 	fmt.Println()
@@ -329,4 +370,5 @@ func ShowHelp() {
 	fmt.Println("  minicmd run --safe")
 	fmt.Println("  minicmd read minicmd.go")
 	fmt.Println("  minicmd list")
+	fmt.Println("  minicmd showlast")
 }
