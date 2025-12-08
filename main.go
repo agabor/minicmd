@@ -55,6 +55,8 @@ func main() {
 		err = commands.HandleRunCommand(commandArgs, *claudeFlag, *ollamaFlag, *deepseekFlag, *verboseFlag, *debugFlag, *safeFlag)
 	case "clear":
 		err = commands.HandleClearCommand()
+	case "showlast":
+		err = commands.HandleShowLastCommand()
 	default:
 		fmt.Printf("Error: Unknown command '%s'\n", command)
 		fmt.Println("Run 'minicmd --help' for usage information.")
