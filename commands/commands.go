@@ -14,7 +14,7 @@ import (
 )
 
 func showProgress(done chan bool) {
-	chars := "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+	chars := []rune("⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏")
 	idx := 0
 	for {
 		select {
