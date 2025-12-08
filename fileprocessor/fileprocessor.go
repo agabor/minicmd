@@ -67,7 +67,7 @@ func createFile(filePath, content string) error {
 		return fmt.Errorf("error writing file %s: %w", filePath, err)
 	}
 
-	fmt.Printf("Created/Updated: %s\n", filePath)
+	fmt.Printf("Written: %s\n", filePath)
 	return nil
 }
 
