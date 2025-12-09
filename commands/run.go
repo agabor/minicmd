@@ -55,7 +55,7 @@ func getAPIClient(provider string) apiclient.APIClient {
 	}
 }
 
-func HandleRunCommand(args []string, provider string, safe bool, cfg *config.Config) error {
+func HandleRunCommand(args []string, provider string, safe bool, cfg *config.Config, systemPrompt string) error {
 	if provider == "" {
 		provider = cfg.DefaultProvider
 	}
@@ -68,10 +68,11 @@ func HandleRunCommand(args []string, provider string, safe bool, cfg *config.Con
 		if err := promptmanager.EditPromptFile(); err != nil {
 			return err
 		}
-		prompt, err := promptmanager.GetPromptFromFile()
+		promptContent, err := promptmanager.GetPromptFromFile()
 		if err != nil {
 			return err
 		}
+		prompt = promptContent
 		fmt.Println("Using default prompt file")
 	}
 
@@ -90,7 +91,7 @@ func HandleRunCommand(args []string, provider string, safe bool, cfg *config.Con
 	done := make(chan bool)
 	go showProgress(done)
 
-	response, err := client.Call(prompt, config.SystemPrompt, attachments)
+	response, err := client.Call(prompt, systemPrompt, attachments)
 
 	done <- true
 	close(done)

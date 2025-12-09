@@ -69,7 +69,9 @@ func main() {
 	case "config":
 		commandErr = commands.HandleConfigCommand(commandArgs, cfg)
 	case "run":
-		commandErr = commands.HandleRunCommand(commandArgs, provider, *safeFlag, cfg)
+		commandErr = commands.HandleRunCommand(commandArgs, provider, *safeFlag, cfg, config.SystemPrompt)
+	case "bash":
+		commandErr = commands.HandleRunCommand(commandArgs, provider, *safeFlag, cfg, config.SystemPromptBash)
 	case "clear":
 		commandErr = commands.HandleClearCommand()
 	case "showlast":
