@@ -1,3 +1,4 @@
+
 package commands
 
 import (
@@ -9,6 +10,7 @@ func ShowHelp() {
 	fmt.Println()
 	fmt.Println("Usage:")
 	fmt.Println("  minicmd run [prompt_content] [--claude|--ollama|--deepseek]  # Generate code with optional custom prompt content")
+	fmt.Println("  minicmd bash [script_content] [--claude|--ollama|--deepseek]  # Generate a bash script file")
 	fmt.Println("  minicmd edit                      # Edit the prompt file")
 	fmt.Println("  minicmd read <file>               # Add file reference to prompt")
 	fmt.Println("  minicmd list                      # List current attachments")
