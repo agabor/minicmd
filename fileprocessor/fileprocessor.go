@@ -75,6 +75,7 @@ func processMarkdownBlocks(lines []string, safe bool) error {
         inCodeBlock := false
         filePath := ""
         var contentLines []string
+        var nonCodeLines []string
 
         for _, line := range lines {
                 if strings.Contains(line, "```") {
@@ -107,6 +108,25 @@ func processMarkdownBlocks(lines []string, safe bool) error {
                                 }
                         }
                         contentLines = append(contentLines, line)
+                } else {
+                        // Track non-code lines
+                        trimmedLine := strings.TrimSpace(line)
+                        if trimmedLine != "" {
+                                nonCodeLines = append(nonCodeLines, line)
+                        }
+                }
+        }
+
+        // Show warning for non-code content
+        if len(nonCodeLines) > 0 {
+                fmt.Printf("Warning: Found %d lines of text outside code blocks:\n", len(nonCodeLines))
+                for i, line := range nonCodeLines {
+                        if i < 3 {
+                                fmt.Printf("  %s\n", strings.TrimSpace(line))
+                        } else if i == 3 {
+                                fmt.Printf("  ... and %d more lines\n", len(nonCodeLines)-3)
+                                break
+                        }
                 }
         }
 
