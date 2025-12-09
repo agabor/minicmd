@@ -38,7 +38,7 @@ const (
                 "- No explanatory text before or after the code block\n" +
                 "- Use triple backticks with bash identifier (```bash)\n" +
                 "- First line must be the shebang: #!/bin/bash\n" +
-                "- Second line must be a comment with the script filename (e.g., # filename: deploy.sh)\n\n" +
+                "- Second line must be a comment with the script filename (e.g., # deploy.sh)\n\n" +
                 "SCRIPT REQUIREMENTS:\n" +
                 "- Include proper error handling (set -euo pipefail recommended)\n" +
                 "- Add comments for complex operations\n" +
