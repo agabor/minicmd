@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"io"
 	"net/http"
 	"time"
@@ -38,7 +39,7 @@ func (oc *OllamaClient) Call(userPrompt string, systemPrompt string, attachments
 	fullPrompt := userPrompt
 	if len(attachments) > 0 {
 		parts := append(attachments, userPrompt)
-		fullPrompt = joinStrings(parts, "\n\n")
+		fullPrompt = strings.Join(parts, "\n\n")
 	}
 
 	payload := OllamaRequest{

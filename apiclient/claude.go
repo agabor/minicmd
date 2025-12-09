@@ -3,6 +3,7 @@ package apiclient
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"minicmd/config"
@@ -35,7 +36,7 @@ func (c *ClaudeClient) Call(userPrompt string, systemPrompt string, attachments 
 	fullPrompt := userPrompt
 	if len(attachments) > 0 {
 		parts := append(attachments, userPrompt)
-		fullPrompt = joinStrings(parts, "\n\n")
+		fullPrompt = strings.Join(parts, "\n\n")
 	}
 
 	message, err := client.Messages.New(context.Background(), anthropic.MessageNewParams{
@@ -69,15 +70,4 @@ func (c *ClaudeClient) Call(userPrompt string, systemPrompt string, attachments 
 	}
 
 	return responseText, nil
-}
-
-func joinStrings(strs []string, sep string) string {
-	if len(strs) == 0 {
-		return ""
-	}
-	result := strs[0]
-	for i := 1; i < len(strs); i++ {
-		result += sep + strs[i]
-	}
-	return result
 }
