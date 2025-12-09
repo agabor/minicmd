@@ -74,7 +74,7 @@ func CallDeepSeek(userPrompt string, cfg *config.Config, systemPrompt string, de
 	payload := DeepSeekRequest{
 		Model:       cfg.DeepSeekModel,
 		Messages:    messages,
-		MaxTokens:   4000,
+		MaxTokens:   cfg.MaxOutputTokens,
 		Temperature: 0.1,
 		Stream:      false,
 	}
@@ -120,6 +120,11 @@ func CallDeepSeek(userPrompt string, cfg *config.Config, systemPrompt string, de
 		deepSeekResp.Usage.PromptTokens,
 		deepSeekResp.Usage.CompletionTokens,
 		deepSeekResp.Usage.PromptTokensDetails.CachedTokens)
+
+	// Check if maximum output tokens reached
+	if deepSeekResp.Usage.CompletionTokens >= cfg.MaxOutputTokens {
+		fmt.Printf("⚠️  WARNING: Maximum output tokens (%d) reached. Response may be incomplete.\n", cfg.MaxOutputTokens)
+	}
 
 	if len(deepSeekResp.Choices) == 0 {
 		return "", "", fmt.Errorf("unexpected response format from DeepSeek API: no choices")

@@ -30,7 +30,7 @@ func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, debu
 	// Create message
 	message, err := client.Messages.New(context.Background(), anthropic.MessageNewParams{
 		Model:     anthropic.F(cfg.ClaudeModel),
-		MaxTokens: anthropic.F(int64(4000)),
+		MaxTokens: anthropic.F(int64(cfg.MaxOutputTokens)),
 		System: anthropic.F([]anthropic.TextBlockParam{
 			anthropic.NewTextBlock(systemPrompt),
 		}),
@@ -48,6 +48,11 @@ func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, debu
 	fmt.Printf("Token usage - Input: %d, Output: %d\n",
 		message.Usage.InputTokens,
 		message.Usage.OutputTokens)
+
+	// Check if maximum output tokens reached
+	if message.Usage.OutputTokens >= cfg.MaxOutputTokens {
+		fmt.Printf("⚠️  WARNING: Maximum output tokens (%d) reached. Response may be incomplete.\n", cfg.MaxOutputTokens)
+	}
 
 	// Extract text from response
 	var responseText string
