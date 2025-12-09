@@ -63,7 +63,7 @@ func main() {
 	case "edit":
 		commandErr = commands.HandleEditCommand()
 	case "read":
-		commandErr = commands.HandleAddCommand(commandArgs)
+		commandErr = commands.HandleReadCommand(commandArgs)
 	case "list":
 		commandErr = commands.HandleListCommand()
 	case "config":

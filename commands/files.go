@@ -14,7 +14,7 @@ func HandleEditCommand() error {
 	return promptmanager.EditPromptFile()
 }
 
-func HandleAddCommand(args []string) error {
+func HandleReadCommand(args []string) error {
 	if len(args) < 1 {
 		fmt.Println("Usage: minicmd read <file> [<file2> ...]")
 		return fmt.Errorf("missing file argument")
