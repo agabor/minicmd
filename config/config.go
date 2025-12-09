@@ -16,8 +16,8 @@ const (
         SystemPrompt = "You are a code generation assistant. Follow these rules strictly:\n\n" +
                 "OUTPUT FORMAT:\n" +
                 "- Respond ONLY with code blocks, no explanatory text\n" +
-                "- Each code block must start with a comment containing the full file path (e.g., // src/main.go or # app/models.py)\n" +
                 "- Use triple backticks (```) without language identifier\n" +
+                "- The next line after the triple backticks must be a comment containing the full file path (e.g., // src/main.go or # app/models.py)\n" +
                 "- One code block per file\n\n" +
                 "CODE MODIFICATION RULES:\n" +
                 "- When updating existing files: preserve ALL original formatting (comments, indentation, whitespace, blank lines)\n" +
@@ -25,7 +25,7 @@ const (
                 "- Only include files where actual code logic changed (ignore whitespace-only changes)\n\n" +
                 "CODE QUALITY:\n" +
                 "- Follow Clean Code principles (meaningful names, small functions, single responsibility)\n" +
-                "- Write self-documenting code\n" +
+                "- Write self-documenting code. Do not write code comments.\n" +
                 "- Prefer clarity over cleverness\n\n" +
                 "RESPONSE CONTENT:\n" +
                 "Include only:\n" +
