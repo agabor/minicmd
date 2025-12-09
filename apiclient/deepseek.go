@@ -45,19 +45,31 @@ type DeepSeekResponse struct {
 	Usage   DeepSeekUsage    `json:"usage"`
 }
 
-func CallDeepSeek(userPrompt string, cfg *config.Config, systemPrompt string, attachments []string) (string, error) {
-	if cfg.DeepSeekAPIKey == "" {
+type DeepSeekClient struct {
+	apiKey        string
+	model         string
+	url           string
+	maxTokens     int
+}
+
+func (c *DeepSeekClient) Init(cfg *config.Config) {
+	c.apiKey = cfg.DeepSeekAPIKey
+	c.model = cfg.DeepSeekModel
+	c.url = cfg.DeepSeekURL
+	c.maxTokens = cfg.MaxOutputTokens
+}
+
+func (c *DeepSeekClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
+	if c.apiKey == "" {
 		return "", fmt.Errorf("DeepSeek API key not configured. Please set your API key with: minicmd config deepseek_api_key YOUR_API_KEY")
 	}
 
 	startTime := time.Now()
 
-	// Build messages array
 	messages := []DeepSeekMessage{
 		{Role: "system", Content: systemPrompt},
 	}
 
-	// Add attachment files as separate messages
 	for _, attachment := range attachments {
 		messages = append(messages, DeepSeekMessage{
 			Role:    "user",
@@ -65,16 +77,15 @@ func CallDeepSeek(userPrompt string, cfg *config.Config, systemPrompt string, at
 		})
 	}
 
-	// Add main user prompt
 	messages = append(messages, DeepSeekMessage{
 		Role:    "user",
 		Content: userPrompt,
 	})
 
 	payload := DeepSeekRequest{
-		Model:       cfg.DeepSeekModel,
+		Model:       c.model,
 		Messages:    messages,
-		MaxTokens:   cfg.MaxOutputTokens,
+		MaxTokens:   c.maxTokens,
 		Temperature: 0.1,
 		Stream:      false,
 	}
@@ -84,12 +95,12 @@ func CallDeepSeek(userPrompt string, cfg *config.Config, systemPrompt string, at
 		return "", fmt.Errorf("error marshaling request: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", cfg.DeepSeekURL, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", c.url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return "", fmt.Errorf("error creating request: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+cfg.DeepSeekAPIKey)
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -121,9 +132,8 @@ func CallDeepSeek(userPrompt string, cfg *config.Config, systemPrompt string, at
 		deepSeekResp.Usage.CompletionTokens,
 		deepSeekResp.Usage.PromptTokensDetails.CachedTokens)
 
-	// Check if maximum output tokens reached
-	if deepSeekResp.Usage.CompletionTokens >= cfg.MaxOutputTokens {
-		fmt.Printf("⚠️  WARNING: Maximum output tokens (%d) reached. Response may be incomplete.\n", cfg.MaxOutputTokens)
+	if deepSeekResp.Usage.CompletionTokens >= c.maxTokens {
+		fmt.Printf("⚠️  WARNING: Maximum output tokens (%d) reached. Response may be incomplete.\n", c.maxTokens)
 	}
 
 	if len(deepSeekResp.Choices) == 0 {
