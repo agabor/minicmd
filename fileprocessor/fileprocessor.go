@@ -1,6 +1,7 @@
 package fileprocessor
 
 import (
+        "strconv"
         "fmt"
         "os"
         "path/filepath"
@@ -75,15 +76,19 @@ func processMarkdownBlocks(lines []string, safe bool) error {
         inCodeBlock := false
         filePath := ""
         blockHeader := ""
+        unknownFileCounter := 0
         var contentLines []string
-        var nonCodeLines []string
 
         for _, line := range lines {
                 if strings.Contains(line, "```") {
                         if inCodeBlock {
                                 // End of code block - create file
-                                if filePath != "" && len(contentLines) > 0 {
+                                if len(contentLines) > 0 {
                                         content := strings.Join(contentLines, "\n")
+                                        if filePath == "" {
+                                                unknownFileCounter += 1
+                                                filePath = "unknown" + strconv.Itoa(unknownFileCounter)
+                                        }
                                         finalPath := filePath
                                         if safe {
                                                 finalPath += ".new"
@@ -99,6 +104,7 @@ func processMarkdownBlocks(lines []string, safe bool) error {
                         } else {
                                 // Start of code block
                                 inCodeBlock = true
+                                blockHeader = strings.TrimSpace(strings.Replace(line, "```", "", 1))
                         }
                 } else if inCodeBlock {
                         if filePath == "" {
@@ -113,25 +119,7 @@ func processMarkdownBlocks(lines []string, safe bool) error {
                         }
                         contentLines = append(contentLines, line)
                 } else {
-                        blockHeader = strings.TrimSpace(strings.Replace(line, "```", "", 1))
-                        // Track non-code lines
-                        trimmedLine := strings.TrimSpace(line)
-                        if trimmedLine != "" {
-                                nonCodeLines = append(nonCodeLines, line)
-                        }
-                }
-        }
-
-        // Show warning for non-code content
-        if len(nonCodeLines) > 0 {
-                fmt.Printf("Warning: Found %d lines of text outside code blocks:\n", len(nonCodeLines))
-                for i, line := range nonCodeLines {
-                        if i < 3 {
-                                fmt.Printf("  %s\n", strings.TrimSpace(line))
-                        } else if i == 3 {
-                                fmt.Printf("  ... and %d more lines\n", len(nonCodeLines)-3)
-                                break
-                        }
+                        inCodeBlock = true
                 }
         }
 
