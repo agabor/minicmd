@@ -44,36 +44,16 @@ func saveLastResponse(response string) error {
 	return os.WriteFile(responseFile, []byte(response), 0644)
 }
 
-func HandleRunCommand(args []string, claudeFlag, ollamaFlag, deepseekFlag, verbose, debug, safe bool) error {
-	// Check for conflicting provider options
-	providerFlags := 0
-	if claudeFlag {
-		providerFlags++
-	}
-	if ollamaFlag {
-		providerFlags++
-	}
-	if deepseekFlag {
-		providerFlags++
-	}
-	if providerFlags > 1 {
-		return fmt.Errorf("cannot specify multiple provider flags")
-	}
-
+func HandleRunCommand(args []string, provider string, verbose, debug, safe bool) error {
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
 		return fmt.Errorf("error loading config: %w", err)
 	}
 
-	// Determine which provider to use
-	provider := cfg.DefaultProvider
-	if claudeFlag {
-		provider = "claude"
-	} else if ollamaFlag {
-		provider = "ollama"
-	} else if deepseekFlag {
-		provider = "deepseek"
+	// If no provider specified via flags, use default from config
+	if provider == "" {
+		provider = cfg.DefaultProvider
 	}
 
 	// Get prompt content from args if provided, otherwise use default prompt file

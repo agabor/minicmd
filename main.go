@@ -34,6 +34,26 @@ func main() {
 		return
 	}
 
+	// Determine provider from flags
+	provider := ""
+	providerFlags := 0
+	if *claudeFlag {
+		provider = "claude"
+		providerFlags++
+	}
+	if *ollamaFlag {
+		provider = "ollama"
+		providerFlags++
+	}
+	if *deepseekFlag {
+		provider = "deepseek"
+		providerFlags++
+	}
+	if providerFlags > 1 {
+		fmt.Fprintf(os.Stderr, "Error: cannot specify multiple provider flags\n")
+		os.Exit(1)
+	}
+
 	command := args[0]
 	commandArgs := []string{}
 	if len(args) > 1 {
@@ -52,7 +72,7 @@ func main() {
 	case "config":
 		err = commands.HandleConfigCommand(commandArgs)
 	case "run":
-		err = commands.HandleRunCommand(commandArgs, *claudeFlag, *ollamaFlag, *deepseekFlag, *verboseFlag, *debugFlag, *safeFlag)
+		err = commands.HandleRunCommand(commandArgs, provider, *verboseFlag, *debugFlag, *safeFlag)
 	case "clear":
 		err = commands.HandleClearCommand()
 	case "showlast":
