@@ -11,6 +11,11 @@ import (
 	"minicmd/config"
 )
 
+type OllamaClient struct {
+	model string
+	url   string
+}
+
 type OllamaRequest struct {
 	Model  string `json:"model"`
 	Prompt string `json:"prompt"`
@@ -22,10 +27,14 @@ type OllamaResponse struct {
 	Response string `json:"response"`
 }
 
-func CallOllama(userPrompt string, cfg *config.Config, systemPrompt string, attachments []string) (string, error) {
+func (oc *OllamaClient) Init(cfg *config.Config) {
+	oc.model = cfg.OllamaModel
+	oc.url = cfg.OllamaURL
+}
+
+func (oc *OllamaClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
 	startTime := time.Now()
 
-	// For Ollama, combine attachments with user prompt
 	fullPrompt := userPrompt
 	if len(attachments) > 0 {
 		parts := append(attachments, userPrompt)
@@ -33,7 +42,7 @@ func CallOllama(userPrompt string, cfg *config.Config, systemPrompt string, atta
 	}
 
 	payload := OllamaRequest{
-		Model:  cfg.OllamaModel,
+		Model:  oc.model,
 		Prompt: fullPrompt,
 		System: systemPrompt,
 		Stream: false,
@@ -44,7 +53,7 @@ func CallOllama(userPrompt string, cfg *config.Config, systemPrompt string, atta
 		return "", fmt.Errorf("error marshaling request: %w", err)
 	}
 
-	resp, err := http.Post(cfg.OllamaURL, "application/json", bytes.NewBuffer(jsonData))
+	resp, err := http.Post(oc.url, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return "", fmt.Errorf("error calling Ollama API: %w", err)
 	}
