@@ -74,6 +74,7 @@ func createFile(filePath, content string) error {
 func processMarkdownBlocks(lines []string, safe bool) error {
         inCodeBlock := false
         filePath := ""
+        blockHeader := ""
         var contentLines []string
         var nonCodeLines []string
 
@@ -93,6 +94,7 @@ func processMarkdownBlocks(lines []string, safe bool) error {
                                 }
                                 inCodeBlock = false
                                 filePath = ""
+                                blockHeader = ""
                                 contentLines = nil
                         } else {
                                 // Start of code block
@@ -105,10 +107,13 @@ func processMarkdownBlocks(lines []string, safe bool) error {
                                 if extractedPath != "" {
                                         filePath = extractedPath
                                         continue
+                                } else {
+                                        filePath = blockHeader
                                 }
                         }
                         contentLines = append(contentLines, line)
                 } else {
+                        blockHeader = strings.TrimSpace(strings.Replace(line, "```", "", 1))
                         // Track non-code lines
                         trimmedLine := strings.TrimSpace(line)
                         if trimmedLine != "" {
