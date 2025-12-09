@@ -16,7 +16,7 @@ const (
         SystemPrompt = "You are a code generation assistant. Follow these rules strictly:\n\n" +
                 "OUTPUT FORMAT:\n" +
                 "- Respond ONLY with code blocks, no explanatory text\n" +
-                "- Use triple backticks (```) without language identifier\n" +
+                "- Use triple backticks (```) without language identifier to mark the beggining and the end of each code block.\n" +
                 "- The next line after the triple backticks must be a comment containing the full file path (e.g., // src/main.go or # app/models.py)\n" +
                 "- One code block per file\n\n" +
                 "CODE MODIFICATION RULES:\n" +
