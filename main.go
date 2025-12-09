@@ -5,12 +5,12 @@ import (
 	"os"
 
 	"minicmd/commands"
+	"minicmd/config"
 
 	flag "github.com/spf13/pflag"
 )
 
 func main() {
-	// Define flags
 	claudeFlag := flag.Bool("claude", false, "Use Claude API")
 	ollamaFlag := flag.Bool("ollama", false, "Use Ollama API")
 	deepseekFlag := flag.Bool("deepseek", false, "Use DeepSeek API")
@@ -21,13 +21,17 @@ func main() {
 
 	args := flag.Args()
 
-	// Handle help flag or no command
 	if *helpFlag || len(args) == 0 || (len(args) > 0 && args[0] == "help") {
 		commands.ShowHelp()
 		return
 	}
 
-	// Determine provider from flags
+	cfg, err := config.Load()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
 	provider := ""
 	providerFlags := 0
 	if *claudeFlag {
@@ -53,31 +57,31 @@ func main() {
 		commandArgs = args[1:]
 	}
 
-	var err error
+	var commandErr error
 
 	switch command {
 	case "edit":
-		err = commands.HandleEditCommand()
+		commandErr = commands.HandleEditCommand()
 	case "read":
-		err = commands.HandleAddCommand(commandArgs)
+		commandErr = commands.HandleAddCommand(commandArgs)
 	case "list":
-		err = commands.HandleListCommand()
+		commandErr = commands.HandleListCommand()
 	case "config":
-		err = commands.HandleConfigCommand(commandArgs)
+		commandErr = commands.HandleConfigCommand(commandArgs, cfg)
 	case "run":
-		err = commands.HandleRunCommand(commandArgs, provider, *safeFlag)
+		commandErr = commands.HandleRunCommand(commandArgs, provider, *safeFlag, cfg)
 	case "clear":
-		err = commands.HandleClearCommand()
+		commandErr = commands.HandleClearCommand()
 	case "showlast":
-		err = commands.HandleShowLastCommand()
+		commandErr = commands.HandleShowLastCommand()
 	default:
 		fmt.Printf("Error: Unknown command '%s'\n", command)
 		fmt.Println("Run 'minicmd --help' for usage information.")
 		os.Exit(1)
 	}
 
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+	if commandErr != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", commandErr)
 		os.Exit(1)
 	}
 }

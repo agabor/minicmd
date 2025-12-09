@@ -10,14 +10,8 @@ import (
 	"minicmd/promptmanager"
 )
 
-func HandleConfigCommand(args []string) error {
-	cfg, err := config.Load()
-	if err != nil {
-		return fmt.Errorf("error loading config: %w", err)
-	}
-
+func HandleConfigCommand(args []string, cfg *config.Config) error {
 	if len(args) == 0 {
-		// Show current config
 		fmt.Println("Current configuration:")
 		fmt.Printf("  default_provider: %s\n", cfg.DefaultProvider)
 		if cfg.AnthropicAPIKey != "" {

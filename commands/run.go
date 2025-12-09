@@ -55,12 +55,7 @@ func getAPIClient(provider string) apiclient.APIClient {
 	}
 }
 
-func HandleRunCommand(args []string, provider string, safe bool) error {
-	cfg, err := config.Load()
-	if err != nil {
-		return fmt.Errorf("error loading config: %w", err)
-	}
-
+func HandleRunCommand(args []string, provider string, safe bool, cfg *config.Config) error {
 	if provider == "" {
 		provider = cfg.DefaultProvider
 	}
@@ -73,7 +68,7 @@ func HandleRunCommand(args []string, provider string, safe bool) error {
 		if err := promptmanager.EditPromptFile(); err != nil {
 			return err
 		}
-		prompt, err = promptmanager.GetPromptFromFile()
+		prompt, err := promptmanager.GetPromptFromFile()
 		if err != nil {
 			return err
 		}
