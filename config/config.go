@@ -12,7 +12,7 @@ const (
         ClaudeModel          = "claude-haiku-4-5-20251001"
         DeepSeekURL          = "https://api.deepseek.com/v1/chat/completions"
         DeepSeekModel        = "deepseek-coder"
-        DefaultMaxTokens     = 20000
+        DefaultMaxTokens     = 8192
         SystemPrompt = "You are a code generation assistant. Follow these rules strictly:\n\n" +
                 "OUTPUT FORMAT:\n" +
                 "- Respond ONLY with code blocks, no explanatory text\n" +
