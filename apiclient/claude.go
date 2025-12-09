@@ -11,26 +11,36 @@ import (
 	"github.com/anthropics/anthropic-sdk-go/option"
 )
 
-func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, attachments []string) (string, error) {
-	if cfg.AnthropicAPIKey == "" {
+type ClaudeClient struct {
+	apiKey         string
+	model          string
+	maxOutputTokens int
+}
+
+func (c *ClaudeClient) Init(cfg *config.Config) {
+	c.apiKey = cfg.AnthropicAPIKey
+	c.model = cfg.ClaudeModel
+	c.maxOutputTokens = cfg.MaxOutputTokens
+}
+
+func (c *ClaudeClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
+	if c.apiKey == "" {
 		return "", fmt.Errorf("Claude API key not configured. Please set your API key with: minicmd config anthropic_api_key YOUR_API_KEY")
 	}
 
 	startTime := time.Now()
 
-	client := anthropic.NewClient(option.WithAPIKey(cfg.AnthropicAPIKey))
+	client := anthropic.NewClient(option.WithAPIKey(c.apiKey))
 
-	// Build content array - combine attachments and prompt
 	fullPrompt := userPrompt
 	if len(attachments) > 0 {
 		parts := append(attachments, userPrompt)
 		fullPrompt = joinStrings(parts, "\n\n")
 	}
 
-	// Create message
 	message, err := client.Messages.New(context.Background(), anthropic.MessageNewParams{
-		Model:     anthropic.F(cfg.ClaudeModel),
-		MaxTokens: anthropic.F(int64(cfg.MaxOutputTokens)),
+		Model:     anthropic.F(c.model),
+		MaxTokens: anthropic.F(int64(c.maxOutputTokens)),
 		System: anthropic.F([]anthropic.TextBlockParam{
 			anthropic.NewTextBlock(systemPrompt),
 		}),
@@ -49,12 +59,10 @@ func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, atta
 		message.Usage.InputTokens,
 		message.Usage.OutputTokens)
 
-	// Check if maximum output tokens reached
-	if message.Usage.OutputTokens >= int64(cfg.MaxOutputTokens) {
-		fmt.Printf("⚠️  WARNING: Maximum output tokens (%d) reached. Response may be incomplete.\n", cfg.MaxOutputTokens)
+	if message.Usage.OutputTokens >= int64(c.maxOutputTokens) {
+		fmt.Printf("⚠️  WARNING: Maximum output tokens (%d) reached. Response may be incomplete.\n", c.maxOutputTokens)
 	}
 
-	// Extract text from response
 	var responseText string
 	for _, block := range message.Content {
 		responseText += block.Text
