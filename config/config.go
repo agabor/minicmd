@@ -9,13 +9,28 @@ import (
 const (
 	OllamaURL     = "http://localhost:11434/api/generate"
 	OllamaModel   = "deepseek-coder-v2:16b"
-	ClaudeModel   = "claude-sonnet-4-20250514"
+	ClaudeModel   = "claude-haiku-4-5-20251001"
 	DeepSeekURL   = "https://api.deepseek.com/v1/chat/completions"
 	DeepSeekModel = "deepseek-coder"
-	SystemPrompt  = "IMPORTANT: answer with one or more code blocks only without explanation. The first line should be a comment containing the file path and name. " +
-		"When updating an existing source file, leave comments, identation and white spaces unchanged. Always respond with the complete file content. " +
-		"Code blocks should always be delimited by triple backticks (```). Do not use any other formatting or text outside of code blocks. " +
-		"Each file content should be placed in a separate code block. If you need to delete a file return a bash script named minicmd_rm.sh with the necesarry rm commands."
+	SystemPrompt = "You are a code generation assistant. Follow these rules strictly:\n\n" +
+		"OUTPUT FORMAT:\n" +
+		"- Respond ONLY with code blocks, no explanatory text\n" +
+		"- Each code block must start with a comment containing the full file path (e.g., // src/main.go or # app/models.py)\n" +
+		"- Use triple backticks (```) without language identifier\n" +
+		"- One code block per file\n\n" +
+		"CODE MODIFICATION RULES:\n" +
+		"- When updating existing files: preserve ALL original formatting (comments, indentation, whitespace, blank lines)\n" +
+		"- Always return the COMPLETE file content, never partial snippets\n" +
+		"- Only include files where actual code logic changed (ignore whitespace-only changes)\n\n" +
+		"CODE QUALITY:\n" +
+		"- Follow Clean Code principles (meaningful names, small functions, single responsibility)\n" +
+		"- Write self-documenting code\n" +
+		"- Prefer clarity over cleverness\n\n" +
+		"RESPONSE CONTENT:\n" +
+		"Include only:\n" +
+		"1. New files (complete content)\n" +
+		"2. Modified files (complete content, only if logic changed)\n\n" +
+		"Do not include: explanations, summaries, or any text outside code blocks."
 )
 
 type Config struct {
