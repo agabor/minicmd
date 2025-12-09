@@ -25,7 +25,9 @@ type OllamaRequest struct {
 }
 
 type OllamaResponse struct {
-	Response string `json:"response"`
+    Response           string `json:"response"`
+    PromptEvalCount    int    `json:"prompt_eval_count,omitempty"`
+    EvalCount          int    `json:"eval_count,omitempty"`
 }
 
 func (oc *OllamaClient) Init(cfg *config.Config) {
@@ -73,7 +75,7 @@ func (oc *OllamaClient) Call(userPrompt string, systemPrompt string, attachments
 	if err != nil {
 		return "", fmt.Errorf("error reading response: %w", err)
 	}
-
+	
 	var ollamaResp OllamaResponse
 	if err := json.Unmarshal(body, &ollamaResp); err != nil {
 		return "", fmt.Errorf("error parsing JSON response: %w", err)
@@ -81,6 +83,9 @@ func (oc *OllamaClient) Call(userPrompt string, systemPrompt string, attachments
 
 	duration := time.Since(startTime)
 	fmt.Printf("Ollama API call took %.2f seconds\n", duration.Seconds())
+	fmt.Printf("Token usage - Input: %d, Output: %d\n", 
+		ollamaResp.PromptEvalCount, 
+		ollamaResp.EvalCount)
 
 	return ollamaResp.Response, nil
 }

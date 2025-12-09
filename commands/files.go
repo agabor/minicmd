@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"minicmd/config"
 	"minicmd/promptmanager"
 )
 
