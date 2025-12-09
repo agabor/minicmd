@@ -24,6 +24,10 @@ func (c *ClaudeClient) Init(cfg *config.Config) {
 	c.maxOutputTokens = cfg.MaxOutputTokens
 }
 
+func (c *ClaudeClient) GetModelName() string {
+	return c.model
+}
+
 func (c *ClaudeClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
 	if c.apiKey == "" {
 		return "", fmt.Errorf("Claude API key not configured. Please set your API key with: minicmd config anthropic_api_key YOUR_API_KEY")

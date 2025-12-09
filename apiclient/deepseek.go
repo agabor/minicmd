@@ -59,6 +59,10 @@ func (c *DeepSeekClient) Init(cfg *config.Config) {
 	c.maxTokens = cfg.MaxOutputTokens
 }
 
+func (c *DeepSeekClient) GetModelName() string {
+	return c.model
+}
+
 func (c *DeepSeekClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
 	if c.apiKey == "" {
 		return "", fmt.Errorf("DeepSeek API key not configured. Please set your API key with: minicmd config deepseek_api_key YOUR_API_KEY")

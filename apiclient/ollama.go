@@ -33,6 +33,10 @@ func (oc *OllamaClient) Init(cfg *config.Config) {
 	oc.url = cfg.OllamaURL
 }
 
+func (c *OllamaClient) GetModelName() string {
+	return c.model
+}
+
 func (oc *OllamaClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
 	startTime := time.Now()
 

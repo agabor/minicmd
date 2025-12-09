@@ -55,17 +55,6 @@ func getAPIClient(provider string) apiclient.APIClient {
 	}
 }
 
-func getModelName(cfg *config.Config, provider string) string {
-	switch provider {
-	case "claude":
-		return cfg.ClaudeModel
-	case "deepseek":
-		return cfg.DeepSeekModel
-	default:
-		return cfg.OllamaModel
-	}
-}
-
 func HandleRunCommand(args []string, provider string, safe bool) error {
 	cfg, err := config.Load()
 	if err != nil {
@@ -92,7 +81,11 @@ func HandleRunCommand(args []string, provider string, safe bool) error {
 	}
 
 	fmt.Printf("Sending request to %s...\n", strings.Title(provider))
-	fmt.Printf("Model: %s\n", getModelName(cfg, provider))
+	
+	client := getAPIClient(provider)
+	client.Init(cfg)
+	
+	fmt.Printf("Model: %s\n", client.GetModelName())
 
 	attachments, err := promptmanager.GetAttachments()
 	if err != nil {
@@ -102,8 +95,6 @@ func HandleRunCommand(args []string, provider string, safe bool) error {
 	done := make(chan bool)
 	go showProgress(done)
 
-	client := getAPIClient(provider)
-	client.Init(cfg)
 	response, err := client.Call(prompt, config.SystemPrompt, attachments)
 
 	done <- true
