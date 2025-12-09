@@ -50,7 +50,7 @@ func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, debu
 		message.Usage.OutputTokens)
 
 	// Check if maximum output tokens reached
-	if message.Usage.OutputTokens >= cfg.MaxOutputTokens {
+	if message.Usage.OutputTokens >= int64(cfg.MaxOutputTokens) {
 		fmt.Printf("⚠️  WARNING: Maximum output tokens (%d) reached. Response may be incomplete.\n", cfg.MaxOutputTokens)
 	}
 
