@@ -11,9 +11,9 @@ import (
 	"github.com/anthropics/anthropic-sdk-go/option"
 )
 
-func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, debug bool, attachments []string) (string, string, error) {
+func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, attachments []string) (string, error) {
 	if cfg.AnthropicAPIKey == "" {
-		return "", "", fmt.Errorf("Claude API key not configured. Please set your API key with: minicmd config anthropic_api_key YOUR_API_KEY")
+		return "", fmt.Errorf("Claude API key not configured. Please set your API key with: minicmd config anthropic_api_key YOUR_API_KEY")
 	}
 
 	startTime := time.Now()
@@ -40,7 +40,7 @@ func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, debu
 	})
 
 	if err != nil {
-		return "", "", fmt.Errorf("error calling Claude API: %w", err)
+		return "", fmt.Errorf("error calling Claude API: %w", err)
 	}
 
 	duration := time.Since(startTime)
@@ -60,12 +60,7 @@ func CallClaude(userPrompt string, cfg *config.Config, systemPrompt string, debu
 		responseText += block.Text
 	}
 
-	rawResponse := ""
-	if debug {
-		rawResponse = fmt.Sprintf("%+v", message)
-	}
-
-	return responseText, rawResponse, nil
+	return responseText, nil
 }
 
 func joinStrings(strs []string, sep string) string {

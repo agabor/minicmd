@@ -44,7 +44,7 @@ func saveLastResponse(response string) error {
 	return os.WriteFile(responseFile, []byte(response), 0644)
 }
 
-func HandleRunCommand(args []string, provider string, verbose, debug, safe bool) error {
+func HandleRunCommand(args []string, provider string, safe bool) error {
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
@@ -74,11 +74,6 @@ func HandleRunCommand(args []string, provider string, verbose, debug, safe bool)
 		fmt.Println("Using default prompt file")
 	}
 
-	if verbose {
-		fmt.Printf("Prompt: %s\n", prompt)
-		fmt.Println("---")
-	}
-
 	fmt.Printf("Sending request to %s...\n", strings.Title(provider))
 	switch provider {
 	case "claude":
@@ -100,16 +95,16 @@ func HandleRunCommand(args []string, provider string, verbose, debug, safe bool)
 	go showProgress(done)
 
 	// Call API
-	var response, rawResponse string
+	var response string
 	systemPrompt := config.SystemPrompt
 	
 	switch provider {
 	case "claude":
-		response, rawResponse, err = apiclient.CallClaude(prompt, cfg, systemPrompt, debug, attachments)
+		response, err = apiclient.CallClaude(prompt, cfg, systemPrompt, attachments)
 	case "deepseek":
-		response, rawResponse, err = apiclient.CallDeepSeek(prompt, cfg, systemPrompt, debug, attachments)
+		response, err = apiclient.CallDeepSeek(prompt, cfg, systemPrompt, attachments)
 	default:
-		response, rawResponse, err = apiclient.CallOllama(prompt, cfg, systemPrompt, debug, attachments)
+		response, err = apiclient.CallOllama(prompt, cfg, systemPrompt, attachments)
 	}
 
 	// Stop progress indicator
@@ -136,24 +131,6 @@ func HandleRunCommand(args []string, provider string, verbose, debug, safe bool)
 	// Save the response to last_response file
 	if err := saveLastResponse(response); err != nil {
 		fmt.Printf("Warning: could not save response to last_response file: %v\n", err)
-	}
-
-	// Echo the response to see what we got
-	if verbose {
-		fmt.Println("Raw response:")
-		fmt.Println("==============")
-		fmt.Println(response)
-		fmt.Println("==============")
-		fmt.Println()
-	}
-
-	// In debug mode, also show the complete API response
-	if debug && rawResponse != "" {
-		fmt.Println("Complete API response (JSON):")
-		fmt.Println("=============================")
-		fmt.Println(rawResponse)
-		fmt.Println("=============================")
-		fmt.Println()
 	}
 
 	// Process the response and create files

@@ -15,16 +15,9 @@ func main() {
 	ollamaFlag := flag.Bool("ollama", false, "Use Ollama API")
 	deepseekFlag := flag.Bool("deepseek", false, "Use DeepSeek API")
 	helpFlag := flag.BoolP("help", "h", false, "Show help message")
-	verboseFlag := flag.BoolP("verbose", "v", false, "Print verbose output")
-	debugFlag := flag.BoolP("debug", "d", false, "Print debug output (includes verbose and raw API response)")
 	safeFlag := flag.BoolP("safe", "s", false, "Add .new suffix to generated files")
 
 	flag.Parse()
-
-	// Debug mode implies verbose mode
-	if *debugFlag {
-		*verboseFlag = true
-	}
 
 	args := flag.Args()
 
@@ -72,7 +65,7 @@ func main() {
 	case "config":
 		err = commands.HandleConfigCommand(commandArgs)
 	case "run":
-		err = commands.HandleRunCommand(commandArgs, provider, *verboseFlag, *debugFlag, *safeFlag)
+		err = commands.HandleRunCommand(commandArgs, provider, *safeFlag)
 	case "clear":
 		err = commands.HandleClearCommand()
 	case "showlast":
