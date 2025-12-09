@@ -168,7 +168,7 @@ func GetAttachments() ([]string, error) {
 
 		// Add formatted content
 		contentStr := strings.TrimRight(string(content), "\n")
-		fileContents = append(fileContents, fmt.Sprintf("// %s\n%s", filePath, contentStr))
+		fileContents = append(fileContents, fmt.Sprintf("```\n// %s\n%s\n```", filePath, contentStr))
 	}
 
 	return fileContents, nil
