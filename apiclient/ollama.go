@@ -28,6 +28,8 @@ type OllamaResponse struct {
     Response           string `json:"response"`
     PromptEvalCount    int    `json:"prompt_eval_count,omitempty"`
     EvalCount          int    `json:"eval_count,omitempty"`
+    Done               bool   `json:"done"`
+    DoneReason         string `json:"done_reason"`
 }
 
 func (oc *OllamaClient) Init(cfg *config.Config) {
@@ -86,6 +88,8 @@ func (oc *OllamaClient) Call(userPrompt string, systemPrompt string, attachments
 	fmt.Printf("Token usage - Input: %d, Output: %d\n", 
 		ollamaResp.PromptEvalCount, 
 		ollamaResp.EvalCount)
+
+	fmt.Printf("Done: %t, Done Reason: %s\n", ollamaResp.Done, ollamaResp.DoneReason)
 
 	return ollamaResp.Response, nil
 }
