@@ -1,13 +1,18 @@
 package fileprocessor
 
 import (
+	"strconv"
+	"fmt"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
 
+var unknownFileCounter = 0
+
 type CodeBlock struct {
 	blockHeader string
-	filePath   string
 	lines      []string
 }
 
@@ -36,36 +41,57 @@ func extractFilenameFromComment(line string) string {
 	return ""
 }
 
-func (cb *CodeBlock) resolveFilePath() {
-	if cb.filePath == "" {
-		cb.filePath = cb.blockHeader
+func (cb *CodeBlock) getFilePath(safe bool) string {
+	filePath := ""
+	if len(cb.lines) > 0 {
+		extractedPath := extractFilenameFromComment(cb.lines[0])
+		if extractedPath != "" {
+			filePath = extractedPath
+			cb.lines = cb.lines[1:]
+		}
 	}
-}
-
-func (cb *CodeBlock) extractFilePathFromFirstLine() {
-	if len(cb.lines) == 0 {
-		return
+	if filePath == "" {
+		filePath = cb.blockHeader
 	}
 
-	extractedPath := extractFilenameFromComment(cb.lines[0])
-	if extractedPath != "" {
-		cb.filePath = extractedPath
-		cb.lines = cb.lines[1:]
+	if filePath == "" {
+		unknownFileCounter += 1
+		filePath = "unknown" + strconv.Itoa(unknownFileCounter)
 	}
-}
 
-func (cb *CodeBlock) content() string {
-	return strings.Join(cb.lines, "\n")
+	if strings.HasPrefix(filePath, "/") {
+		relPath := filePath[1:]
+		if _, err := os.Stat(relPath); err == nil {
+			filePath = relPath
+		} else {
+			if _, err := os.Stat(filePath); err == nil {
+
+			} else {
+				filePath = relPath
+			}
+		}
+	}
+
+	if safe {
+		filePath += ".new"
+	}
+	return filePath
+
 }
 
 func (cb *CodeBlock) write(safe bool) error {
-	cb.extractFilePathFromFirstLine()
-	cb.resolveFilePath()
 
-	finalPath := cb.filePath
-	if safe {
-		finalPath += ".new"
+	filePath := cb.getFilePath(safe)
+
+	dir := filepath.Dir(filePath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("error creating directory %s: %w", dir, err)
 	}
 
-	return createFile(finalPath, cb.content())
+	if err := os.WriteFile(filePath, []byte(strings.Join(cb.lines, "\n")), 0644); err != nil {
+		return fmt.Errorf("error writing file %s: %w", filePath, err)
+	}
+
+	fmt.Printf("Written: %s\n", filePath)
+	return nil
 }
