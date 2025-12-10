@@ -18,10 +18,15 @@ type OllamaClient struct {
 }
 
 type OllamaRequest struct {
-	Model  string `json:"model"`
-	Prompt string `json:"prompt"`
-	System string `json:"system"`
-	Stream bool   `json:"stream"`
+	Model       string      `json:"model"`
+	Prompt      string      `json:"prompt"`
+	System      string      `json:"system"`
+	Stream      bool        `json:"stream"`
+	Options     OllamaOptions `json:"options"`
+}
+
+type OllamaOptions struct {
+	Temperature float64 `json:"temperature"`
 }
 
 type OllamaResponse struct {
@@ -55,6 +60,9 @@ func (oc *OllamaClient) Call(userPrompt string, systemPrompt string, attachments
 		Prompt: fullPrompt,
 		System: systemPrompt,
 		Stream: false,
+		Options: OllamaOptions{
+			Temperature: 0.1,
+		},
 	}
 
 	jsonData, err := json.Marshal(payload)
