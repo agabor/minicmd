@@ -5,34 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 )
-
-func extractFilenameFromComment(line string) string {
-	patterns := []string{
-		`^\s*//\s*(.+?)(?:\s*//.*)?$`,
-		`^\s*#\s*(.+?)(?:\s*#.*)?$`,
-		`^\s*#\s*//\s*(.+?)(?:\s*#.*)?$`,
-		`^\s*/\*\s*(.+?)\s*\*/$`,
-		`^\s*--\s*(.+?)(?:\s*--.*)?$`,
-		`^\s*<!--\s*(.+?)\s*-->$`,
-	}
-
-	for _, pattern := range patterns {
-		re := regexp.MustCompile(pattern)
-		matches := re.FindStringSubmatch(line)
-		if len(matches) > 1 {
-			filename := strings.TrimSpace(matches[1])
-			if strings.Contains(filename, "!") {
-				continue
-			}
-			filename = regexp.MustCompile(`\s*\*+/$`).ReplaceAllString(filename, "")
-			return filename
-		}
-	}
-	return ""
-}
 
 func createFile(filePath, content string) error {
 	if strings.HasPrefix(filePath, "/") {
@@ -67,65 +41,41 @@ func createFile(filePath, content string) error {
 
 func processMarkdownBlocks(lines []string, safe bool) error {
 	inCodeBlock := false
-	filePath := ""
-	blockHeader := ""
+	var currentBlock *CodeBlock
 	unknownFileCounter := 0
-	var contentLines []string
 
 	for _, line := range lines {
 		if strings.HasPrefix(strings.TrimSpace(line), "```") {
 			if inCodeBlock {
-				if len(contentLines) > 0 {
-					content := strings.Join(contentLines, "\n")
-					if filePath == "" {
+				if len(currentBlock.lines) > 0 {
+					if currentBlock.filePath == "" {
 						unknownFileCounter += 1
-						filePath = "unknown" + strconv.Itoa(unknownFileCounter)
+						currentBlock.filePath = "unknown" + strconv.Itoa(unknownFileCounter)
 					}
-					finalPath := filePath
-					if safe {
-						finalPath += ".new"
-					}
-					if err := createFile(finalPath, content); err != nil {
+					if err := currentBlock.write(safe); err != nil {
 						return err
 					}
 				}
 				inCodeBlock = false
-				filePath = ""
-				blockHeader = ""
-				contentLines = nil
+				currentBlock = nil
 			} else {
 				inCodeBlock = true
-				blockHeader = strings.TrimSpace(strings.Replace(line, "```", "", 1))
+				blockHeader := strings.TrimSpace(strings.Replace(line, "```", "", 1))
+				currentBlock = &CodeBlock{blockHeader: blockHeader}
 			}
 		} else if inCodeBlock {
-			if filePath == "" {
-				extractedPath := extractFilenameFromComment(line)
-				if extractedPath != "" {
-					filePath = extractedPath
-					continue
-				} else {
-					filePath = blockHeader
-				}
-			}
-			contentLines = append(contentLines, line)
-		} else {
-			inCodeBlock = true
+			currentBlock.lines = append(currentBlock.lines, line)
 		}
 	}
 
-	if len(contentLines) > 0 {
-		if filePath == "" {
+	if inCodeBlock && currentBlock != nil && len(currentBlock.lines) > 0 {
+		if currentBlock.filePath == "" {
 			return fmt.Errorf("content lines exist but no filepath was provided")
 		}
-		content := strings.Join(contentLines, "\n")
-		finalPath := filePath
-		if safe {
-			finalPath += ".new"
-		}
-		if err := createFile(finalPath, content); err != nil {
+		if err := currentBlock.write(safe); err != nil {
 			return err
 		}
-		return fmt.Errorf("incomplete code block: file %s was written but no closing backticks found", filePath)
+		return fmt.Errorf("incomplete code block: file %s was written but no closing backticks found", currentBlock.filePath)
 	}
 
 	return nil
