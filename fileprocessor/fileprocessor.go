@@ -80,7 +80,7 @@ func processMarkdownBlocks(lines []string, safe bool) error {
         var contentLines []string
 
         for _, line := range lines {
-                if strings.Contains(line, "```") {
+                if strings.HasPrefix(strings.TrimSpace(line), "```") {
                         if inCodeBlock {
                                 // End of code block - create file
                                 if len(contentLines) > 0 {
