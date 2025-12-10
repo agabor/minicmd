@@ -44,13 +44,24 @@ func extractFilenameFromComment(line string) string {
 
 func (cb *CodeBlock) getFilePath(safe bool) string {
 	filePath := ""
-	if len(cb.lines) > 0 {
-		extractedPath := extractFilenameFromComment(cb.lines[0])
+	lineIndex := 0
+
+	for lineIndex < len(cb.lines) && strings.TrimSpace(cb.lines[lineIndex]) == "" {
+		lineIndex++
+	}
+
+	if lineIndex < len(cb.lines) && strings.HasPrefix(strings.TrimSpace(cb.lines[lineIndex]), "#!") {
+		lineIndex++
+	}
+
+	if lineIndex < len(cb.lines) {
+		extractedPath := extractFilenameFromComment(cb.lines[lineIndex])
 		if extractedPath != "" {
 			filePath = extractedPath
-			cb.lines = cb.lines[1:]
+			cb.lines = append(cb.lines[:lineIndex], cb.lines[lineIndex+1:]...)
 		}
 	}
+
 	if filePath == "" {
 		filePath = cb.blockHeader
 	}
