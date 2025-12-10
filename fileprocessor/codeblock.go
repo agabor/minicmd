@@ -13,7 +13,8 @@ var unknownFileCounter = 0
 
 type CodeBlock struct {
 	blockHeader string
-	lines      []string
+	filePath    string
+	lines       []string
 }
 
 func extractFilenameFromComment(line string) string {
@@ -81,17 +82,17 @@ func (cb *CodeBlock) getFilePath(safe bool) string {
 
 func (cb *CodeBlock) write(safe bool) error {
 
-	filePath := cb.getFilePath(safe)
+	cb.filePath = cb.getFilePath(safe)
 
-	dir := filepath.Dir(filePath)
+	dir := filepath.Dir(cb.filePath)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return fmt.Errorf("error creating directory %s: %w", dir, err)
 	}
 
-	if err := os.WriteFile(filePath, []byte(strings.Join(cb.lines, "\n")), 0644); err != nil {
-		return fmt.Errorf("error writing file %s: %w", filePath, err)
+	if err := os.WriteFile(cb.filePath, []byte(strings.Join(cb.lines, "\n")), 0644); err != nil {
+		return fmt.Errorf("error writing file %s: %w", cb.filePath, err)
 	}
 
-	fmt.Printf("Written: %s\n", filePath)
+	fmt.Printf("Written: %s\n", cb.filePath)
 	return nil
 }

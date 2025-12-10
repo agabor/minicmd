@@ -33,7 +33,7 @@ func processMarkdownBlocks(lines []string, safe bool) error {
 		if err := currentBlock.write(safe); err != nil {
 			return err
 		}
-		return fmt.Errorf("incomplete code block: file %s was written but no closing backticks found", currentBlock.getFilePath(safe))
+		return fmt.Errorf("incomplete code block: file %s was written but no closing backticks found", currentBlock.filePath)
 	}
 
 	return nil
