@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"minicmd/config"
+	"minicmd/promptmanager"
 )
 
 func HandleFimCommand(args []string, provider string, safe bool, cfg *config.Config) error {
@@ -44,7 +45,14 @@ func HandleFimCommand(args []string, provider string, safe bool, cfg *config.Con
 	done := make(chan bool)
 	go showProgress(done)
 
-	prompt := buildFimPrompt(prefix, suffix)
+	attachments, err := promptmanager.GetAttachments()
+	if err != nil {
+		done <- true
+		close(done)
+		return err
+	}
+
+	prompt := buildFimPromptWithAttachments(prefix, suffix, attachments)
 	response, err := client.Call(prompt, client.GetFIMSystemPrompt(), nil)
 
 	done <- true
@@ -79,22 +87,55 @@ func HandleFimCommand(args []string, provider string, safe bool, cfg *config.Con
 	return nil
 }
 
-func buildFimPrompt(prefix string, suffix string) string {
-	return fmt.Sprintf("<｜fim_prefix｜>%s<｜fim_middle｜><｜fim_suffix｜>%s<｜fim_middle｜>", prefix, suffix)
+func buildFimPromptWithAttachments(prefix string, suffix string, attachments []string) string {
+	var promptParts []string
+
+	for _, attachment := range attachments {
+		lines := strings.Split(attachment, "\n")
+		if len(lines) > 0 && strings.HasPrefix(lines[0], "```") {
+			filePath := ""
+			fileContent := ""
+			inContent := false
+
+			for _, line := range lines {
+				if strings.HasPrefix(line, "// ") && !inContent {
+					filePath = strings.TrimPrefix(line, "// ")
+					inContent = true
+					continue
+				}
+				if strings.HasPrefix(line, "```") && inContent {
+					break
+				}
+				if inContent && filePath != "" {
+					fileContent += line + "\n"
+				}
+			}
+
+			if filePath != "" {
+				fileContent = strings.TrimRight(fileContent, "\n")
+				promptParts = append(promptParts, fmt.Sprintf("<|file_sep|>%s\n%s", filePath, fileContent))
+			}
+		}
+	}
+
+	fimPart := fmt.Sprintf("<|fim_prefix|>%s<|fim_suffix|>%s<|fim_middle|>", prefix, suffix)
+	promptParts = append(promptParts, fimPart)
+
+	return strings.Join(promptParts, "\n\n")
 }
 
 func trimCodeBlockDelimiters(response string) string {
 	response = strings.TrimSpace(response)
-	
+
 	if strings.HasPrefix(response, "```") {
 		response = strings.TrimPrefix(response, "```")
 		response = strings.TrimLeft(response, "\n")
 	}
-	
+
 	if strings.HasSuffix(response, "```") {
 		response = strings.TrimSuffix(response, "```")
 		response = strings.TrimRight(response, "\n")
 	}
-	
+
 	return response
 }
