@@ -76,6 +76,11 @@ const (
                 "- Explanations of changes\n" +
                 "- Partial file content\n" +
                 "- Language identifier: ```go (WRONG)\n\n" +
+                "\n\nBEFORE RESPONDING CHECK:\n" +
+                "✓ Check: Using ``` without language identifier?\n" +
+                "✓ Check: File path comment on line 2?\n" +
+                "✓ Check: Complete file content?\n" +
+                "✓ Check: No text outside code blocks?\n"
                 "REMEMBER: Only code blocks. Nothing else."
         SystemPromptBash = "BASH SCRIPT GENERATION ASSISTANT\n\n" +
                 "====================\n" +
