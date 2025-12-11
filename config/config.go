@@ -8,12 +8,12 @@ import (
 
 const (
         OllamaURL            = "http://localhost:11434/api/generate"
-        OllamaModel          = "deepseek-coder-v2:16b"
+        OllamaModel          = "qwen2.5-coder:7b"
         ClaudeModel          = "claude-haiku-4-5-20251001"
         DeepSeekURL          = "https://api.deepseek.com/v1/chat/completions"
         DeepSeekModel        = "deepseek-coder"
         DefaultMaxTokens     = 8192
-        DefaultFimToken      = "[FIM]"
+        DefaultFimToken      = "//FIM"
         SystemPrompt = "CODE GENERATION ASSISTANT\n\n" +
                 "====================\n" +
                 "STRICT OUTPUT RULES:\n" +
