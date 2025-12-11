@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"minicmd/config"
@@ -25,6 +24,14 @@ type DeepSeekRequest struct {
 	Stream      bool              `json:"stream"`
 }
 
+type DeepSeekCompletionRequest struct {
+	Model     string  `json:"model"`
+	Prompt    string  `json:"prompt"`
+	Suffix    string  `json:"suffix"`
+	MaxTokens int     `json:"max_tokens"`
+	Temperature float64 `json:"temperature"`
+}
+
 type DeepSeekUsage struct {
 	PromptTokens            int                        `json:"prompt_tokens"`
 	CompletionTokens        int                        `json:"completion_tokens"`
@@ -39,6 +46,7 @@ type DeepSeekPromptTokenDetails struct {
 type DeepSeekChoice struct {
 	Index   int             `json:"index"`
 	Message DeepSeekMessage `json:"message"`
+	Text    string          `json:"text"`
 }
 
 type DeepSeekResponse struct {
@@ -71,18 +79,12 @@ func (c *DeepSeekClient) FIM(prefix string, suffix string, attachments []string)
 
 	startTime := time.Now()
 
-	prompt := buildFimPrompt(prefix, suffix, attachments)
-
-	messages := []DeepSeekMessage{
-		{Role: "user", Content: prompt},
-	}
-
-	payload := DeepSeekRequest{
+	payload := DeepSeekCompletionRequest{
 		Model:       c.model,
-		Messages:    messages,
+		Prompt:      prefix,
+		Suffix:      suffix,
 		MaxTokens:   c.maxTokens,
 		Temperature: 0.1,
-		Stream:      false,
 	}
 
 	jsonData, err := json.Marshal(payload)
@@ -90,7 +92,7 @@ func (c *DeepSeekClient) FIM(prefix string, suffix string, attachments []string)
 		return "", fmt.Errorf("error marshaling request: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", c.url, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", "https://api.deepseek.com/beta", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return "", fmt.Errorf("error creating request: %w", err)
 	}
@@ -135,7 +137,7 @@ func (c *DeepSeekClient) FIM(prefix string, suffix string, attachments []string)
 		return "", fmt.Errorf("unexpected response format from DeepSeek API: no choices")
 	}
 
-	return deepSeekResp.Choices[0].Message.Content, nil
+	return deepSeekResp.Choices[0].Text, nil
 }
 
 func (c *DeepSeekClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
@@ -220,41 +222,4 @@ func (c *DeepSeekClient) Call(userPrompt string, systemPrompt string, attachment
 	}
 
 	return deepSeekResp.Choices[0].Message.Content, nil
-}
-
-func buildFimPrompt(prefix string, suffix string, attachments []string) string {
-	var promptParts []string
-
-	for _, attachment := range attachments {
-		lines := strings.Split(attachment, "\n")
-		if len(lines) > 0 && strings.HasPrefix(lines[0], "```") {
-			filePath := ""
-			fileContent := ""
-			inContent := false
-
-			for _, line := range lines {
-				if strings.HasPrefix(line, "// ") && !inContent {
-					filePath = strings.TrimPrefix(line, "// ")
-					inContent = true
-					continue
-				}
-				if strings.HasPrefix(line, "```") && inContent {
-					break
-				}
-				if inContent && filePath != "" {
-					fileContent += line + "\n"
-				}
-			}
-
-			if filePath != "" {
-				fileContent = strings.TrimRight(fileContent, "\n")
-				promptParts = append(promptParts, fmt.Sprintf("<|file_sep|>%s\n%s", filePath, fileContent))
-			}
-		}
-	}
-
-	fimPart := fmt.Sprintf("<|fim_prefix|>%s<|fim_suffix|>%s<|fim_middle|>", prefix, suffix)
-	promptParts = append(promptParts, fimPart)
-
-	return strings.Join(promptParts, "\n\n")
 }
