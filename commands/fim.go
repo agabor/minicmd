@@ -53,7 +53,7 @@ func HandleFimCommand(args []string, provider string, safe bool, cfg *config.Con
 	}
 
 	prompt := buildFimPromptWithAttachments(prefix, suffix, attachments)
-	response, err := client.Call(prompt, client.GetFIMSystemPrompt(), nil)
+	response, err := client.FIM(prompt)
 
 	done <- true
 	close(done)
