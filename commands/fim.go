@@ -45,7 +45,7 @@ func HandleFimCommand(args []string, provider string, safe bool, cfg *config.Con
 	go showProgress(done)
 
 	prompt := buildFimPrompt(prefix, suffix)
-	response, err := client.Call(prompt, "Respond with the missing code part only, and nothing else.", nil)
+	response, err := client.Call(prompt, "Respond with the missing code part only, and nothing else. Do not include triple backtick code block delimiter.", nil)
 
 	done <- true
 	close(done)
@@ -61,6 +61,8 @@ func HandleFimCommand(args []string, provider string, safe bool, cfg *config.Con
 	if strings.TrimSpace(response) == "" {
 		return fmt.Errorf("error: empty response from %s API", strings.Title(provider))
 	}
+
+	response = trimCodeBlockDelimiters(response)
 
 	if err := saveLastResponse(response); err != nil {
 		fmt.Printf("Warning: could not save response to last_response file: %v\n", err)
@@ -79,4 +81,20 @@ func HandleFimCommand(args []string, provider string, safe bool, cfg *config.Con
 
 func buildFimPrompt(prefix string, suffix string) string {
 	return fmt.Sprintf("<｜fim_prefix｜>%s<｜fim_middle｜><｜fim_suffix｜>%s<｜fim_middle｜>", prefix, suffix)
+}
+
+func trimCodeBlockDelimiters(response string) string {
+	response = strings.TrimSpace(response)
+	
+	if strings.HasPrefix(response, "```") {
+		response = strings.TrimPrefix(response, "```")
+		response = strings.TrimLeft(response, "\n")
+	}
+	
+	if strings.HasSuffix(response, "```") {
+		response = strings.TrimSuffix(response, "```")
+		response = strings.TrimRight(response, "\n")
+	}
+	
+	return response
 }
