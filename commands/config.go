@@ -26,6 +26,7 @@ func HandleConfigCommand(args []string, cfg *config.Config) error {
 		fmt.Printf("  ollama_model: %s\n", cfg.OllamaModel)
 		fmt.Printf("  deepseek_url: %s\n", cfg.DeepSeekURL)
 		fmt.Printf("  deepseek_model: %s\n", cfg.DeepSeekModel)
+		fmt.Printf("  fim_token: %s\n", cfg.FimToken)
 		return nil
 	}
 
@@ -50,6 +51,8 @@ func HandleConfigCommand(args []string, cfg *config.Config) error {
 			cfg.DeepSeekURL = value
 		case "deepseek_model":
 			cfg.DeepSeekModel = value
+		case "fim_token":
+			cfg.FimToken = value
 		default:
 			return fmt.Errorf("unknown config key '%s'", key)
 		}

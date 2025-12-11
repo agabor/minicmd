@@ -13,6 +13,7 @@ const (
         DeepSeekURL          = "https://api.deepseek.com/v1/chat/completions"
         DeepSeekModel        = "deepseek-coder"
         DefaultMaxTokens     = 8192
+        DefaultFimToken      = "[FIM]"
         SystemPrompt = "You are a code generation assistant. Follow these rules strictly:\n\n" +
                 "OUTPUT FORMAT:\n" +
                 "- Respond ONLY with code blocks, no explanatory text\n" +
@@ -65,6 +66,7 @@ type Config struct {
         DeepSeekURL      string `json:"deepseek_url"`
         DeepSeekModel    string `json:"deepseek_model"`
         MaxOutputTokens  int    `json:"max_output_tokens"`
+        FimToken         string `json:"fim_token"`
 }
 
 func getConfigDir() (string, error) {
@@ -94,6 +96,7 @@ func DefaultConfig() *Config {
                 DeepSeekURL:     DeepSeekURL,
                 DeepSeekModel:   DeepSeekModel,
                 MaxOutputTokens: DefaultMaxTokens,
+                FimToken:        DefaultFimToken,
         }
 }
 
@@ -120,6 +123,11 @@ func Load() (*Config, error) {
         // Ensure MaxOutputTokens has a valid value
         if cfg.MaxOutputTokens <= 0 {
                 cfg.MaxOutputTokens = DefaultMaxTokens
+        }
+
+        // Ensure FimToken has a valid value
+        if cfg.FimToken == "" {
+                cfg.FimToken = DefaultFimToken
         }
 
         return cfg, nil
