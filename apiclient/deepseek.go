@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"minicmd/config"
@@ -63,12 +64,14 @@ func (c *DeepSeekClient) GetModelName() string {
 	return c.model
 }
 
-func (c *DeepSeekClient) FIM(prompt string) (string, error) {
+func (c *DeepSeekClient) FIM(prefix string, suffix string, attachments []string) (string, error) {
 	if c.apiKey == "" {
 		return "", fmt.Errorf("DeepSeek API key not configured. Please set your API key with: minicmd config deepseek_api_key YOUR_API_KEY")
 	}
 
 	startTime := time.Now()
+
+	prompt := buildFimPrompt(prefix, suffix, attachments)
 
 	messages := []DeepSeekMessage{
 		{Role: "user", Content: prompt},
@@ -217,4 +220,41 @@ func (c *DeepSeekClient) Call(userPrompt string, systemPrompt string, attachment
 	}
 
 	return deepSeekResp.Choices[0].Message.Content, nil
+}
+
+func buildFimPrompt(prefix string, suffix string, attachments []string) string {
+	var promptParts []string
+
+	for _, attachment := range attachments {
+		lines := strings.Split(attachment, "\n")
+		if len(lines) > 0 && strings.HasPrefix(lines[0], "```") {
+			filePath := ""
+			fileContent := ""
+			inContent := false
+
+			for _, line := range lines {
+				if strings.HasPrefix(line, "// ") && !inContent {
+					filePath = strings.TrimPrefix(line, "// ")
+					inContent = true
+					continue
+				}
+				if strings.HasPrefix(line, "```") && inContent {
+					break
+				}
+				if inContent && filePath != "" {
+					fileContent += line + "\n"
+				}
+			}
+
+			if filePath != "" {
+				fileContent = strings.TrimRight(fileContent, "\n")
+				promptParts = append(promptParts, fmt.Sprintf("<|file_sep|>%s\n%s", filePath, fileContent))
+			}
+		}
+	}
+
+	fimPart := fmt.Sprintf("<|fim_prefix|>%s<|fim_suffix|>%s<|fim_middle|>", prefix, suffix)
+	promptParts = append(promptParts, fimPart)
+
+	return strings.Join(promptParts, "\n\n")
 }

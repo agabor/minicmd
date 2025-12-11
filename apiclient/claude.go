@@ -28,7 +28,7 @@ func (c *ClaudeClient) GetModelName() string {
 	return c.model
 }
 
-func (c *ClaudeClient) FIM(prompt string) (string, error) {
+func (c *ClaudeClient) FIM(prefix string, suffix string, attachments []string) (string, error) {
 	if c.apiKey == "" {
 		return "", fmt.Errorf("Claude API key not configured. Please set your API key with: minicmd config anthropic_api_key YOUR_API_KEY")
 	}
@@ -40,6 +40,8 @@ func (c *ClaudeClient) FIM(prompt string) (string, error) {
 	systemPrompt := `You are a code completion assistant. Complete the code based on the context provided.
 Only return the code completion without any explanations or markdown formatting.
 Maintain the same indentation and style as the existing code.`
+
+	prompt := buildFimPrompt(prefix, suffix, attachments)
 
 	params := anthropic.MessageNewParams{
 		Model:     anthropic.F(c.model),
@@ -128,4 +130,41 @@ func (c *ClaudeClient) Call(userPrompt string, systemPrompt string, attachments 
 	}
 
 	return responseText, nil
+}
+
+func buildFimPrompt(prefix string, suffix string, attachments []string) string {
+	var promptParts []string
+
+	for _, attachment := range attachments {
+		lines := strings.Split(attachment, "\n")
+		if len(lines) > 0 && strings.HasPrefix(lines[0], "```") {
+			filePath := ""
+			fileContent := ""
+			inContent := false
+
+			for _, line := range lines {
+				if strings.HasPrefix(line, "// ") && !inContent {
+					filePath = strings.TrimPrefix(line, "// ")
+					inContent = true
+					continue
+				}
+				if strings.HasPrefix(line, "```") && inContent {
+					break
+				}
+				if inContent && filePath != "" {
+					fileContent += line + "\n"
+				}
+			}
+
+			if filePath != "" {
+				fileContent = strings.TrimRight(fileContent, "\n")
+				promptParts = append(promptParts, fmt.Sprintf("<|file_sep|>%s\n%s", filePath, fileContent))
+			}
+		}
+	}
+
+	fimPart := fmt.Sprintf("<|fim_prefix|>%s<|fim_suffix|>%s<|fim_middle|>", prefix, suffix)
+	promptParts = append(promptParts, fimPart)
+
+	return strings.Join(promptParts, "\n\n")
 }

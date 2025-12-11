@@ -52,8 +52,7 @@ func HandleFimCommand(args []string, provider string, safe bool, cfg *config.Con
 		return err
 	}
 
-	prompt := buildFimPromptWithAttachments(prefix, suffix, attachments)
-	response, err := client.FIM(prompt)
+	response, err := client.FIM(prefix, suffix, attachments)
 
 	done <- true
 	close(done)
@@ -85,43 +84,6 @@ func HandleFimCommand(args []string, provider string, safe bool, cfg *config.Con
 
 	fmt.Println("Done!")
 	return nil
-}
-
-func buildFimPromptWithAttachments(prefix string, suffix string, attachments []string) string {
-	var promptParts []string
-
-	for _, attachment := range attachments {
-		lines := strings.Split(attachment, "\n")
-		if len(lines) > 0 && strings.HasPrefix(lines[0], "```") {
-			filePath := ""
-			fileContent := ""
-			inContent := false
-
-			for _, line := range lines {
-				if strings.HasPrefix(line, "// ") && !inContent {
-					filePath = strings.TrimPrefix(line, "// ")
-					inContent = true
-					continue
-				}
-				if strings.HasPrefix(line, "```") && inContent {
-					break
-				}
-				if inContent && filePath != "" {
-					fileContent += line + "\n"
-				}
-			}
-
-			if filePath != "" {
-				fileContent = strings.TrimRight(fileContent, "\n")
-				promptParts = append(promptParts, fmt.Sprintf("<|file_sep|>%s\n%s", filePath, fileContent))
-			}
-		}
-	}
-
-	fimPart := fmt.Sprintf("<|fim_prefix|>%s<|fim_suffix|>%s<|fim_middle|>", prefix, suffix)
-	promptParts = append(promptParts, fimPart)
-
-	return strings.Join(promptParts, "\n\n")
 }
 
 func trimCodeBlockDelimiters(response string) string {
