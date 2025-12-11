@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"minicmd/config"
@@ -18,10 +18,10 @@ type OllamaClient struct {
 }
 
 type OllamaRequest struct {
-	Model       string      `json:"model"`
-	Prompt      string      `json:"prompt"`
-	System      string      `json:"system"`
-	Stream      bool        `json:"stream"`
+	Model       string        `json:"model"`
+	Prompt      string        `json:"prompt"`
+	System      string        `json:"system"`
+	Stream      bool          `json:"stream"`
 	Options     OllamaOptions `json:"options"`
 }
 
@@ -30,11 +30,11 @@ type OllamaOptions struct {
 }
 
 type OllamaResponse struct {
-    Response           string `json:"response"`
-    PromptEvalCount    int    `json:"prompt_eval_count,omitempty"`
-    EvalCount          int    `json:"eval_count,omitempty"`
-    Done               bool   `json:"done"`
-    DoneReason         string `json:"done_reason"`
+	Response        string `json:"response"`
+	PromptEvalCount int    `json:"prompt_eval_count,omitempty"`
+	EvalCount       int    `json:"eval_count,omitempty"`
+	Done            bool   `json:"done"`
+	DoneReason      string `json:"done_reason"`
 }
 
 func (oc *OllamaClient) Init(cfg *config.Config) {
@@ -44,6 +44,10 @@ func (oc *OllamaClient) Init(cfg *config.Config) {
 
 func (c *OllamaClient) GetModelName() string {
 	return c.model
+}
+
+func (c *OllamaClient) GetFIMSystemPrompt() string {
+	return ""
 }
 
 func (oc *OllamaClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
@@ -85,7 +89,7 @@ func (oc *OllamaClient) Call(userPrompt string, systemPrompt string, attachments
 	if err != nil {
 		return "", fmt.Errorf("error reading response: %w", err)
 	}
-	
+
 	var ollamaResp OllamaResponse
 	if err := json.Unmarshal(body, &ollamaResp); err != nil {
 		return "", fmt.Errorf("error parsing JSON response: %w", err)
@@ -93,8 +97,8 @@ func (oc *OllamaClient) Call(userPrompt string, systemPrompt string, attachments
 
 	duration := time.Since(startTime)
 	fmt.Printf("Ollama API call took %.2f seconds\n", duration.Seconds())
-	fmt.Printf("Token usage - Input: %d, Output: %d\n", 
-		ollamaResp.PromptEvalCount, 
+	fmt.Printf("Token usage - Input: %d, Output: %d\n",
+		ollamaResp.PromptEvalCount,
 		ollamaResp.EvalCount)
 
 	fmt.Printf("Done: %t, Done Reason: %s\n", ollamaResp.Done, ollamaResp.DoneReason)

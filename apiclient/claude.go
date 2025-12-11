@@ -28,6 +28,12 @@ func (c *ClaudeClient) GetModelName() string {
 	return c.model
 }
 
+func (c *ClaudeClient) GetFIMSystemPrompt() string {
+	return `You are a code completion assistant. Complete the code based on the context provided.
+Only return the code completion without any explanations or markdown formatting.
+Maintain the same indentation and style as the existing code.`
+}
+
 func (c *ClaudeClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
 	if c.apiKey == "" {
 		return "", fmt.Errorf("Claude API key not configured. Please set your API key with: minicmd config anthropic_api_key YOUR_API_KEY")
