@@ -43,16 +43,21 @@ func (c *ClaudeClient) Call(userPrompt string, systemPrompt string, attachments 
 		fullPrompt = strings.Join(parts, "\n\n")
 	}
 
-	message, err := client.Messages.New(context.Background(), anthropic.MessageNewParams{
+	params := anthropic.MessageNewParams{
 		Model:     anthropic.F(c.model),
 		MaxTokens: anthropic.F(int64(c.maxOutputTokens)),
-		System: anthropic.F([]anthropic.TextBlockParam{
-			anthropic.NewTextBlock(systemPrompt),
-		}),
 		Messages: anthropic.F([]anthropic.MessageParam{
 			anthropic.NewUserMessage(anthropic.NewTextBlock(fullPrompt)),
 		}),
-	})
+	}
+
+	if systemPrompt != "" {
+		params.System = anthropic.F([]anthropic.TextBlockParam{
+			anthropic.NewTextBlock(systemPrompt),
+		})
+	}
+
+	message, err := client.Messages.New(context.Background(), params)
 
 	if err != nil {
 		return "", fmt.Errorf("error calling Claude API: %w", err)

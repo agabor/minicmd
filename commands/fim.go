@@ -45,7 +45,7 @@ func HandleFimCommand(args []string, provider string, safe bool, cfg *config.Con
 	go showProgress(done)
 
 	prompt := buildFimPrompt(prefix, suffix)
-	response, err := client.Call(prompt, "", []string{})
+	response, err := client.Call(prompt, "Respond with the missing code part only, and nothing else.", nil)
 
 	done <- true
 	close(done)
