@@ -24,7 +24,6 @@ func HandleConfigCommand(args []string, cfg *config.Config) error {
 		fmt.Printf("  claude_model: %s\n", cfg.ClaudeModel)
 		fmt.Printf("  ollama_url: %s\n", cfg.OllamaURL)
 		fmt.Printf("  ollama_model: %s\n", cfg.OllamaModel)
-		fmt.Printf("  deepseek_url: %s\n", cfg.DeepSeekURL)
 		fmt.Printf("  deepseek_model: %s\n", cfg.DeepSeekModel)
 		fmt.Printf("  fim_token: %s\n", cfg.FimToken)
 		return nil
@@ -47,8 +46,6 @@ func HandleConfigCommand(args []string, cfg *config.Config) error {
 			cfg.OllamaURL = value
 		case "ollama_model":
 			cfg.OllamaModel = value
-		case "deepseek_url":
-			cfg.DeepSeekURL = value
 		case "deepseek_model":
 			cfg.DeepSeekModel = value
 		case "fim_token":

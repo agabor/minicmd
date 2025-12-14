@@ -60,6 +60,10 @@ func (oc *OllamaClient) FIM(prefix string, suffix string, attachments []string) 
 		},
 	}
 
+	if err := saveLastRequestJSON(payload, "ollama"); err != nil {
+		fmt.Printf("Warning: could not save request to last_request file: %v\n", err)
+	}
+
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
 		return "", fmt.Errorf("error marshaling request: %w", err)
@@ -114,6 +118,10 @@ func (oc *OllamaClient) Call(userPrompt string, systemPrompt string, attachments
 		Options: OllamaOptions{
 			Temperature: 0.1,
 		},
+	}
+
+	if err := saveLastRequestJSON(payload, "ollama"); err != nil {
+		fmt.Printf("Warning: could not save request to last_request file: %v\n", err)
 	}
 
 	jsonData, err := json.Marshal(payload)

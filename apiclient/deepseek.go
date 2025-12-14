@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"minicmd/config"
@@ -25,10 +27,10 @@ type DeepSeekRequest struct {
 }
 
 type DeepSeekCompletionRequest struct {
-	Model     string  `json:"model"`
-	Prompt    string  `json:"prompt"`
-	Suffix    string  `json:"suffix"`
-	MaxTokens int     `json:"max_tokens"`
+	Model       string  `json:"model"`
+	Prompt      string  `json:"prompt"`
+	Suffix      string  `json:"suffix"`
+	MaxTokens   int     `json:"max_tokens"`
 	Temperature float64 `json:"temperature"`
 }
 
@@ -57,14 +59,12 @@ type DeepSeekResponse struct {
 type DeepSeekClient struct {
 	apiKey    string
 	model     string
-	url       string
 	maxTokens int
 }
 
 func (c *DeepSeekClient) Init(cfg *config.Config) {
 	c.apiKey = cfg.DeepSeekAPIKey
 	c.model = cfg.DeepSeekModel
-	c.url = cfg.DeepSeekURL
 	c.maxTokens = cfg.MaxOutputTokens
 }
 
@@ -85,6 +85,10 @@ func (c *DeepSeekClient) FIM(prefix string, suffix string, attachments []string)
 		Suffix:      suffix,
 		MaxTokens:   c.maxTokens,
 		Temperature: 0.1,
+	}
+
+	if err := saveLastRequestJSON(payload, "deepseek"); err != nil {
+		fmt.Printf("Warning: could not save request to last_request file: %v\n", err)
 	}
 
 	jsonData, err := json.Marshal(payload)
@@ -171,12 +175,16 @@ func (c *DeepSeekClient) Call(userPrompt string, systemPrompt string, attachment
 		Stream:      false,
 	}
 
+	if err := saveLastRequestJSON(payload, "deepseek"); err != nil {
+		fmt.Printf("Warning: could not save request to last_request file: %v\n", err)
+	}
+
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
 		return "", fmt.Errorf("error marshaling request: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", c.url, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", "https://api.deepseek.com/v1/chat/completions", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return "", fmt.Errorf("error creating request: %w", err)
 	}
@@ -222,4 +230,24 @@ func (c *DeepSeekClient) Call(userPrompt string, systemPrompt string, attachment
 	}
 
 	return deepSeekResp.Choices[0].Message.Content, nil
+}
+
+func saveLastRequestJSON(data interface{}, provider string) error {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	minicmdDir := filepath.Join(homeDir, ".minicmd")
+	if err := os.MkdirAll(minicmdDir, 0755); err != nil {
+		return err
+	}
+
+	requestFile := filepath.Join(minicmdDir, "last_request_"+provider+".json")
+	jsonData, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(requestFile, jsonData, 0644)
 }

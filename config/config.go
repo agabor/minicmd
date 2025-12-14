@@ -10,7 +10,6 @@ const (
 	OllamaURL           = "http://localhost:11434/api/generate"
 	OllamaModel         = "qwen2.5-coder:7b"
 	ClaudeModel         = "claude-haiku-4-5-20251001"
-	DeepSeekURL         = "https://api.deepseek.com/v1/chat/completions"
 	DeepSeekModel       = "deepseek-coder"
 	DefaultMaxTokens    = 8192
 	DefaultFimToken     = "//FIM"
@@ -23,7 +22,6 @@ type Config struct {
 	OllamaURL        string `json:"ollama_url"`
 	OllamaModel      string `json:"ollama_model"`
 	ClaudeModel      string `json:"claude_model"`
-	DeepSeekURL      string `json:"deepseek_url"`
 	DeepSeekModel    string `json:"deepseek_model"`
 	MaxOutputTokens  int    `json:"max_output_tokens"`
 	FimToken         string `json:"fim_token"`
@@ -53,7 +51,6 @@ func DefaultConfig() *Config {
 		OllamaURL:       OllamaURL,
 		OllamaModel:     OllamaModel,
 		ClaudeModel:     ClaudeModel,
-		DeepSeekURL:     DeepSeekURL,
 		DeepSeekModel:   DeepSeekModel,
 		MaxOutputTokens: DefaultMaxTokens,
 		FimToken:        DefaultFimToken,
