@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"minicmd/config"
+	"yact/config"
 )
 
 type DeepSeekMessage struct {
@@ -74,7 +74,7 @@ func (c *DeepSeekClient) GetModelName() string {
 
 func (c *DeepSeekClient) FIM(prefix string, suffix string, attachments []string) (string, error) {
 	if c.apiKey == "" {
-		return "", fmt.Errorf("DeepSeek API key not configured. Please set your API key with: minicmd config deepseek_api_key YOUR_API_KEY")
+		return "", fmt.Errorf("DeepSeek API key not configured. Please set your API key with: ya config deepseek_api_key YOUR_API_KEY")
 	}
 
 	startTime := time.Now()
@@ -146,7 +146,7 @@ func (c *DeepSeekClient) FIM(prefix string, suffix string, attachments []string)
 
 func (c *DeepSeekClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
 	if c.apiKey == "" {
-		return "", fmt.Errorf("DeepSeek API key not configured. Please set your API key with: minicmd config deepseek_api_key YOUR_API_KEY")
+		return "", fmt.Errorf("DeepSeek API key not configured. Please set your API key with: ya config deepseek_api_key YOUR_API_KEY")
 	}
 
 	startTime := time.Now()
@@ -238,12 +238,12 @@ func saveLastRequestJSON(data interface{}, provider string) error {
 		return err
 	}
 
-	minicmdDir := filepath.Join(homeDir, ".minicmd")
-	if err := os.MkdirAll(minicmdDir, 0755); err != nil {
+	yactDir := filepath.Join(homeDir, ".yact")
+	if err := os.MkdirAll(yactDir, 0755); err != nil {
 		return err
 	}
 
-	requestFile := filepath.Join(minicmdDir, "last_request_"+provider+".json")
+	requestFile := filepath.Join(yactDir, "last_request_"+provider+".json")
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return err

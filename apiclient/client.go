@@ -1,7 +1,7 @@
 package apiclient
 
 import (
-	"minicmd/config"
+	"yact/config"
 )
 
 type APIClient interface {

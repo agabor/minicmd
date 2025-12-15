@@ -32,7 +32,7 @@ func getConfigDir() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(home, ".minicmd"), nil
+	return filepath.Join(home, ".yact"), nil
 }
 
 func getConfigFile() (string, error) {

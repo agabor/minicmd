@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"minicmd/config"
+	"yact/config"
 )
 
 type OllamaClient struct {

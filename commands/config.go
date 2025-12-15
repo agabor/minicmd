@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"minicmd/config"
+	"yact/config"
 )
 
 func HandleConfigCommand(args []string, cfg *config.Config) error {
@@ -67,7 +67,7 @@ func HandleConfigCommand(args []string, cfg *config.Config) error {
 	}
 
 	fmt.Println("Usage:")
-	fmt.Println("  minicmd config                    # Show current config")
-	fmt.Println("  minicmd config <key> <value>      # Set config value")
+	fmt.Println("  ya config                    # Show current config")
+	fmt.Println("  ya config <key> <value>      # Set config value")
 	return nil
 }

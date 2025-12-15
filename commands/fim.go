@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"minicmd/config"
-	"minicmd/promptmanager"
+	"yact/config"
+	"yact/promptmanager"
 )
 
 func HandleFimCommand(args []string, provider string, safe bool, cfg *config.Config) error {

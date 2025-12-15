@@ -1,6 +1,6 @@
-# MiniCmd Go Implementation
+# YACT
 
-This is a Go reimplementation of the MiniCmd AI-powered code generation tool.
+Yet Another AI Coding Tool
 
 ## Prerequisites
 
@@ -21,10 +21,10 @@ Download and install from: https://golang.org/dl/
 ```bash
 cd go
 go mod download
-go build -o minicmd
+go build -o ya
 ```
 
-This will create a `minicmd` binary in the current directory.
+This will create a `ya` binary in the current directory.
 
 ## Installation
 
@@ -32,8 +32,8 @@ To install the binary to your system:
 
 ```bash
 cd go
-go build -o minicmd
-sudo mv minicmd /usr/local/bin/
+go build -o ya
+sudo mv ya /usr/local/bin/
 ```
 
 Or use the provided install script:
@@ -50,30 +50,30 @@ The Go implementation has the same interface as the Python version:
 
 ```bash
 # Show help
-minicmd --help
+ya --help
 
 # Configure API keys
-minicmd config anthropic_api_key YOUR_API_KEY
-minicmd config deepseek_api_key YOUR_API_KEY
+ya config anthropic_api_key YOUR_API_KEY
+ya config deepseek_api_key YOUR_API_KEY
 
 # Run code generation
-minicmd run
-minicmd run "create a hello world function"
+ya run
+ya run "create a hello world function"
 
 # Edit prompt
-minicmd edit
+ya edit
 
 # Add files to context
-minicmd read file.go
+ya read file.go
 
 # List attachments
-minicmd list
+ya list
 
 # Clear prompt and attachments
-minicmd clear
+ya clear
 
 # Show configuration
-minicmd config
+ya config
 ```
 
 ## Project Structure
@@ -111,7 +111,7 @@ All features from the Python implementation are supported:
 
 ## Configuration
 
-Configuration is stored in `~/.minicmd/config` (same location as Python version).
+Configuration is stored in `~/.yact/config` (same location as Python version).
 
 The Go implementation is compatible with the Python version's configuration.
 

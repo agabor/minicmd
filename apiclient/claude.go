@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"minicmd/config"
+	"yact/config"
 
 	"github.com/anthropics/anthropic-sdk-go"
 	"github.com/anthropics/anthropic-sdk-go/option"
@@ -34,7 +34,7 @@ func (c *ClaudeClient) FIM(prefix string, suffix string, attachments []string) (
 
 func (c *ClaudeClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
 	if c.apiKey == "" {
-		return "", fmt.Errorf("Claude API key not configured. Please set your API key with: minicmd config anthropic_api_key YOUR_API_KEY")
+		return "", fmt.Errorf("Claude API key not configured. Please set your API key with: ya config anthropic_api_key YOUR_API_KEY")
 	}
 
 	startTime := time.Now()

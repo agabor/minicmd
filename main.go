@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"minicmd/commands"
-	"minicmd/config"
+	"yact/commands"
+	"yact/config"
 
 	flag "github.com/spf13/pflag"
 )
@@ -80,7 +80,7 @@ func main() {
 		commandErr = commands.HandleShowLastCommand()
 	default:
 		fmt.Printf("Error: Unknown command '%s'\n", command)
-		fmt.Println("Run 'minicmd --help' for usage information.")
+		fmt.Println("Run 'ya --help' for usage information.")
 		os.Exit(1)
 	}
 

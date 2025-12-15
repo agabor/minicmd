@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"minicmd/promptmanager"
+	"yact/promptmanager"
 )
 
 func HandleEditCommand() error {
@@ -14,7 +14,7 @@ func HandleEditCommand() error {
 
 func HandleReadCommand(args []string) error {
 	if len(args) < 1 {
-		fmt.Println("Usage: minicmd read <file> [<file2> ...]")
+		fmt.Println("Usage: ya read <file> [<file2> ...]")
 		return fmt.Errorf("missing file argument")
 	}
 
@@ -64,7 +64,7 @@ func HandleShowLastCommand() error {
 		return fmt.Errorf("error getting home directory: %w", err)
 	}
 	
-	responseFile := filepath.Join(homeDir, ".minicmd", "last_response")
+	responseFile := filepath.Join(homeDir, ".yact", "last_response")
 	content, err := os.ReadFile(responseFile)
 	if err != nil {
 		if os.IsNotExist(err) {

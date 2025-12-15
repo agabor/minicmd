@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Build the Go binary
-echo "Building minicmd..."
-go build -o minicmd
+echo "Building yact..."
+go build -o ya
 
 if [ $? -ne 0 ]; then
     echo "Build failed!"
@@ -10,12 +10,12 @@ if [ $? -ne 0 ]; then
 fi
 
 # Install to /usr/local/bin
-echo "Installing minicmd to /usr/local/bin..."
-sudo mv minicmd /usr/local/bin/
+echo "Installing ya to /usr/local/bin..."
+sudo mv ya /usr/local/bin/
 
 if [ $? -eq 0 ]; then
     echo "Installation successful!"
-    echo "You can now run 'minicmd' from anywhere."
+    echo "You can now run 'ya' from anywhere."
 else
     echo "Installation failed. You may need to run this script with sudo."
     exit 1

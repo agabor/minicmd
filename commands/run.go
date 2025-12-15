@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"minicmd/apiclient"
-	"minicmd/config"
-	"minicmd/fileprocessor"
-	"minicmd/promptmanager"
+	"yact/apiclient"
+	"yact/config"
+	"yact/fileprocessor"
+	"yact/promptmanager"
 )
 
 func showProgress(done chan bool) {
@@ -35,12 +35,12 @@ func saveLastResponse(response string) error {
 		return err
 	}
 	
-	minicmdDir := filepath.Join(homeDir, ".minicmd")
-	if err := os.MkdirAll(minicmdDir, 0755); err != nil {
+	yactDir := filepath.Join(homeDir, ".yact")
+	if err := os.MkdirAll(yactDir, 0755); err != nil {
 		return err
 	}
 	
-	responseFile := filepath.Join(minicmdDir, "last_response")
+	responseFile := filepath.Join(yactDir, "last_response")
 	return os.WriteFile(responseFile, []byte(response), 0644)
 }
 
