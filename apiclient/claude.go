@@ -32,6 +32,28 @@ func (c *ClaudeClient) FIM(prefix string, suffix string, attachments []string) (
 	return "", fmt.Errorf("Claude does not support FIM calls.")
 }
 
+func (c *ClaudeClient) calculateCost(inputTokens int64, outputTokens int64) float64 {
+	var inputCostPer1M, outputCostPer1M float64
+
+	switch {
+	case strings.Contains(c.model, "haiku"):
+		inputCostPer1M = 0.80
+		outputCostPer1M = 4.0
+	case strings.Contains(c.model, "sonnet"):
+		inputCostPer1M = 3.0
+		outputCostPer1M = 15.0
+	case strings.Contains(c.model, "opus"):
+		inputCostPer1M = 15.0
+		outputCostPer1M = 75.0
+	default:
+		return 0.0
+	}
+
+	inputCost := (float64(inputTokens) / 1_000_000) * inputCostPer1M
+	outputCost := (float64(outputTokens) / 1_000_000) * outputCostPer1M
+	return inputCost + outputCost
+}
+
 func (c *ClaudeClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
 	if c.apiKey == "" {
 		return "", fmt.Errorf("Claude API key not configured. Please set your API key with: ya config anthropic_api_key YOUR_API_KEY")
@@ -72,6 +94,9 @@ func (c *ClaudeClient) Call(userPrompt string, systemPrompt string, attachments 
 	fmt.Printf("Token usage - Input: %d, Output: %d\n",
 		message.Usage.InputTokens,
 		message.Usage.OutputTokens)
+
+	cost := c.calculateCost(message.Usage.InputTokens, message.Usage.OutputTokens)
+	fmt.Printf("Cost: $%.6f\n", cost)
 
 	if message.Usage.OutputTokens >= int64(c.maxOutputTokens) {
 		fmt.Printf("⚠️  WARNING: Maximum output tokens (%d) reached. Response may be incomplete.\n", c.maxOutputTokens)
