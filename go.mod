@@ -1,4 +1,4 @@
-module minicmd
+module yact
 
 go 1.21
 
