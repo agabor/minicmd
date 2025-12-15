@@ -21,9 +21,15 @@ func main() {
 
 	args := flag.Args()
 
-	if *helpFlag || len(args) == 0 || (len(args) > 0 && args[0] == "help") {
+	if *helpFlag {
 		commands.ShowHelp()
 		return
+	}
+
+	if len(args) == 0 {
+		fmt.Fprintf(os.Stderr, "Error: no command provided\n")
+		fmt.Println("Run 'ya --help' for usage information.")
+		os.Exit(1)
 	}
 
 	cfg, err := config.Load()
@@ -60,6 +66,9 @@ func main() {
 	var commandErr error
 
 	switch command {
+	case "help":
+		commands.ShowHelp()
+		return
 	case "edit":
 		commandErr = commands.HandleEditCommand()
 	case "read":

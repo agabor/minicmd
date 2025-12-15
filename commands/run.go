@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -55,15 +56,34 @@ func getAPIClient(provider string) apiclient.APIClient {
 	}
 }
 
+func isStdinPiped() bool {
+	stat, _ := os.Stdin.Stat()
+	return (stat.Mode() & os.ModeCharDevice) == 0
+}
+
+func getPromptFromStdin() (string, error) {
+	data, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
 func HandleRunCommand(args []string, provider string, safe bool, cfg *config.Config, systemPrompt string) error {
 	if provider == "" {
 		provider = cfg.DefaultProvider
 	}
 
 	var prompt string
+	
 	if len(args) > 0 {
 		prompt = strings.Join(args, " ")
-		fmt.Println("Using provided prompt content")
+	} else if isStdinPiped() {
+		stdinContent, err := getPromptFromStdin()
+		if err != nil {
+			return err
+		}
+		prompt = stdinContent
 	} else {
 		if err := promptmanager.EditPromptFile(); err != nil {
 			return err
