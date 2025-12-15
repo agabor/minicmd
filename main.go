@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"yact/commands"
@@ -9,6 +10,19 @@ import (
 
 	flag "github.com/spf13/pflag"
 )
+
+func isStdinPiped() bool {
+	stat, _ := os.Stdin.Stat()
+	return (stat.Mode() & os.ModeCharDevice) == 0
+}
+
+func getPromptFromStdin() (string, error) {
+	data, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
 
 func main() {
 	claudeFlag := flag.Bool("claude", false, "Use Claude API")
@@ -27,9 +41,19 @@ func main() {
 	}
 
 	if len(args) == 0 {
-		fmt.Fprintf(os.Stderr, "Error: no command provided\n")
-		fmt.Println("Run 'ya --help' for usage information.")
-		os.Exit(1)
+		if isStdinPiped() {
+			stdinContent, err := getPromptFromStdin()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
+			}
+			fmt.Println(stdinContent)
+			args = []string{"run", stdinContent}
+		} else {
+			fmt.Fprintf(os.Stderr, "Error: no command provided\n")
+			fmt.Println("Run 'ya --help' for usage information.")
+			os.Exit(1)
+		}
 	}
 
 	cfg, err := config.Load()
