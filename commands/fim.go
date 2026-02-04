@@ -71,10 +71,6 @@ func HandleFimCommand(args []string, provider string, safe bool, cfg *config.Con
 
 	response = trimCodeBlockDelimiters(response)
 
-	if err := saveLastResponse(response); err != nil {
-		fmt.Printf("Warning: could not save response to last_response file: %v\n", err)
-	}
-
 	result := prefix + response + suffix
 
 	fmt.Println("Writing result to file...")
