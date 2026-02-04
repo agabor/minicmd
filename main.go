@@ -71,8 +71,6 @@ func main() {
 	case "help":
 		commands.ShowHelp()
 		return
-	case "edit":
-		commandErr = commands.HandleEditCommand()
 	case "read":
 		commandErr = commands.HandleReadCommand(commandArgs)
 	case "list":

@@ -29,21 +29,22 @@ func showProgress(done chan bool) {
 
 func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt string) error {
 
-	var prompt string
-
-	if len(args) > 0 {
-		prompt = strings.Join(args, " ")
-	} else {
-		if err := promptmanager.EditPromptFile(); err != nil {
-			return err
-		}
-		promptContent, err := promptmanager.GetPromptFromFile()
-		if err != nil {
-			return err
-		}
-		prompt = promptContent
-		fmt.Println("Using default prompt file")
+	responseContent, err := HandleCall(args, cfg, systemPrompt)
+	if err != nil {
+		return err
 	}
+
+	fmt.Println("Processing response...")
+	if err := fileprocessor.ProcessCodeBlocks(responseContent, safe); err != nil {
+		return fmt.Errorf("error processing code blocks: %w", err)
+	}
+
+	fmt.Println("Done!")
+	return nil
+}
+
+func HandleCall(args []string, cfg *config.Config, systemPrompt string) (string, error) {
+	prompt := strings.Join(args, " ")
 
 	fmt.Printf("Sending request to Claude...\n")
 
@@ -61,7 +62,7 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 
 	attachments, err := promptmanager.GetAttachments()
 	if err != nil {
-		return fmt.Errorf("error getting attachments: %w", err)
+		return "", fmt.Errorf("error getting attachments: %w", err)
 	}
 
 	messages := buildMessages(contextMessages, prompt, attachments)
@@ -75,34 +76,27 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 	close(done)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if err := promptmanager.ClearPrompt(); err != nil {
-		return fmt.Errorf("error clearing prompt: %w", err)
+		return "", fmt.Errorf("error clearing prompt: %w", err)
 	}
 
 	responseContent := response.Content
 	if responseContent == "" {
-		return fmt.Errorf("error: no response from Claude API")
+		return "", fmt.Errorf("error: no response from Claude API")
 	}
 
 	if strings.TrimSpace(responseContent) == "" {
-		return fmt.Errorf("error: empty response from Claude API")
+		return "", fmt.Errorf("error: empty response from Claude API")
 	}
 
 	updatedMessages := append(messages, response)
 	if err := SaveContext(updatedMessages); err != nil {
 		fmt.Printf("Warning: could not save context: %v\n", err)
 	}
-
-	fmt.Println("Processing response...")
-	if err := fileprocessor.ProcessCodeBlocks(responseContent, safe); err != nil {
-		return fmt.Errorf("error processing code blocks: %w", err)
-	}
-
-	fmt.Println("Done!")
-	return nil
+	return responseContent, nil
 }
 
 func buildMessages(contextMessages []apiclient.Message, prompt string, attachments []string) []apiclient.Message {

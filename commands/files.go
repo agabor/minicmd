@@ -8,10 +8,6 @@ import (
 	"yact/promptmanager"
 )
 
-func HandleEditCommand() error {
-	return promptmanager.EditPromptFile()
-}
-
 func HandleReadCommand(args []string) error {
 	if len(args) < 1 {
 		fmt.Println("Usage: y read <file> [<file2> ...]")
