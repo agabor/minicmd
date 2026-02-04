@@ -43,6 +43,16 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 	return nil
 }
 
+func HandleAskCommand(args []string, cfg *config.Config, systemPrompt string) error {
+	responseContent, err := HandleCall(args, cfg, systemPrompt)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("\n" + responseContent)
+	return nil
+}
+
 func HandleNewCommand() error {
 	if err := ClearContext(); err != nil {
 		return fmt.Errorf("error clearing context: %w", err)
@@ -63,18 +73,11 @@ func HandleCall(args []string, cfg *config.Config, systemPrompt string) (string,
 
 	fmt.Printf("Model: %s\n", client.GetModelName())
 
-	contextMessages, err := LoadContext()
-	if err != nil {
-		fmt.Printf("Warning: could not load context: %v\n", err)
-		contextMessages = []apiclient.Message{}
-	}
+	messages, err := BuildMessages(prompt)
 
-	attachments, err := promptmanager.GetAttachments()
 	if err != nil {
-		return "", fmt.Errorf("error getting attachments: %w", err)
+		return "", err
 	}
-
-	messages := buildMessages(contextMessages, prompt, attachments)
 
 	done := make(chan bool)
 	go showProgress(done)
@@ -106,20 +109,4 @@ func HandleCall(args []string, cfg *config.Config, systemPrompt string) (string,
 		fmt.Printf("Warning: could not save context: %v\n", err)
 	}
 	return responseContent, nil
-}
-
-func buildMessages(contextMessages []apiclient.Message, prompt string, attachments []string) []apiclient.Message {
-	var content string
-	if len(attachments) > 0 {
-		content = prompt + "\n\n" + strings.Join(attachments, "\n")
-	} else {
-		content = prompt
-	}
-
-	userMessage := apiclient.Message{
-		Role:    "user",
-		Content: content,
-	}
-
-	return append(contextMessages, userMessage)
 }

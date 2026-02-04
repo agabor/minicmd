@@ -2,8 +2,11 @@ package commands
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+	"yact/promptmanager"
 
 	"yact/apiclient"
 )
@@ -68,4 +71,30 @@ func ClearContext() error {
 	}
 
 	return nil
+}
+func BuildMessages(prompt string) ([]apiclient.Message, error) {
+	contextMessages, err := LoadContext()
+	if err != nil {
+		fmt.Printf("Warning: could not load context: %v\n", err)
+		contextMessages = []apiclient.Message{}
+	}
+
+	attachments, err := promptmanager.GetAttachments()
+	if err != nil {
+		return nil, fmt.Errorf("error getting attachments: %w", err)
+	}
+
+	var content string
+	if len(attachments) > 0 {
+		content = prompt + "\n\n" + strings.Join(attachments, "\n")
+	} else {
+		content = prompt
+	}
+
+	userMessage := apiclient.Message{
+		Role:    "user",
+		Content: content,
+	}
+
+	return append(contextMessages, userMessage), nil
 }
