@@ -70,3 +70,13 @@ func HandleAskCommand(args []string, cfg *config.Config, systemPrompt string) er
 	fmt.Println("\n" + response.Content)
 	return nil
 }
+
+func buildMessagesWithAttachments(prompt string) ([]apiclient.Message, error) {
+	attachments, err := promptmanager.GetAttachments()
+	if err != nil {
+		return nil, fmt.Errorf("error getting attachments: %w", err)
+	}
+
+	messages := buildMessages(nil, prompt, attachments)
+	return messages, nil
+}
