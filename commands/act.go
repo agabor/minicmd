@@ -70,10 +70,18 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 
 	fmt.Printf("Model: %s\n", client.GetModelName())
 
-	messages, err := buildMessagesWithAttachments(prompt)
+	contextMessages, err := LoadContext()
 	if err != nil {
-		return err
+		fmt.Printf("Warning: could not load context: %v\n", err)
+		contextMessages = []apiclient.Message{}
 	}
+
+	attachments, err := promptmanager.GetAttachments()
+	if err != nil {
+		return fmt.Errorf("error getting attachments: %w", err)
+	}
+
+	messages := buildMessages(contextMessages, prompt, attachments)
 
 	done := make(chan bool)
 	go showProgress(done)
@@ -100,6 +108,11 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 		return fmt.Errorf("error: empty response from Claude API")
 	}
 
+	updatedMessages := append(messages, response)
+	if err := SaveContext(updatedMessages); err != nil {
+		fmt.Printf("Warning: could not save context: %v\n", err)
+	}
+
 	if err := saveLastResponse(responseContent); err != nil {
 		fmt.Printf("Warning: could not save response to last_response file: %v\n", err)
 	}
@@ -113,27 +126,18 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 	return nil
 }
 
-func buildMessagesWithAttachments(prompt string) ([]apiclient.Message, error) {
-	attachments, err := promptmanager.GetAttachments()
-	if err != nil {
-		return nil, fmt.Errorf("error getting attachments: %w", err)
-	}
-
-	messages := buildMessages(prompt, attachments)
-	return messages, nil
-}
-
-func buildMessages(prompt string, attachments []string) []apiclient.Message {
+func buildMessages(contextMessages []apiclient.Message, prompt string, attachments []string) []apiclient.Message {
 	var content string
 	if len(attachments) > 0 {
 		content = prompt + "\n\n" + strings.Join(attachments, "\n")
 	} else {
 		content = prompt
 	}
-	return []apiclient.Message{
-		{
-			Role:    "user",
-			Content: content,
-		},
+
+	userMessage := apiclient.Message{
+		Role:    "user",
+		Content: content,
 	}
+
+	return append(contextMessages, userMessage)
 }
