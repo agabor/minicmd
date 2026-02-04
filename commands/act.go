@@ -44,7 +44,7 @@ func saveLastResponse(response string) error {
 	return os.WriteFile(responseFile, []byte(response), 0644)
 }
 
-func HandleRunCommand(args []string, safe bool, cfg *config.Config, systemPrompt string) error {
+func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt string) error {
 
 	var prompt string
 

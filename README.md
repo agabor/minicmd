@@ -56,8 +56,8 @@ ya --help
 ya config anthropic_api_key YOUR_API_KEY
 
 # Run code generation
-ya run
-ya run "create a hello world function"
+ya act
+ya act "create a hello world function"
 
 # Edit prompt
 ya edit

@@ -8,7 +8,7 @@ func ShowHelp() {
 	fmt.Println("ya - Yet Another Coding Tool")
 	fmt.Println()
 	fmt.Println("Usage:")
-	fmt.Println("  ya run [prompt_content]  # Generate code with optional custom prompt content")
+	fmt.Println("  ya act [prompt_content]  # Generate code with optional custom prompt content")
 	fmt.Println("  ya bash [script_content] # Generate a bash script file")
 	fmt.Println("  ya ask [question]        # Ask questions about the codebase")
 	fmt.Println("  ya edit                      # Edit the prompt file")

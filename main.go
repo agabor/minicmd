@@ -45,7 +45,7 @@ func main() {
 				os.Exit(1)
 			}
 			fmt.Println(stdinContent)
-			args = []string{"run", stdinContent}
+			args = []string{"act", stdinContent}
 		} else {
 			fmt.Fprintf(os.Stderr, "Error: no command provided\n")
 			fmt.Println("Run 'ya --help' for usage information.")
@@ -79,10 +79,10 @@ func main() {
 		commandErr = commands.HandleListCommand()
 	case "config":
 		commandErr = commands.HandleConfigCommand(commandArgs, cfg)
-	case "run":
-		commandErr = commands.HandleRunCommand(commandArgs, *safeFlag, cfg, config.SystemPrompt)
+	case "act":
+		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, config.SystemPrompt)
 	case "bash":
-		commandErr = commands.HandleRunCommand(commandArgs, *safeFlag, cfg, config.SystemPromptBash)
+		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, config.SystemPromptBash)
 	case "ask":
 		commandErr = commands.HandleAskCommand(commandArgs, cfg)
 	case "clear":
