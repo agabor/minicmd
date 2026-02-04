@@ -21,10 +21,10 @@ Download and install from: https://golang.org/dl/
 ```bash
 cd go
 go mod download
-go build -o ya
+go build -o y
 ```
 
-This will create a `ya` binary in the current directory.
+This will create a `y` binary in the current directory.
 
 ## Installation
 
@@ -32,8 +32,8 @@ To install the binary to your system:
 
 ```bash
 cd go
-go build -o ya
-sudo mv ya /usr/local/bin/
+go build -o y
+sudo mv y /usr/local/bin/
 ```
 
 Or use the provided install script:
@@ -50,29 +50,29 @@ The Go implementation has the same interface as the Python version:
 
 ```bash
 # Show help
-ya --help
+y --help
 
 # Configure API key
-ya config anthropic_api_key YOUR_API_KEY
+y config anthropic_api_key YOUR_API_KEY
 
 # Run code generation
-ya act
-ya act "create a hello world function"
+y act
+y act "create a hello world function"
 
 # Edit prompt
-ya edit
+y edit
 
 # Add files to context
-ya read file.go
+y read file.go
 
 # List attachments
-ya list
+y list
 
 # Clear prompt and attachments
-ya clear
+y clear
 
 # Show configuration
-ya config
+y config
 ```
 
 ## Features

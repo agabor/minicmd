@@ -52,7 +52,7 @@ func (c *ClaudeClient) calculateCost(inputTokens int64, outputTokens int64) floa
 
 func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (Message, error) {
 	if c.apiKey == "" {
-		return Message{}, fmt.Errorf("Claude API key not configured. Please set your API key with: ya config anthropic_api_key YOUR_API_KEY")
+		return Message{}, fmt.Errorf("Claude API key not configured. Please set your API key with: y config anthropic_api_key YOUR_API_KEY")
 	}
 
 	startTime := time.Now()

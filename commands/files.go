@@ -14,7 +14,7 @@ func HandleEditCommand() error {
 
 func HandleReadCommand(args []string) error {
 	if len(args) < 1 {
-		fmt.Println("Usage: ya read <file> [<file2> ...]")
+		fmt.Println("Usage: y read <file> [<file2> ...]")
 		return fmt.Errorf("missing file argument")
 	}
 

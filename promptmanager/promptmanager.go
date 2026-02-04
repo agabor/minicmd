@@ -73,7 +73,7 @@ func GetPromptFromFile() (string, error) {
 	}
 
 	if _, err := os.Stat(promptFile); os.IsNotExist(err) {
-		return "", fmt.Errorf("prompt file does not exist. Please run 'ya edit' to create and edit your prompt")
+		return "", fmt.Errorf("prompt file does not exist. Please run 'y edit' to create and edit your prompt")
 	}
 
 	content, err := os.ReadFile(promptFile)
@@ -83,7 +83,7 @@ func GetPromptFromFile() (string, error) {
 
 	contentStr := strings.TrimSpace(string(content))
 	if contentStr == "" {
-		return "", fmt.Errorf("prompt file is empty. Please run 'ya edit' to add content to your prompt")
+		return "", fmt.Errorf("prompt file is empty. Please run 'y edit' to add content to your prompt")
 	}
 
 	return contentStr, nil

@@ -45,7 +45,7 @@ func HandleConfigCommand(args []string, cfg *config.Config) error {
 	}
 
 	fmt.Println("Usage:")
-	fmt.Println("  ya config                    # Show current config")
-	fmt.Println("  ya config <key> <value>      # Set config value")
+	fmt.Println("  y config                    # Show current config")
+	fmt.Println("  y config <key> <value>      # Set config value")
 	return nil
 }

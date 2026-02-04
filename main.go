@@ -48,7 +48,7 @@ func main() {
 			args = []string{"act", stdinContent}
 		} else {
 			fmt.Fprintf(os.Stderr, "Error: no command provided\n")
-			fmt.Println("Run 'ya --help' for usage information.")
+			fmt.Println("Run 'y --help' for usage information.")
 			os.Exit(1)
 		}
 	}
@@ -91,7 +91,7 @@ func main() {
 		commandErr = commands.HandleLastCommand()
 	default:
 		fmt.Printf("Error: Unknown command '%s'\n", command)
-		fmt.Println("Run 'ya --help' for usage information.")
+		fmt.Println("Run 'y --help' for usage information.")
 		os.Exit(1)
 	}
 
