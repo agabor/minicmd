@@ -5,7 +5,7 @@ import (
 )
 
 func ShowHelp() {
-	fmt.Println("ya - AI-powered code generation tool")
+	fmt.Println("ya - Yet Another Coding Tool")
 	fmt.Println()
 	fmt.Println("Usage:")
 	fmt.Println("  ya run [prompt_content]  # Generate code with optional custom prompt content")
