@@ -1,100 +1,180 @@
-# YACT
+# YACT - Yet Another Coding Tool
 
-Yet Another AI Coding Tool
+A command-line AI assistant powered by Claude that helps you generate code, bash scripts, and answer questions about your codebase.
 
 ## Prerequisites
 
 You need to have Go installed on your system. To install Go:
 
-### Ubuntu/Debian
-```bash
-sudo snap install go
-# or
-sudo apt install golang-go
-```
-
-### Other Systems
-Download and install from: https://golang.org/dl/
-
-## Building
-
-```bash
-cd go
-go mod download
-go build -o y
-```
-
-This will create a `y` binary in the current directory.
-
-## Installation
+## Building and Installation
 
 To install the binary to your system:
 
 ```bash
-cd go
-go build -o y
-sudo mv y /usr/local/bin/
-```
-
-Or use the provided install script:
-
-```bash
-cd go
-chmod +x install.sh
+git clone https://github.com/agabor/yact.git
+cd yact
 ./install.sh
 ```
 
-## Usage
+This will make the `y` command available on your system.
 
-The Go implementation has the same interface as the Python version:
+## Quick Start
+
+Before using `y`, configure your Claude API key:
 
 ```bash
-# Show help
-y --help
-
-# Configure API key
 y config anthropic_api_key YOUR_API_KEY
+```
 
-# Run code generation
-y act
-y act "create a hello world function"
+You can verify your configuration at any time:
 
-# Edit prompt
-y edit
-
-# Add files to context
-y read file.go
-
-# List attachments
-y list
-
-# Clear prompt and attachments
-y clear
-
-# Show configuration
+```bash
 y config
 ```
 
-## Features
+## Commands
 
-All features from the Python implementation are supported:
+### Generate Code
 
-- Code generation from prompts
-- File attachment support
-- Configuration management
-- Progress indicators
-- Verbose and debug modes
-- Safe mode (adds .new suffix to generated files)
+Generate code files based on a prompt:
+
+```bash
+y act "create a user authentication handler"
+```
+
+The AI will generate complete files with code blocks. By default, files are written directly to your filesystem. Use the `--safe` flag to add a `.new` suffix to generated files for review before replacing originals:
+
+```bash
+y act --safe "add logging to the user service"
+```
+
+### Generate Bash Scripts
+
+Generate standalone bash scripts:
+
+```bash
+y bash "create a script that backs up my database"
+```
+
+### Ask Questions
+
+Ask questions about your codebase or general topics:
+
+```bash
+y ask "how does the authentication flow work?"
+y ask "what are the best practices for Go error handling?"
+```
+
+### File References
+
+Attach files to your prompts so the AI can reference them when generating code:
+
+```bash
+y read src/models/user.go
+y read src/handlers/*.go
+y ask "add validation to the user model"
+```
+
+Use glob patterns to match multiple files. View your current attachments:
+
+```bash
+y list
+```
+
+Clear all attachments:
+
+```bash
+y clear
+```
+
+### Context Management
+
+By default, `y` maintains a conversation history. Use this to build on previous responses:
+
+```bash
+y ask "what functions do we need?"
+y act "now implement those functions"  # The AI remembers the previous question
+```
+
+Start a fresh conversation:
+
+```bash
+y new
+```
+
+Retrieve the last AI response:
+
+```bash
+y last
+```
 
 ## Configuration
 
-Configuration is stored in `~/.yact/config` (same location as Python version).
+View current settings:
 
-The Go implementation is compatible with the Python version's configuration.
+```bash
+y config
+```
 
-## Dependencies
+Set configuration values:
 
-- `github.com/anthropics/anthropic-sdk-go` - Claude API client
-- `github.com/spf13/pflag` - Command-line flag parsing
+```bash
+y config anthropic_api_key your_key_here
+y config claude_model claude-opus-4-1-20250805
+```
 
-Dependencies are managed via Go modules and will be automatically downloaded when you run `go mod download` or `go build`.
+Available configuration keys:
+- `anthropic_api_key` - Your Claude API key (required)
+- `claude_model` - Which Claude model to use (default: claude-haiku-4-5-20251001)
+
+## Piping Input
+
+You can pipe text directly to `y`:
+
+```bash
+cat requirements.txt | y act
+echo "fix the database connection" | y bash
+```
+
+## Usage Tips
+
+- **File patterns**: Use glob patterns with `read` to attach multiple related files at once
+- **Safe mode**: Always use `--safe` when generating new code to review changes first
+- **Context**: Build up context by reading relevant files before asking complex questions
+- **Conversation flow**: Use multi-step conversations - ask for a plan first, then generate code
+- **Cost tracking**: The tool displays token usage and estimated costs for each API call
+
+## Help
+
+Display command reference:
+
+```bash
+y help
+y --help
+y -h
+```
+
+## Storage
+
+Configuration and conversation history are stored in `~/.yact/`:
+- `config` - Your API key and model settings
+- `context.json` - Conversation history
+- `attachments.json` - List of attached files
+
+## Troubleshooting
+
+**"Claude API key not configured"**
+- Set your API key: `y config anthropic_api_key YOUR_KEY`
+
+**"No files found matching pattern"**
+- Check that the glob pattern matches existing files
+- Use exact paths if glob patterns don't work
+
+**"File not found in attachments"**
+- Verify the file path is correct and the file exists
+- Use `y list` to see currently attached files
+
+**API errors**
+- Verify your API key is valid
+- Check your internet connection
+- Ensure your Claude API account has available credits
