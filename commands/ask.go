@@ -28,20 +28,23 @@ func HandleAskCommand(args []string, cfg *config.Config) error {
 
 	fmt.Printf("Sending request to Claude...\n")
 
-	client := apiclient.ClaudeClient{}
+	var client apiclient.APIClient
+	client = &apiclient.ClaudeClient{}
 	client.Init(cfg)
 
 	fmt.Printf("Model: %s\n", client.GetModelName())
 
-	attachments, err := promptmanager.GetAttachments()
-	if err != nil {
-		return fmt.Errorf("error getting attachments: %w", err)
+	messages := []apiclient.Message{
+		{
+			Role:    "user",
+			Content: prompt,
+		},
 	}
 
 	done := make(chan bool)
 	go showProgress(done)
 
-	response, err := client.Call(prompt, config.SystemPromptAsk, attachments)
+	response, err := client.Call(messages, config.SystemPromptAsk)
 
 	done <- true
 	close(done)

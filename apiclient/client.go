@@ -4,8 +4,13 @@ import (
 	"yact/config"
 )
 
+type Message struct {
+	Role    string
+	Content string
+}
+
 type APIClient interface {
 	Init(cfg *config.Config)
 	GetModelName() string
-	Call(userPrompt string, systemPrompt string, attachments []string) (string, error)
+	Call(messages []Message, systemPrompt string) (string, error)
 }

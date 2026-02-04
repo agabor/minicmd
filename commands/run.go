@@ -64,7 +64,8 @@ func HandleRunCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 
 	fmt.Printf("Sending request to Claude...\n")
 
-	client := apiclient.ClaudeClient{}
+	var client apiclient.APIClient
+	client = &apiclient.ClaudeClient{}
 	client.Init(cfg)
 
 	fmt.Printf("Model: %s\n", client.GetModelName())
@@ -74,10 +75,12 @@ func HandleRunCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 		return fmt.Errorf("error getting attachments: %w", err)
 	}
 
+	messages := buildMessages(prompt, attachments)
+
 	done := make(chan bool)
 	go showProgress(done)
 
-	response, err := client.Call(prompt, systemPrompt, attachments)
+	response, err := client.Call(messages, systemPrompt)
 
 	done <- true
 	close(done)
@@ -109,4 +112,19 @@ func HandleRunCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 
 	fmt.Println("Done!")
 	return nil
+}
+
+func buildMessages(prompt string, attachments []string) []apiclient.Message {
+	var content string
+	if len(attachments) > 0 {
+		content = prompt + "\n\n" + strings.Join(attachments, "\n")
+	} else {
+		content = prompt
+	}
+	return []apiclient.Message{
+		{
+			Role:    "user",
+			Content: content,
+		},
+	}
 }

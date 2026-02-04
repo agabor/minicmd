@@ -50,7 +50,7 @@ func (c *ClaudeClient) calculateCost(inputTokens int64, outputTokens int64) floa
 	return inputCost + outputCost
 }
 
-func (c *ClaudeClient) Call(userPrompt string, systemPrompt string, attachments []string) (string, error) {
+func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (string, error) {
 	if c.apiKey == "" {
 		return "", fmt.Errorf("Claude API key not configured. Please set your API key with: ya config anthropic_api_key YOUR_API_KEY")
 	}
@@ -59,18 +59,19 @@ func (c *ClaudeClient) Call(userPrompt string, systemPrompt string, attachments 
 
 	client := anthropic.NewClient(option.WithAPIKey(c.apiKey))
 
-	fullPrompt := userPrompt
-	if len(attachments) > 0 {
-		parts := append(attachments, userPrompt)
-		fullPrompt = strings.Join(parts, "\n\n")
+	messageParams := make([]anthropic.MessageParam, len(messages))
+	for i, msg := range messages {
+		if msg.Role == "user" {
+			messageParams[i] = anthropic.NewUserMessage(anthropic.NewTextBlock(msg.Content))
+		} else if msg.Role == "assistant" {
+			messageParams[i] = anthropic.NewAssistantMessage(anthropic.NewTextBlock(msg.Content))
+		}
 	}
 
 	params := anthropic.MessageNewParams{
 		Model:     anthropic.F(c.model),
 		MaxTokens: anthropic.F(int64(c.maxOutputTokens)),
-		Messages: anthropic.F([]anthropic.MessageParam{
-			anthropic.NewUserMessage(anthropic.NewTextBlock(fullPrompt)),
-		}),
+		Messages:  anthropic.F(messageParams),
 	}
 
 	if systemPrompt != "" {
