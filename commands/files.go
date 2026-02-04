@@ -59,20 +59,21 @@ func HandleClearCommand() error {
 }
 
 func HandleLastCommand() error {
-	homeDir, err := os.UserHomeDir()
+	contextMessages, err := LoadContext()
 	if err != nil {
-		return fmt.Errorf("error getting home directory: %w", err)
+		return fmt.Errorf("error loading context: %w", err)
 	}
 
-	responseFile := filepath.Join(homeDir, ".yact", "last_response")
-	content, err := os.ReadFile(responseFile)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return fmt.Errorf("no previous response found")
+	if len(contextMessages) == 0 {
+		return fmt.Errorf("no previous messages found")
+	}
+
+	for i := len(contextMessages) - 1; i >= 0; i-- {
+		if contextMessages[i].Role == "assistant" {
+			fmt.Print(contextMessages[i].Content)
+			return nil
 		}
-		return fmt.Errorf("error reading last response: %w", err)
 	}
 
-	fmt.Print(string(content))
-	return nil
+	return fmt.Errorf("no previous assistant message found")
 }

@@ -2,8 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -27,21 +25,6 @@ func showProgress(done chan bool) {
 			time.Sleep(100 * time.Millisecond)
 		}
 	}
-}
-
-func saveLastResponse(response string) error {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-
-	yactDir := filepath.Join(homeDir, ".yact")
-	if err := os.MkdirAll(yactDir, 0755); err != nil {
-		return err
-	}
-
-	responseFile := filepath.Join(yactDir, "last_response")
-	return os.WriteFile(responseFile, []byte(response), 0644)
 }
 
 func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt string) error {
@@ -111,10 +94,6 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 	updatedMessages := append(messages, response)
 	if err := SaveContext(updatedMessages); err != nil {
 		fmt.Printf("Warning: could not save context: %v\n", err)
-	}
-
-	if err := saveLastResponse(responseContent); err != nil {
-		fmt.Printf("Warning: could not save response to last_response file: %v\n", err)
 	}
 
 	fmt.Println("Processing response...")
