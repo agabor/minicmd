@@ -10,6 +10,7 @@ func ShowHelp() {
 	fmt.Println("Usage:")
 	fmt.Println("  ya run [prompt_content]  # Generate code with optional custom prompt content")
 	fmt.Println("  ya bash [script_content] # Generate a bash script file")
+	fmt.Println("  ya ask [question]        # Ask questions about the codebase")
 	fmt.Println("  ya edit                      # Edit the prompt file")
 	fmt.Println("  ya read <file>               # Add file reference to prompt")
 	fmt.Println("  ya list                      # List current attachments")

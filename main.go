@@ -83,6 +83,8 @@ func main() {
 		commandErr = commands.HandleRunCommand(commandArgs, *safeFlag, cfg, config.SystemPrompt)
 	case "bash":
 		commandErr = commands.HandleRunCommand(commandArgs, *safeFlag, cfg, config.SystemPromptBash)
+	case "ask":
+		commandErr = commands.HandleAskCommand(commandArgs, cfg)
 	case "clear":
 		commandErr = commands.HandleClearCommand()
 	case "last":
