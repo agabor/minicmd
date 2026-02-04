@@ -76,32 +76,10 @@ ya clear
 ya config
 ```
 
-## Project Structure
-
-```
-go/
-├── main.go                 # Main entry point
-├── config/                 # Configuration management
-│   └── config.go
-├── apiclient/             # API client implementations
-│   ├── claude.go
-│   ├── deepseek.go
-│   └── ollama.go
-├── commands/              # Command handlers
-│   └── commands.go
-├── fileprocessor/         # Code block processing
-│   └── fileprocessor.go
-├── promptmanager/         # Prompt and attachment management
-│   └── promptmanager.go
-├── go.mod                 # Go module definition
-└── README.md             # This file
-```
-
 ## Features
 
 All features from the Python implementation are supported:
 
-- Multiple AI providers (Claude, Ollama, DeepSeek)
 - Code generation from prompts
 - File attachment support
 - Configuration management

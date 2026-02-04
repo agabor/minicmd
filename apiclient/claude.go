@@ -13,8 +13,8 @@ import (
 )
 
 type ClaudeClient struct {
-	apiKey         string
-	model          string
+	apiKey          string
+	model           string
 	maxOutputTokens int
 }
 
@@ -26,10 +26,6 @@ func (c *ClaudeClient) Init(cfg *config.Config) {
 
 func (c *ClaudeClient) GetModelName() string {
 	return c.model
-}
-
-func (c *ClaudeClient) FIM(prefix string, suffix string, attachments []string) (string, error) {
-	return "", fmt.Errorf("Claude does not support FIM calls.")
 }
 
 func (c *ClaudeClient) calculateCost(inputTokens int64, outputTokens int64) float64 {

@@ -16,16 +16,7 @@ func HandleConfigCommand(args []string, cfg *config.Config) error {
 		} else {
 			fmt.Printf("  anthropic_api_key: %s\n", cfg.AnthropicAPIKey)
 		}
-		if cfg.DeepSeekAPIKey != "" {
-			fmt.Printf("  deepseek_api_key: %s\n", strings.Repeat("*", len(cfg.DeepSeekAPIKey)))
-		} else {
-			fmt.Printf("  deepseek_api_key: %s\n", cfg.DeepSeekAPIKey)
-		}
 		fmt.Printf("  claude_model: %s\n", cfg.ClaudeModel)
-		fmt.Printf("  ollama_url: %s\n", cfg.OllamaURL)
-		fmt.Printf("  ollama_model: %s\n", cfg.OllamaModel)
-		fmt.Printf("  deepseek_model: %s\n", cfg.DeepSeekModel)
-		fmt.Printf("  fim_token: %s\n", cfg.FimToken)
 		return nil
 	}
 
@@ -42,14 +33,6 @@ func HandleConfigCommand(args []string, cfg *config.Config) error {
 			cfg.DeepSeekAPIKey = value
 		case "claude_model":
 			cfg.ClaudeModel = value
-		case "ollama_url":
-			cfg.OllamaURL = value
-		case "ollama_model":
-			cfg.OllamaModel = value
-		case "deepseek_model":
-			cfg.DeepSeekModel = value
-		case "fim_token":
-			cfg.FimToken = value
 		default:
 			return fmt.Errorf("unknown config key '%s'", key)
 		}

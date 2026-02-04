@@ -25,9 +25,6 @@ func getPromptFromStdin() (string, error) {
 }
 
 func main() {
-	claudeFlag := flag.Bool("claude", false, "Use Claude API")
-	ollamaFlag := flag.Bool("ollama", false, "Use Ollama API")
-	deepseekFlag := flag.Bool("deepseek", false, "Use DeepSeek API")
 	helpFlag := flag.BoolP("help", "h", false, "Show help message")
 	safeFlag := flag.BoolP("safe", "s", false, "Add .new suffix to generated files")
 
@@ -62,25 +59,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	provider := ""
-	providerFlags := 0
-	if *claudeFlag {
-		provider = "claude"
-		providerFlags++
-	}
-	if *ollamaFlag {
-		provider = "ollama"
-		providerFlags++
-	}
-	if *deepseekFlag {
-		provider = "deepseek"
-		providerFlags++
-	}
-	if providerFlags > 1 {
-		fmt.Fprintf(os.Stderr, "Error: cannot specify multiple provider flags\n")
-		os.Exit(1)
-	}
-
 	command := args[0]
 	commandArgs := []string{}
 	if len(args) > 1 {
@@ -102,11 +80,9 @@ func main() {
 	case "config":
 		commandErr = commands.HandleConfigCommand(commandArgs, cfg)
 	case "run":
-		commandErr = commands.HandleRunCommand(commandArgs, provider, *safeFlag, cfg, config.SystemPrompt)
+		commandErr = commands.HandleRunCommand(commandArgs, *safeFlag, cfg, config.SystemPrompt)
 	case "bash":
-		commandErr = commands.HandleRunCommand(commandArgs, provider, *safeFlag, cfg, config.SystemPromptBash)
-	case "fim":
-		commandErr = commands.HandleFimCommand(commandArgs, provider, *safeFlag, cfg)
+		commandErr = commands.HandleRunCommand(commandArgs, *safeFlag, cfg, config.SystemPromptBash)
 	case "clear":
 		commandErr = commands.HandleClearCommand()
 	case "last":

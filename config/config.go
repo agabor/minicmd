@@ -7,24 +7,14 @@ import (
 )
 
 const (
-	OllamaURL           = "http://localhost:11434/api/generate"
-	OllamaModel         = "qwen2.5-coder:7b"
-	ClaudeModel         = "claude-haiku-4-5-20251001"
-	DeepSeekModel       = "deepseek-coder"
-	DefaultMaxTokens    = 8192
-	DefaultFimToken     = "//FIM"
+	ClaudeModel      = "claude-haiku-4-5-20251001"
+	DefaultMaxTokens = 8192
 )
 
 type Config struct {
-	DefaultProvider  string `json:"default_provider"`
-	AnthropicAPIKey  string `json:"anthropic_api_key"`
-	DeepSeekAPIKey   string `json:"deepseek_api_key"`
-	OllamaURL        string `json:"ollama_url"`
-	OllamaModel      string `json:"ollama_model"`
-	ClaudeModel      string `json:"claude_model"`
-	DeepSeekModel    string `json:"deepseek_model"`
-	MaxOutputTokens  int    `json:"max_output_tokens"`
-	FimToken         string `json:"fim_token"`
+	AnthropicAPIKey string `json:"anthropic_api_key"`
+	ClaudeModel     string `json:"claude_model"`
+	MaxOutputTokens int    `json:"max_output_tokens"`
 }
 
 func getConfigDir() (string, error) {
@@ -45,15 +35,9 @@ func getConfigFile() (string, error) {
 
 func DefaultConfig() *Config {
 	return &Config{
-		DefaultProvider: "ollama",
 		AnthropicAPIKey: "",
-		DeepSeekAPIKey:  "",
-		OllamaURL:       OllamaURL,
-		OllamaModel:     OllamaModel,
 		ClaudeModel:     ClaudeModel,
-		DeepSeekModel:   DeepSeekModel,
 		MaxOutputTokens: DefaultMaxTokens,
-		FimToken:        DefaultFimToken,
 	}
 }
 
@@ -79,10 +63,6 @@ func Load() (*Config, error) {
 
 	if cfg.MaxOutputTokens <= 0 {
 		cfg.MaxOutputTokens = DefaultMaxTokens
-	}
-
-	if cfg.FimToken == "" {
-		cfg.FimToken = DefaultFimToken
 	}
 
 	return cfg, nil

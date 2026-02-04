@@ -34,35 +34,20 @@ func saveLastResponse(response string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	yactDir := filepath.Join(homeDir, ".yact")
 	if err := os.MkdirAll(yactDir, 0755); err != nil {
 		return err
 	}
-	
+
 	responseFile := filepath.Join(yactDir, "last_response")
 	return os.WriteFile(responseFile, []byte(response), 0644)
 }
 
-func getAPIClient(provider string) apiclient.APIClient {
-	switch provider {
-	case "claude":
-		return &apiclient.ClaudeClient{}
-	case "deepseek":
-		return &apiclient.DeepSeekClient{}
-	default:
-		return &apiclient.OllamaClient{}
-	}
-}
-
-
-func HandleRunCommand(args []string, provider string, safe bool, cfg *config.Config, systemPrompt string) error {
-	if provider == "" {
-		provider = cfg.DefaultProvider
-	}
+func HandleRunCommand(args []string, safe bool, cfg *config.Config, systemPrompt string) error {
 
 	var prompt string
-	
+
 	if len(args) > 0 {
 		prompt = strings.Join(args, " ")
 	} else {
@@ -77,11 +62,11 @@ func HandleRunCommand(args []string, provider string, safe bool, cfg *config.Con
 		fmt.Println("Using default prompt file")
 	}
 
-	fmt.Printf("Sending request to %s...\n", strings.Title(provider))
-	
-	client := getAPIClient(provider)
+	fmt.Printf("Sending request to Claude...\n")
+
+	client := apiclient.ClaudeClient{}
 	client.Init(cfg)
-	
+
 	fmt.Printf("Model: %s\n", client.GetModelName())
 
 	attachments, err := promptmanager.GetAttachments()
@@ -106,11 +91,11 @@ func HandleRunCommand(args []string, provider string, safe bool, cfg *config.Con
 	}
 
 	if response == "" {
-		return fmt.Errorf("error: no response from %s API", strings.Title(provider))
+		return fmt.Errorf("error: no response from Claude API")
 	}
 
 	if strings.TrimSpace(response) == "" {
-		return fmt.Errorf("error: empty response from %s API", strings.Title(provider))
+		return fmt.Errorf("error: empty response from Claude API")
 	}
 
 	if err := saveLastResponse(response); err != nil {
