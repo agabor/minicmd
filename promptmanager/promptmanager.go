@@ -16,14 +16,6 @@ func getConfigDir() (string, error) {
 	return filepath.Join(home, ".yact"), nil
 }
 
-func getPromptFile() (string, error) {
-	dir, err := getConfigDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(dir, "prompt"), nil
-}
-
 func getAttachmentsFile() (string, error) {
 	dir, err := getConfigDir()
 	if err != nil {
@@ -38,19 +30,16 @@ func AddFileToPrompt(filePath string) error {
 		return err
 	}
 
-	// Create directory if it doesn't exist
 	dir := filepath.Dir(attachmentsFile)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
 	}
 
-	// Load existing attachments
 	var attachments []string
 	if data, err := os.ReadFile(attachmentsFile); err == nil {
 		json.Unmarshal(data, &attachments)
 	}
 
-	// Add file if not already present
 	found := false
 	for _, path := range attachments {
 		if path == filePath {
@@ -62,7 +51,6 @@ func AddFileToPrompt(filePath string) error {
 	if !found {
 		attachments = append(attachments, filePath)
 
-		// Save updated attachments
 		data, err := json.MarshalIndent(attachments, "", "  ")
 		if err != nil {
 			return err
@@ -86,30 +74,25 @@ func GetAttachments() ([]string, error) {
 		return nil, err
 	}
 
-	// Read attachments
 	var attachments []string
 	if data, err := os.ReadFile(attachmentsFile); err == nil {
 		json.Unmarshal(data, &attachments)
 	}
 
-	// Build file contents list
 	var fileContents []string
 
 	for _, filePath := range attachments {
-		// Check if file exists
 		if _, err := os.Stat(filePath); os.IsNotExist(err) {
 			fileContents = append(fileContents, fmt.Sprintf("// %s\n// Error: File not found", filePath))
 			continue
 		}
 
-		// Read file content
 		content, err := os.ReadFile(filePath)
 		if err != nil {
 			fileContents = append(fileContents, fmt.Sprintf("// %s\n// Error reading file: %v", filePath, err))
 			continue
 		}
 
-		// Add formatted content
 		contentStr := strings.TrimRight(string(content), "\n")
 		fileContents = append(fileContents, fmt.Sprintf("```\n// %s\n%s\n```", filePath, contentStr))
 	}
@@ -159,34 +142,17 @@ func ListAttachments() error {
 }
 
 func ClearPrompt() error {
-	promptFile, err := getPromptFile()
-	if err != nil {
-		return err
-	}
-
 	attachmentsFile, err := getAttachmentsFile()
 	if err != nil {
 		return err
 	}
 
-	// Create directory if it doesn't exist
-	dir := filepath.Dir(promptFile)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return err
-	}
-
-	// Clear prompt file
-	if err := os.WriteFile(promptFile, []byte{}, 0644); err != nil {
-		return err
-	}
-
-	// Remove attachments file if it exists
 	if _, err := os.Stat(attachmentsFile); err == nil {
 		if err := os.Remove(attachmentsFile); err != nil {
 			return err
 		}
 	}
 
-	fmt.Println("Cleared prompt and attachments")
+	fmt.Println("Cleared attachments")
 	return nil
 }

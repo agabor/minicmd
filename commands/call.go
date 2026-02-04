@@ -8,7 +8,6 @@ import (
 	"yact/apiclient"
 	"yact/config"
 	"yact/fileprocessor"
-	"yact/promptmanager"
 )
 
 func showProgress(done chan bool) {
@@ -91,14 +90,7 @@ func HandleCall(args []string, cfg *config.Config, systemPrompt string) (string,
 		return "", err
 	}
 
-	if err := promptmanager.ClearPrompt(); err != nil {
-		return "", fmt.Errorf("error clearing prompt: %w", err)
-	}
-
 	responseContent := response.Content
-	if responseContent == "" {
-		return "", fmt.Errorf("error: no response from Claude API")
-	}
 
 	if strings.TrimSpace(responseContent) == "" {
 		return "", fmt.Errorf("error: empty response from Claude API")
