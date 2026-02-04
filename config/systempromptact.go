@@ -1,6 +1,6 @@
 package config
 
-const SystemPrompt = "CODE GENERATION ASSISTANT\n\n" +
+const SystemPromptAct = "CODE GENERATION ASSISTANT\n\n" +
 	"====================\n" +
 	"STRICT OUTPUT RULES:\n" +
 	"====================\n\n" +

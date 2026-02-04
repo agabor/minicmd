@@ -80,7 +80,7 @@ func main() {
 	case "config":
 		commandErr = commands.HandleConfigCommand(commandArgs, cfg)
 	case "act":
-		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, config.SystemPrompt)
+		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, config.SystemPromptAct)
 	case "bash":
 		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, config.SystemPromptBash)
 	case "ask":
