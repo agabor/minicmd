@@ -52,9 +52,8 @@ The Go implementation has the same interface as the Python version:
 # Show help
 ya --help
 
-# Configure API keys
+# Configure API key
 ya config anthropic_api_key YOUR_API_KEY
-ya config deepseek_api_key YOUR_API_KEY
 
 # Run code generation
 ya run

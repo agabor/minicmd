@@ -10,7 +10,6 @@ import (
 func HandleConfigCommand(args []string, cfg *config.Config) error {
 	if len(args) == 0 {
 		fmt.Println("Current configuration:")
-		fmt.Printf("  default_provider: %s\n", cfg.DefaultProvider)
 		if cfg.AnthropicAPIKey != "" {
 			fmt.Printf("  anthropic_api_key: %s\n", strings.Repeat("*", len(cfg.AnthropicAPIKey)))
 		} else {
@@ -25,12 +24,8 @@ func HandleConfigCommand(args []string, cfg *config.Config) error {
 		value := args[1]
 
 		switch key {
-		case "default_provider":
-			cfg.DefaultProvider = value
 		case "anthropic_api_key":
 			cfg.AnthropicAPIKey = value
-		case "deepseek_api_key":
-			cfg.DeepSeekAPIKey = value
 		case "claude_model":
 			cfg.ClaudeModel = value
 		default:
@@ -41,7 +36,7 @@ func HandleConfigCommand(args []string, cfg *config.Config) error {
 			return fmt.Errorf("error saving config: %w", err)
 		}
 
-		if key == "anthropic_api_key" || key == "deepseek_api_key" {
+		if key == "anthropic_api_key" {
 			fmt.Printf("Set %s to %s\n", key, strings.Repeat("*", len(value)))
 		} else {
 			fmt.Printf("Set %s to %s\n", key, value)
