@@ -43,6 +43,15 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 	return nil
 }
 
+func HandleNewCommand() error {
+	if err := ClearContext(); err != nil {
+		return fmt.Errorf("error clearing context: %w", err)
+	}
+
+	fmt.Println("New context created")
+	return nil
+}
+
 func HandleCall(args []string, cfg *config.Config, systemPrompt string) (string, error) {
 	prompt := strings.Join(args, " ")
 

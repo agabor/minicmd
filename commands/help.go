@@ -14,6 +14,7 @@ func ShowHelp() {
 	fmt.Println("  y read <file>           # Add file reference to prompt")
 	fmt.Println("  y list                  # List current attachments")
 	fmt.Println("  y clear                 # Clear prompt and attachments")
+	fmt.Println("  y new                   # Create a new context")
 	fmt.Println("  y last                  # Show last AI response")
 	fmt.Println("  y config                # Show current configuration")
 	fmt.Println("  y config <key> <value>  # Set configuration value")

@@ -87,6 +87,8 @@ func main() {
 		commandErr = commands.HandleAskCommand(commandArgs, cfg, config.SystemPromptPlan)
 	case "clear":
 		commandErr = commands.HandleClearCommand()
+	case "new":
+		commandErr = commands.HandleNewCommand()
 	case "last":
 		commandErr = commands.HandleLastCommand()
 	default:
