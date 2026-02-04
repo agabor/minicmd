@@ -18,11 +18,11 @@ type OllamaClient struct {
 }
 
 type OllamaRequest struct {
-	Model       string        `json:"model"`
-	Prompt      string        `json:"prompt"`
-	System      string        `json:"system"`
-	Stream      bool          `json:"stream"`
-	Options     OllamaOptions `json:"options"`
+	Model   string        `json:"model"`
+	Prompt  string        `json:"prompt"`
+	System  string        `json:"system"`
+	Stream  bool          `json:"stream"`
+	Options OllamaOptions `json:"options"`
 }
 
 type OllamaOptions struct {
@@ -58,10 +58,6 @@ func (oc *OllamaClient) FIM(prefix string, suffix string, attachments []string) 
 		Options: OllamaOptions{
 			Temperature: 0.1,
 		},
-	}
-
-	if err := saveLastRequestJSON(payload, "ollama"); err != nil {
-		fmt.Printf("Warning: could not save request to last_request file: %v\n", err)
 	}
 
 	jsonData, err := json.Marshal(payload)
@@ -118,10 +114,6 @@ func (oc *OllamaClient) Call(userPrompt string, systemPrompt string, attachments
 		Options: OllamaOptions{
 			Temperature: 0.1,
 		},
-	}
-
-	if err := saveLastRequestJSON(payload, "ollama"); err != nil {
-		fmt.Printf("Warning: could not save request to last_request file: %v\n", err)
 	}
 
 	jsonData, err := json.Marshal(payload)

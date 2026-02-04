@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 	"time"
 
 	"yact/config"
@@ -35,10 +33,10 @@ type DeepSeekCompletionRequest struct {
 }
 
 type DeepSeekUsage struct {
-	PromptTokens            int                        `json:"prompt_tokens"`
-	CompletionTokens        int                        `json:"completion_tokens"`
-	TotalTokens             int                        `json:"total_tokens"`
-	PromptTokensDetails     DeepSeekPromptTokenDetails `json:"prompt_tokens_details"`
+	PromptTokens        int                        `json:"prompt_tokens"`
+	CompletionTokens    int                        `json:"completion_tokens"`
+	TotalTokens         int                        `json:"total_tokens"`
+	PromptTokensDetails DeepSeekPromptTokenDetails `json:"prompt_tokens_details"`
 }
 
 type DeepSeekPromptTokenDetails struct {
@@ -85,10 +83,6 @@ func (c *DeepSeekClient) FIM(prefix string, suffix string, attachments []string)
 		Suffix:      suffix,
 		MaxTokens:   c.maxTokens,
 		Temperature: 0.1,
-	}
-
-	if err := saveLastRequestJSON(payload, "deepseek"); err != nil {
-		fmt.Printf("Warning: could not save request to last_request file: %v\n", err)
 	}
 
 	jsonData, err := json.Marshal(payload)
@@ -175,10 +169,6 @@ func (c *DeepSeekClient) Call(userPrompt string, systemPrompt string, attachment
 		Stream:      false,
 	}
 
-	if err := saveLastRequestJSON(payload, "deepseek"); err != nil {
-		fmt.Printf("Warning: could not save request to last_request file: %v\n", err)
-	}
-
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
 		return "", fmt.Errorf("error marshaling request: %w", err)
@@ -230,24 +220,4 @@ func (c *DeepSeekClient) Call(userPrompt string, systemPrompt string, attachment
 	}
 
 	return deepSeekResp.Choices[0].Message.Content, nil
-}
-
-func saveLastRequestJSON(data interface{}, provider string) error {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-
-	yactDir := filepath.Join(homeDir, ".yact")
-	if err := os.MkdirAll(yactDir, 0755); err != nil {
-		return err
-	}
-
-	requestFile := filepath.Join(yactDir, "last_request_"+provider+".json")
-	jsonData, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	return os.WriteFile(requestFile, jsonData, 0644)
 }

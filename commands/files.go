@@ -58,12 +58,12 @@ func HandleClearCommand() error {
 	return promptmanager.ClearPrompt()
 }
 
-func HandleShowLastCommand() error {
+func HandleLastCommand() error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return fmt.Errorf("error getting home directory: %w", err)
 	}
-	
+
 	responseFile := filepath.Join(homeDir, ".yact", "last_response")
 	content, err := os.ReadFile(responseFile)
 	if err != nil {
@@ -72,7 +72,7 @@ func HandleShowLastCommand() error {
 		}
 		return fmt.Errorf("error reading last response: %w", err)
 	}
-	
+
 	fmt.Print(string(content))
 	return nil
 }

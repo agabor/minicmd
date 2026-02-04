@@ -1,4 +1,3 @@
-
 package commands
 
 import (
@@ -15,7 +14,7 @@ func ShowHelp() {
 	fmt.Println("  ya read <file>               # Add file reference to prompt")
 	fmt.Println("  ya list                      # List current attachments")
 	fmt.Println("  ya clear                     # Clear prompt and attachments")
-	fmt.Println("  ya showlast                  # Show last AI response")
+	fmt.Println("  ya last                  # Show last AI response")
 	fmt.Println("  ya config                    # Show current configuration")
 	fmt.Println("  ya config <key> <value>      # Set configuration value")
 	fmt.Println()

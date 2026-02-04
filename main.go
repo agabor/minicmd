@@ -109,8 +109,8 @@ func main() {
 		commandErr = commands.HandleFimCommand(commandArgs, provider, *safeFlag, cfg)
 	case "clear":
 		commandErr = commands.HandleClearCommand()
-	case "showlast":
-		commandErr = commands.HandleShowLastCommand()
+	case "last":
+		commandErr = commands.HandleLastCommand()
 	default:
 		fmt.Printf("Error: Unknown command '%s'\n", command)
 		fmt.Println("Run 'ya --help' for usage information.")
