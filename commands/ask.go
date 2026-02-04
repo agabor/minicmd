@@ -53,11 +53,11 @@ func HandleAskCommand(args []string, cfg *config.Config) error {
 		return err
 	}
 
-	if response == "" {
+	if response.Content == "" {
 		return fmt.Errorf("error: no response from Claude API")
 	}
 
-	if strings.TrimSpace(response) == "" {
+	if strings.TrimSpace(response.Content) == "" {
 		return fmt.Errorf("error: empty response from Claude API")
 	}
 
@@ -65,10 +65,10 @@ func HandleAskCommand(args []string, cfg *config.Config) error {
 		return fmt.Errorf("error clearing prompt: %w", err)
 	}
 
-	if err := saveLastResponse(response); err != nil {
+	if err := saveLastResponse(response.Content); err != nil {
 		fmt.Printf("Warning: could not save response to last_response file: %v\n", err)
 	}
 
-	fmt.Println("\n" + response)
+	fmt.Println("\n" + response.Content)
 	return nil
 }

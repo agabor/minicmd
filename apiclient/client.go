@@ -12,5 +12,5 @@ type Message struct {
 type APIClient interface {
 	Init(cfg *config.Config)
 	GetModelName() string
-	Call(messages []Message, systemPrompt string) (string, error)
+	Call(messages []Message, systemPrompt string) (Message, error)
 }

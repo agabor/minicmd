@@ -93,20 +93,21 @@ func HandleRunCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 		return fmt.Errorf("error clearing prompt: %w", err)
 	}
 
-	if response == "" {
+	responseContent := response.Content
+	if responseContent == "" {
 		return fmt.Errorf("error: no response from Claude API")
 	}
 
-	if strings.TrimSpace(response) == "" {
+	if strings.TrimSpace(responseContent) == "" {
 		return fmt.Errorf("error: empty response from Claude API")
 	}
 
-	if err := saveLastResponse(response); err != nil {
+	if err := saveLastResponse(responseContent); err != nil {
 		fmt.Printf("Warning: could not save response to last_response file: %v\n", err)
 	}
 
 	fmt.Println("Processing response...")
-	if err := fileprocessor.ProcessCodeBlocks(response, safe); err != nil {
+	if err := fileprocessor.ProcessCodeBlocks(responseContent, safe); err != nil {
 		return fmt.Errorf("error processing code blocks: %w", err)
 	}
 

@@ -50,9 +50,9 @@ func (c *ClaudeClient) calculateCost(inputTokens int64, outputTokens int64) floa
 	return inputCost + outputCost
 }
 
-func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (string, error) {
+func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (Message, error) {
 	if c.apiKey == "" {
-		return "", fmt.Errorf("Claude API key not configured. Please set your API key with: ya config anthropic_api_key YOUR_API_KEY")
+		return Message{}, fmt.Errorf("Claude API key not configured. Please set your API key with: ya config anthropic_api_key YOUR_API_KEY")
 	}
 
 	startTime := time.Now()
@@ -83,7 +83,7 @@ func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (string, er
 	message, err := client.Messages.New(context.Background(), params)
 
 	if err != nil {
-		return "", fmt.Errorf("error calling Claude API: %w", err)
+		return Message{}, fmt.Errorf("error calling Claude API: %w", err)
 	}
 
 	duration := time.Since(startTime)
@@ -104,5 +104,8 @@ func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (string, er
 		responseText += block.Text
 	}
 
-	return responseText, nil
+	return Message{
+		Role:    "assistant",
+		Content: responseText,
+	}, nil
 }
