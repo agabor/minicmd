@@ -34,10 +34,18 @@ func HandleAskCommand(args []string, cfg *config.Config, systemPrompt string) er
 
 	fmt.Printf("Model: %s\n", client.GetModelName())
 
-	messages, err := buildMessagesWithAttachments(prompt)
+	contextMessages, err := LoadContext()
 	if err != nil {
-		return err
+		fmt.Printf("Warning: could not load context: %v\n", err)
+		contextMessages = []apiclient.Message{}
 	}
+
+	attachments, err := promptmanager.GetAttachments()
+	if err != nil {
+		return fmt.Errorf("error getting attachments: %w", err)
+	}
+
+	messages := buildMessages(contextMessages, prompt, attachments)
 
 	done := make(chan bool)
 	go showProgress(done)
@@ -63,20 +71,11 @@ func HandleAskCommand(args []string, cfg *config.Config, systemPrompt string) er
 		return fmt.Errorf("error clearing prompt: %w", err)
 	}
 
-	if err := saveLastResponse(response.Content); err != nil {
-		fmt.Printf("Warning: could not save response to last_response file: %v\n", err)
+	updatedMessages := append(messages, response)
+	if err := SaveContext(updatedMessages); err != nil {
+		fmt.Printf("Warning: could not save context: %v\n", err)
 	}
 
 	fmt.Println("\n" + response.Content)
 	return nil
-}
-
-func buildMessagesWithAttachments(prompt string) ([]apiclient.Message, error) {
-	attachments, err := promptmanager.GetAttachments()
-	if err != nil {
-		return nil, fmt.Errorf("error getting attachments: %w", err)
-	}
-
-	messages := buildMessages(nil, prompt, attachments)
-	return messages, nil
 }
