@@ -34,11 +34,9 @@ func HandleAskCommand(args []string, cfg *config.Config, systemPrompt string) er
 
 	fmt.Printf("Model: %s\n", client.GetModelName())
 
-	messages := []apiclient.Message{
-		{
-			Role:    "user",
-			Content: prompt,
-		},
+	messages, err := buildMessagesWithAttachments(prompt)
+	if err != nil {
+		return err
 	}
 
 	done := make(chan bool)

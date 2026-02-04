@@ -70,12 +70,10 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 
 	fmt.Printf("Model: %s\n", client.GetModelName())
 
-	attachments, err := promptmanager.GetAttachments()
+	messages, err := buildMessagesWithAttachments(prompt)
 	if err != nil {
-		return fmt.Errorf("error getting attachments: %w", err)
+		return err
 	}
-
-	messages := buildMessages(prompt, attachments)
 
 	done := make(chan bool)
 	go showProgress(done)
@@ -113,6 +111,16 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 
 	fmt.Println("Done!")
 	return nil
+}
+
+func buildMessagesWithAttachments(prompt string) ([]apiclient.Message, error) {
+	attachments, err := promptmanager.GetAttachments()
+	if err != nil {
+		return nil, fmt.Errorf("error getting attachments: %w", err)
+	}
+
+	messages := buildMessages(prompt, attachments)
+	return messages, nil
 }
 
 func buildMessages(prompt string, attachments []string) []apiclient.Message {
