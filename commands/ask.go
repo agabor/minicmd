@@ -9,7 +9,7 @@ import (
 	"yact/promptmanager"
 )
 
-func HandleAskCommand(args []string, cfg *config.Config) error {
+func HandleAskCommand(args []string, cfg *config.Config, systemPrompt string) error {
 	var prompt string
 
 	if len(args) > 0 {
@@ -44,7 +44,7 @@ func HandleAskCommand(args []string, cfg *config.Config) error {
 	done := make(chan bool)
 	go showProgress(done)
 
-	response, err := client.Call(messages, config.SystemPromptAsk)
+	response, err := client.Call(messages, systemPrompt)
 
 	done <- true
 	close(done)
