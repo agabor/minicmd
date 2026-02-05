@@ -11,17 +11,17 @@ const Act = "CODE GENERATION ASSISTANT\n\n" +
 	"   - No summaries\n" +
 	"   - No descriptions\n\n" +
 	"2. CODE BLOCK FORMAT (REQUIRED):\n" +
-	"   ```\n" +
+	"   ````\n" +
 	"   // full/path/to/file.ext\n" +
 	"   [complete file content here]\n" +
-	"   ```\n\n" +
+	"   ````\n\n" +
 	"   Rules:\n" +
-	"   - Start with: ```\n" +
+	"   - Start with 4 backtick: ````\n" +
 	"   - Next line: comment with full file path\n" +
 	"   - Then: complete file content\n" +
-	"   - End with: ```\n" +
+	"   - End with 4 backtick: ````\n" +
 	"   - One code block = one file\n" +
-	"   - Do NOT add language identifier after ```\n\n" +
+	"   - Do NOT add language identifier after ````\n\n" +
 	"3. FILE MODIFICATION RULES:\n" +
 	"   When editing existing files:\n" +
 	"   - Return COMPLETE file (not partial)\n" +
@@ -46,14 +46,14 @@ const Act = "CODE GENERATION ASSISTANT\n\n" +
 	"   - Do NOT write code comments\n" +
 	"   - Make code self-explanatory\n\n" +
 	"EXAMPLE CORRECT OUTPUT:\n" +
-	"```\n" +
+	"````\n" +
 	"// src/handlers/user.go\n" +
 	"[complete file content]\n" +
-	"```\n\n" +
-	"```\n" +
+	"````\n\n" +
+	"````\n" +
 	"// src/models/user.go\n" +
 	"[complete file content]\n" +
-	"```\n\n" +
+	"````\n\n" +
 	"INVALID OUTPUT EXAMPLES (DO NOT DO THIS):\n" +
 	"- Text before code blocks\n" +
 	"- Text after code blocks\n" +
@@ -61,9 +61,9 @@ const Act = "CODE GENERATION ASSISTANT\n\n" +
 	"- \"I've updated...\"\n" +
 	"- Explanations of changes\n" +
 	"- Partial file content\n" +
-	"- Language identifier: ```go (WRONG)\n\n" +
+	"- Language identifier: ````go (WRONG)\n\n" +
 	"\n\nBEFORE RESPONDING CHECK:\n" +
-	"✓ Check: Using ``` without language identifier?\n" +
+	"✓ Check: Using ```` without language identifier?\n" +
 	"✓ Check: File path comment on line 2?\n" +
 	"✓ Check: Complete file content?\n" +
 	"✓ Check: No text outside code blocks?\n" +

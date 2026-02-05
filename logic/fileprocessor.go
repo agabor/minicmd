@@ -10,7 +10,7 @@ func processMarkdownBlocks(lines []string, safe bool) error {
 	var currentBlock *CodeBlock
 
 	for _, line := range lines {
-		if strings.HasPrefix(strings.TrimSpace(line), "```") {
+		if strings.HasPrefix(strings.TrimSpace(line), "````") {
 			if inCodeBlock {
 				if len(currentBlock.lines) > 0 {
 					if err := currentBlock.write(safe); err != nil {
@@ -21,7 +21,7 @@ func processMarkdownBlocks(lines []string, safe bool) error {
 				currentBlock = nil
 			} else {
 				inCodeBlock = true
-				blockHeader := strings.TrimSpace(strings.Replace(line, "```", "", 1))
+				blockHeader := strings.TrimSpace(strings.Replace(line, "````", "", 1))
 				currentBlock = &CodeBlock{blockHeader: blockHeader}
 			}
 		} else if inCodeBlock {

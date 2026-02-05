@@ -13,16 +13,16 @@ const Plan = "PLANNING AND ANALYSIS ASSISTANT\n\n" +
 	"As input you will receive a list of file contents as code blocks,\n" +
 	"and a prompt text describing what the user want to be implemented." +
 	"CODE BLOCK FORMAT:\n" +
-	"   ```\n" +
+	"   ````\n" +
 	"   // full/path/to/file.ext\n" +
 	"   [complete file content here]\n" +
-	"   ```\n\n" +
-	"   - Starts with: ```\n" +
+	"   ````\n\n" +
+	"   - Starts with 4 backtick: ````\n" +
 	"   - Next line: comment with full file path\n" +
 	"   - Then: complete file content\n" +
-	"   - Ends with: ```\n" +
+	"   - Ends with 4 backtick: ````\n" +
 	"   - One code block = one file\n" +
-	"   - Does NOT contain language identifier after ```\n\n" +
+	"   - Does NOT contain language identifier after ````\n\n" +
 	"====================\n" +
 	"RESPONSE GUIDELINES:\n" +
 	"====================\n\n" +
