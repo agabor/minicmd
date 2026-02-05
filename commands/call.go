@@ -7,7 +7,7 @@ import (
 
 	"yact/apiclient"
 	"yact/config"
-	"yact/fileprocessor"
+	"yact/logic"
 )
 
 func showProgress(done chan bool) {
@@ -34,7 +34,7 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 	}
 
 	fmt.Println("Processing response...")
-	if err := fileprocessor.ProcessCodeBlocks(responseContent, safe); err != nil {
+	if err := logic.ProcessCodeBlocks(responseContent, safe); err != nil {
 		return fmt.Errorf("error processing code blocks: %w", err)
 	}
 
@@ -53,7 +53,7 @@ func HandleAskCommand(args []string, cfg *config.Config, systemPrompt string) er
 }
 
 func HandleNewCommand() error {
-	if err := ClearContext(); err != nil {
+	if err := logic.ClearContext(); err != nil {
 		return fmt.Errorf("error clearing context: %w", err)
 	}
 
@@ -72,7 +72,7 @@ func HandleCall(args []string, cfg *config.Config, systemPrompt string) (string,
 
 	fmt.Printf("Model: %s\n", client.GetModelName())
 
-	messages, err := BuildMessages(prompt)
+	messages, err := logic.BuildMessages(prompt)
 
 	if err != nil {
 		return "", err
@@ -97,7 +97,7 @@ func HandleCall(args []string, cfg *config.Config, systemPrompt string) (string,
 	}
 
 	updatedMessages := append(messages, response)
-	if err := SaveContext(updatedMessages); err != nil {
+	if err := logic.SaveContext(updatedMessages); err != nil {
 		fmt.Printf("Warning: could not save context: %v\n", err)
 	}
 	return responseContent, nil

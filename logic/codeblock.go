@@ -1,11 +1,11 @@
-package fileprocessor
+package logic
 
 import (
-	"strconv"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 

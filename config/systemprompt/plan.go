@@ -1,4 +1,4 @@
-package config
+package systemprompt
 
 const SystemPromptPlan = "PLANNING AND ANALYSIS ASSISTANT\n\n" +
 	"====================\n" +

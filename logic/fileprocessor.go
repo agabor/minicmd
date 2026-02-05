@@ -1,4 +1,4 @@
-package fileprocessor
+package logic
 
 import (
 	"fmt"

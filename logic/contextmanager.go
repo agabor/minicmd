@@ -1,4 +1,4 @@
-package commands
+package logic
 
 import (
 	"encoding/json"

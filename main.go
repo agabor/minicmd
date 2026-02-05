@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"yact/config/systemprompt"
 
 	"yact/commands"
 	"yact/config"
@@ -78,13 +79,13 @@ func main() {
 	case "config":
 		commandErr = commands.HandleConfigCommand(commandArgs, cfg)
 	case "act":
-		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, config.SystemPromptAct)
+		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, systemprompt.SystemPromptAct)
 	case "bash":
-		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, config.SystemPromptBash)
+		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, systemprompt.SystemPromptBash)
 	case "ask":
-		commandErr = commands.HandleAskCommand(commandArgs, cfg, config.SystemPromptAsk)
+		commandErr = commands.HandleAskCommand(commandArgs, cfg, systemprompt.SystemPromptAsk)
 	case "plan":
-		commandErr = commands.HandleAskCommand(commandArgs, cfg, config.SystemPromptPlan)
+		commandErr = commands.HandleAskCommand(commandArgs, cfg, systemprompt.SystemPromptPlan)
 	case "clear":
 		commandErr = commands.HandleClearCommand()
 	case "new":

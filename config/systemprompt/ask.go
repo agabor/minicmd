@@ -1,4 +1,4 @@
-package config
+package systemprompt
 
 const SystemPromptAsk = "CODEBASE QUESTION ANSWERING ASSISTANT\n\n" +
 	"====================\n" +

@@ -1,4 +1,4 @@
-package config
+package systemprompt
 
 const SystemPromptAct = "CODE GENERATION ASSISTANT\n\n" +
 	"====================\n" +

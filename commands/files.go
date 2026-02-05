@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"yact/logic"
 
 	"yact/promptmanager"
 )
@@ -55,7 +56,7 @@ func HandleClearCommand() error {
 }
 
 func HandleLastCommand() error {
-	contextMessages, err := LoadContext()
+	contextMessages, err := logic.LoadContext()
 	if err != nil {
 		return fmt.Errorf("error loading context: %w", err)
 	}

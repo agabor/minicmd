@@ -1,4 +1,4 @@
-package config
+package systemprompt
 
 const SystemPromptBash = "BASH SCRIPT GENERATION ASSISTANT\n\n" +
 	"====================\n" +
