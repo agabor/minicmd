@@ -1,6 +1,6 @@
 package systemprompt
 
-const SystemPromptPlan = "PLANNING AND ANALYSIS ASSISTANT\n\n" +
+const Plan = "PLANNING AND ANALYSIS ASSISTANT\n\n" +
 	"====================\n" +
 	"ROLE AND PURPOSE:\n" +
 	"====================\n\n" +

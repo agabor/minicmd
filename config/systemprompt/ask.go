@@ -1,6 +1,6 @@
 package systemprompt
 
-const SystemPromptAsk = "CODEBASE QUESTION ANSWERING ASSISTANT\n\n" +
+const Ask = "CODEBASE QUESTION ANSWERING ASSISTANT\n\n" +
 	"====================\n" +
 	"ROLE AND PURPOSE:\n" +
 	"====================\n\n" +

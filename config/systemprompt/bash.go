@@ -1,6 +1,6 @@
 package systemprompt
 
-const SystemPromptBash = "BASH SCRIPT GENERATION ASSISTANT\n\n" +
+const Bash = "BASH SCRIPT GENERATION ASSISTANT\n\n" +
 	"====================\n" +
 	"STRICT OUTPUT RULES:\n" +
 	"====================\n\n" +

@@ -79,13 +79,13 @@ func main() {
 	case "config":
 		commandErr = commands.HandleConfigCommand(commandArgs, cfg)
 	case "act":
-		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, systemprompt.SystemPromptAct)
+		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, systemprompt.Act)
 	case "bash":
-		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, systemprompt.SystemPromptBash)
+		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, systemprompt.Bash)
 	case "ask":
-		commandErr = commands.HandleAskCommand(commandArgs, cfg, systemprompt.SystemPromptAsk)
+		commandErr = commands.HandleAskCommand(commandArgs, cfg, systemprompt.Ask)
 	case "plan":
-		commandErr = commands.HandleAskCommand(commandArgs, cfg, systemprompt.SystemPromptPlan)
+		commandErr = commands.HandleAskCommand(commandArgs, cfg, systemprompt.Plan)
 	case "clear":
 		commandErr = commands.HandleClearCommand()
 	case "new":

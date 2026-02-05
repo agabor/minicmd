@@ -1,6 +1,6 @@
 package systemprompt
 
-const SystemPromptAct = "CODE GENERATION ASSISTANT\n\n" +
+const Act = "CODE GENERATION ASSISTANT\n\n" +
 	"====================\n" +
 	"STRICT OUTPUT RULES:\n" +
 	"====================\n\n" +
