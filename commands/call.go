@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"yact/apiclient"
+	"yact/api"
 	"yact/config"
 	"yact/logic"
 )
@@ -66,8 +66,8 @@ func HandleCall(args []string, cfg *config.Config, systemPrompt string) (string,
 
 	fmt.Printf("Sending request to Claude...\n")
 
-	var client apiclient.APIClient
-	client = &apiclient.ClaudeClient{}
+	var client api.APIClient
+	client = &api.ClaudeClient{}
 	client.Init(cfg)
 
 	fmt.Printf("Model: %s\n", client.GetModelName())

@@ -5,8 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"yact/logic"
-
-	"yact/promptmanager"
 )
 
 func HandleReadCommand(args []string) error {
@@ -38,7 +36,7 @@ func HandleReadCommand(args []string) error {
 				continue
 			}
 
-			if err := promptmanager.AddFileToPrompt(filePath); err != nil {
+			if err := logic.AddFileToPrompt(filePath); err != nil {
 				return err
 			}
 		}
@@ -48,11 +46,11 @@ func HandleReadCommand(args []string) error {
 }
 
 func HandleListCommand() error {
-	return promptmanager.ListAttachments()
+	return logic.ListAttachments()
 }
 
 func HandleClearCommand() error {
-	return promptmanager.ClearPrompt()
+	return logic.ClearPrompt()
 }
 
 func HandleLastCommand() error {

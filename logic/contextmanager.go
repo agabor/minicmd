@@ -6,9 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"yact/promptmanager"
-
-	"yact/apiclient"
+	"yact/api"
 )
 
 func GetContextFilePath() (string, error) {
@@ -19,7 +17,7 @@ func GetContextFilePath() (string, error) {
 	return filepath.Join(homeDir, ".yact", "context.json"), nil
 }
 
-func LoadContext() ([]apiclient.Message, error) {
+func LoadContext() ([]api.Message, error) {
 	contextPath, err := GetContextFilePath()
 	if err != nil {
 		return nil, err
@@ -28,12 +26,12 @@ func LoadContext() ([]apiclient.Message, error) {
 	data, err := os.ReadFile(contextPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return []apiclient.Message{}, nil
+			return []api.Message{}, nil
 		}
 		return nil, err
 	}
 
-	var messages []apiclient.Message
+	var messages []api.Message
 	if err := json.Unmarshal(data, &messages); err != nil {
 		return nil, err
 	}
@@ -41,7 +39,7 @@ func LoadContext() ([]apiclient.Message, error) {
 	return messages, nil
 }
 
-func SaveContext(messages []apiclient.Message) error {
+func SaveContext(messages []api.Message) error {
 	contextPath, err := GetContextFilePath()
 	if err != nil {
 		return err
@@ -72,14 +70,14 @@ func ClearContext() error {
 
 	return nil
 }
-func BuildMessages(prompt string) ([]apiclient.Message, error) {
+func BuildMessages(prompt string) ([]api.Message, error) {
 	contextMessages, err := LoadContext()
 	if err != nil {
 		fmt.Printf("Warning: could not load context: %v\n", err)
-		contextMessages = []apiclient.Message{}
+		contextMessages = []api.Message{}
 	}
 
-	attachments, err := promptmanager.GetAttachments()
+	attachments, err := GetAttachments()
 	if err != nil {
 		return nil, fmt.Errorf("error getting attachments: %w", err)
 	}
@@ -91,7 +89,7 @@ func BuildMessages(prompt string) ([]apiclient.Message, error) {
 		content = prompt
 	}
 
-	userMessage := apiclient.Message{
+	userMessage := api.Message{
 		Role:    "user",
 		Content: content,
 	}

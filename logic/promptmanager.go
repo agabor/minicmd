@@ -1,4 +1,4 @@
-package promptmanager
+package logic
 
 import (
 	"encoding/json"
