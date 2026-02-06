@@ -2,21 +2,34 @@
 
 A command-line AI assistant powered by Claude that helps you generate code, bash scripts, and answer questions about your codebase.
 
-## Prerequisites
+## Installation
 
-You need to have Go installed on your system. To install Go:
+Download the latest binary for your operating system from the [GitHub releases page](https://github.com/agabor/yact/releases).
 
-## Building and Installation
+Available binaries:
+- Linux: `yact-linux-amd64`
+- Windows: `yact-windows-amd64.exe`
+- macOS: `yact-darwin-amd64` or `yact-darwin-arm64`
 
-To install the binary to your system:
+For example, to download and install on Linux:
 
 ```bash
-git clone https://github.com/agabor/yact.git
-cd yact
-./install.sh
+cd /tmp
+wget https://github.com/agabor/yact/releases/download/v0.0.0/yact-linux-amd64
+chmod +x yact-linux-amd64
+sudo mv yact-linux-amd64 /usr/local/bin/y
 ```
 
-This will make the `y` command available on your system.
+On macOS:
+
+```bash
+cd /tmp
+curl -L -o yact-darwin-amd64 https://github.com/agabor/yact/releases/download/v0.0.0/yact-darwin-amd64
+chmod +x yact-darwin-amd64
+sudo mv yact-darwin-amd64 /usr/local/bin/y
+```
+
+On Windows, download the `yact-windows-amd64.exe` file and place it in a directory that's in your PATH, or run it directly from where you download it.
 
 ## Quick Start
 
