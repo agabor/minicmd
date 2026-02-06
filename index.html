@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YACT - Yet Another Coding Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 40px 20px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .tagline {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .cta-button:hover {
+            background: #764ba2;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #764ba2;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .installation-steps {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .command {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature {
+            background: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            border-radius: 3px;
+        }
+
+        .feature h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .config-table th,
+        .config-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .config-table th {
+            background: #667eea;
+            color: white;
+        }
+
+        .config-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .platforms {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .platform {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .platform-name {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .platform-file {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        footer {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            color: #666;
+        }
+
+        .github-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .github-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .platforms {
+                grid-template-columns: 1fr;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>YACT</h1>
+            <p class="tagline">Yet Another Coding Tool - A command-line AI assistant powered by Claude</p>
+            <a href="#installation" class="cta-button">Get Started</a>
+        </header>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>Installation</h2>
+                <p>Download the latest binary for your operating system:</p>
+                
+                <div class="platforms">
+                    <div class="platform">
+                        <div class="platform-name">Linux</div>
+                        <div class="platform-file">yact-linux-amd64</div>
+                    </div>
+                    <div class="platform">
+                        <div class="platform-name">Windows</div>
+                        <div class="platform-file">yact-windows-amd64.exe</div>
+                    </div>
+                    <div class="platform">
+                        <div class="platform-name">macOS</div>
+                        <div class="platform-file">yact-darwin-amd64 / arm64</div>
+                    </div>
+                </div>
+
+                <p>Get binaries from <a href="https://github.com/agabor/yact/releases" class="github-link">GitHub releases</a></p>
+
+                <h3>Linux Example</h3>
+                <div class="command">cd /tmp<br>wget https://github.com/agabor/yact/releases/download/v0.0.0/yact-linux-amd64<br>chmod +x yact-linux-amd64<br>sudo mv yact-linux-amd64 /usr/local/bin/y</div>
+
+                <h3>macOS Example</h3>
+                <div class="command">cd /tmp<br>curl -L -o yact-darwin-amd64 https://github.com/agabor/yact/releases/download/v0.0.0/yact-darwin-amd64<br>chmod +x yact-darwin-amd64<br>sudo mv yact-darwin-amd64 /usr/local/bin/y</div>
+            </div>
+
+            <div class="card">
+                <h2>Quick Start</h2>
+                <h3>Configure API Key</h3>
+                <div class="command">y config anthropic_api_key YOUR_API_KEY</div>
+
+                <h3>Verify Configuration</h3>
+                <div class="command">y config</div>
+
+                <h2 style="margin-top: 30px;">Commands Overview</h2>
+                <div class="features">
+                    <div class="feature">
+                        <h4>Generate Code</h4>
+                        <p>Create code files from prompts with full file generation.</p>
+                    </div>
+                    <div class="feature">
+                        <h4>Bash Scripts</h4>
+                        <p>Generate standalone bash scripts from descriptions.</p>
+                    </div>
+                    <div class="feature">
+                        <h4>Ask Questions</h4>
+                        <p>Get answers about your codebase or general topics.</p>
+                    </div>
+                    <div class="feature">
+                        <h4>File References</h4>
+                        <p>Attach files with glob patterns for AI context.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Core Commands</h2>
+            
+            <h3>Generate Code</h3>
+            <div class="command">y act "create a user authentication handler"</div>
+            <p>With safe mode (adds .new suffix for review):</p>
+            <div class="command">y act --safe "add logging to the user service"</div>
+
+            <h3>Generate Bash Scripts</h3>
+            <div class="command">y bash "create a script that backs up my database"</div>
+
+            <h3>Ask Questions</h3>
+            <div class="command">y ask "how does the authentication flow work?"<br>y ask "what are the best practices for Go error handling?"</div>
+
+            <h3>File References</h3>
+            <div class="command">y read src/models/user.go<br>y read src/handlers/*.go<br>y ask "add validation to the user model"</div>
+
+            <h3>Context Management</h3>
+            <div class="command">y list</div>
+            <p>View current attachments</p>
+            
+            <div class="command">y clear</div>
+            <p>Clear all attachments</p>
+            
+            <div class="command">y new</div>
+            <p>Start a fresh conversation</p>
+            
+            <div class="command">y last</div>
+            <p>Retrieve the last AI response</p>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>Configuration</h2>
+                <p>Available configuration keys:</p>
+                <table class="config-table">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Description</th>
+                            <th>Default</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>anthropic_api_key</td>
+                            <td>Your Claude API key (required)</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>claude_model</td>
+                            <td>Which Claude model to use</td>
+                            <td>claude-haiku-4-5-20251001</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Set Configuration</h3>
+                <div class="command">y config anthropic_api_key your_key_here<br>y config claude_model claude-opus-4-1-20250805</div>
+            </div>
+
+            <div class="card">
+                <h2>Usage Tips</h2>
+                <ul>
+                    <li><strong>File patterns:</strong> Use glob patterns with read to attach multiple files</li>
+                    <li><strong>Safe mode:</strong> Always use --safe when generating code to review first</li>
+                    <li><strong>Context:</strong> Read relevant files before asking complex questions</li>
+                    <li><strong>Conversation flow:</strong> Ask for a plan first, then generate code</li>
+                    <li><strong>Cost tracking:</strong> Tool displays token usage and estimated costs</li>
+                </ul>
+
+                <h2>Piping Input</h2>
+                <div class="command">cat requirements.txt | y act<br>echo "fix the database connection" | y bash</div>
+
+                <h2>Help</h2>
+                <div class="command">y help<br>y --help<br>y -h</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Storage & Troubleshooting</h2>
+            
+            <h3>Storage Location</h3>
+            <p>Configuration and conversation history are stored in <code>~/.yact/</code>:</p>
+            <ul>
+                <li><strong>config</strong> - API key and model settings</li>
+                <li><strong>context.json</strong> - Conversation history</li>
+                <li><strong>attachments.json</strong> - List of attached files</li>
+            </ul>
+
+            <h3>Common Issues</h3>
+            <ul>
+                <li><strong>"Claude API key not configured"</strong> - Run: <code>y config anthropic_api_key YOUR_KEY</code></li>
+                <li><strong>"No files found matching pattern"</strong> - Verify glob pattern matches existing files</li>
+                <li><strong>"File not found in attachments"</strong> - Use <code>y list</code> to see attached files</li>
+                <li><strong>API errors</strong> - Verify API key validity and internet connection</li>
+            </ul>
+        </div>
+
+        <footer>
+            <p>YACT - Yet Another Coding Tool | <a href="https://github.com/agabor/yact" class="github-link">View on GitHub</a></p>
+        </footer>
+    </div>
+</body>
+</html>
