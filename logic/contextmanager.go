@@ -26,6 +26,7 @@ func LoadContext() ([]api.Message, error) {
 	data, err := os.ReadFile(contextPath)
 	if err != nil {
 		if os.IsNotExist(err) {
+			fmt.Println("Loaded 0 messages")
 			return []api.Message{}, nil
 		}
 		return nil, err
@@ -36,6 +37,7 @@ func LoadContext() ([]api.Message, error) {
 		return nil, err
 	}
 
+	fmt.Printf("Loaded %d messages\n", len(messages))
 	return messages, nil
 }
 

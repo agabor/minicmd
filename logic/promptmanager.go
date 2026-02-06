@@ -79,6 +79,8 @@ func GetAttachments() ([]string, error) {
 		json.Unmarshal(data, &attachments)
 	}
 
+	fmt.Printf("Loaded %d attachments\n", len(attachments))
+
 	var fileContents []string
 
 	for _, filePath := range attachments {
@@ -106,13 +108,11 @@ func ListAttachments() error {
 		return err
 	}
 
-	// Check if attachments file exists
 	if _, err := os.Stat(attachmentsFile); os.IsNotExist(err) {
 		fmt.Println("No attachments found.")
 		return nil
 	}
 
-	// Load attachments
 	var attachments []string
 	data, err := os.ReadFile(attachmentsFile)
 	if err != nil {
@@ -123,13 +123,11 @@ func ListAttachments() error {
 		return fmt.Errorf("error parsing attachments file: %w", err)
 	}
 
-	// Display attachments
 	if len(attachments) == 0 {
 		fmt.Println("No attachments found.")
 	} else {
 		fmt.Println("Current attachments:")
 		for i, filePath := range attachments {
-			// Check if file exists
 			if _, err := os.Stat(filePath); os.IsNotExist(err) {
 				fmt.Printf("  %d. %s (file not found)\n", i+1, filePath)
 			} else {
