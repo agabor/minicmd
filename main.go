@@ -90,6 +90,9 @@ func main() {
 		commandErr = commands.HandleClearCommand()
 	case "new":
 		commandErr = commands.HandleNewCommand()
+		if commandErr == nil {
+			commandErr = commands.HandleClearCommand()
+		}
 	case "last":
 		commandErr = commands.HandleLastCommand()
 	default:

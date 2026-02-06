@@ -80,6 +80,8 @@ func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (Message, e
 		})
 	}
 
+	fmt.Printf("Calling Claude with %d messages\n", len(messages))
+
 	message, err := client.Messages.New(context.Background(), params)
 
 	if err != nil {
