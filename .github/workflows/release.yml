@@ -12,28 +12,8 @@ on:
         type: string
 
 jobs:
-  release:
-    name: Create Release
-    permissions:
-      contents: write
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-    steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.event.inputs.tag || github.ref }}
-          release_name: Release ${{ github.event.inputs.tag || github.ref }}
-          draft: false
-          prerelease: false
-
   build:
     name: Build
-    needs: release
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -66,12 +46,25 @@ jobs:
           CGO_ENABLED: 0
         run: go build -o yact-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.suffix }} -ldflags "-s -w"
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+      - name: Upload Release Assets
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./yact-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.suffix }}
-          asset_name: yact-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.suffix }}
-          asset_content_type: application/octet-stream
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${{ github.event.inputs.tag || github.ref }}"
+          ASSET_PATH="./yact-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.suffix }}"
+          
+          if [ "${{ matrix.goos }}" == "windows" ]; then
+            CONTENT_TYPE="application/x-msdownload"
+          else
+            CONTENT_TYPE="application/octet-stream"
+          fi
+          
+          if ! gh release view "$TAG_NAME" > /dev/null 2>&1; then
+            gh release create "$TAG_NAME" \
+              --title "Release $TAG_NAME" \
+              --draft=false \
+              --prerelease=false
+          fi
+          
+          gh release upload "$TAG_NAME" "$ASSET_PATH" \
+            --clobber
