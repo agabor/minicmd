@@ -83,9 +83,9 @@ func main() {
 	case "bash":
 		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, systemprompt.Bash)
 	case "ask":
-		commandErr = commands.HandleAskCommand(commandArgs, cfg, systemprompt.Ask)
+		commandErr = commands.HandleVerbalCommand(commandArgs, cfg, systemprompt.Ask, "ask")
 	case "plan":
-		commandErr = commands.HandleAskCommand(commandArgs, cfg, systemprompt.Plan)
+		commandErr = commands.HandleVerbalCommand(commandArgs, cfg, systemprompt.Plan, "plan")
 	case "new":
 		commandErr = commands.HandleNewCommand()
 	case "last":

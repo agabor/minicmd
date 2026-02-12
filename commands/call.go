@@ -28,7 +28,7 @@ func showProgress(done chan bool) {
 
 func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt string) error {
 
-	responseContent, err := HandleCall(args, cfg, systemPrompt)
+	responseContent, err := HandleCall(args, cfg, systemPrompt, "act")
 	if err != nil {
 		return err
 	}
@@ -42,8 +42,8 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 	return nil
 }
 
-func HandleAskCommand(args []string, cfg *config.Config, systemPrompt string) error {
-	responseContent, err := HandleCall(args, cfg, systemPrompt)
+func HandleVerbalCommand(args []string, cfg *config.Config, systemPrompt string, promptType string) error {
+	responseContent, err := HandleCall(args, cfg, systemPrompt, promptType)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func HandleNewCommand() error {
 	return nil
 }
 
-func HandleCall(args []string, cfg *config.Config, systemPrompt string) (string, error) {
+func HandleCall(args []string, cfg *config.Config, systemPrompt string, promptType string) (string, error) {
 	prompt := strings.Join(args, " ")
 
 	fmt.Printf("Sending request to Claude...\n")
@@ -95,6 +95,8 @@ func HandleCall(args []string, cfg *config.Config, systemPrompt string) (string,
 	if strings.TrimSpace(responseContent) == "" {
 		return "", fmt.Errorf("error: empty response from Claude API")
 	}
+
+	response.Type = promptType
 
 	updatedMessages := append(messages, response)
 	if err := logic.SaveContext(updatedMessages); err != nil {

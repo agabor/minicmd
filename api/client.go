@@ -6,6 +6,7 @@ import (
 
 type Message struct {
 	Role    string
+	Type    string
 	Content string
 }
 
