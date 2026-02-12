@@ -62,7 +62,7 @@ func listContext() error {
 
 		truncatedContent = strings.ReplaceAll(truncatedContent, "\n", " ")
 
-		fmt.Printf("[%d] %s: %s\n", i, msg.Role, truncatedContent)
+		fmt.Printf("[%d] %s (%s): %s\n", i, msg.Role, msg.Type, truncatedContent)
 	}
 
 	return nil
