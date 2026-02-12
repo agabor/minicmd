@@ -97,6 +97,7 @@ func ClearContext() error {
 
 	return nil
 }
+
 func BuildMessages(prompt string) ([]api.Message, error) {
 	contextMessages, err := LoadContext()
 	if err != nil {
@@ -111,4 +112,33 @@ func BuildMessages(prompt string) ([]api.Message, error) {
 	}
 
 	return append(contextMessages, userMessage), nil
+}
+
+func ReloadContextFiles() error {
+	messages, err := LoadContext()
+	if err != nil {
+		return err
+	}
+
+	var reloadErrors []string
+	for i, message := range messages {
+		if message.Type == "file" {
+			content, err := getFileContentAsCodeBlock(message.Path)
+			if err != nil {
+				reloadErrors = append(reloadErrors, fmt.Sprintf("could not reload %s: %v", message.Path, err))
+				continue
+			}
+			messages[i].Content = content
+		}
+	}
+
+	if err := SaveContext(messages); err != nil {
+		return err
+	}
+
+	if len(reloadErrors) > 0 {
+		return fmt.Errorf("reloaded context with errors: %s", strings.Join(reloadErrors, "; "))
+	}
+
+	return nil
 }
