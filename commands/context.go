@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"yact/logic"
 )
@@ -41,6 +42,14 @@ func handleContextList() error {
 		fmt.Printf("[%d] %s (%s)", i, message.Role, message.Type)
 		if message.Path != "" {
 			fmt.Printf(" - %s", message.Path)
+		} else {
+			truncatedContent := message.Content
+			if len(truncatedContent) > 200 {
+				truncatedContent = truncatedContent[:200] + "..."
+			}
+
+			truncatedContent = strings.ReplaceAll(truncatedContent, "\n", " ")
+			fmt.Printf(" - %s", truncatedContent)
 		}
 		fmt.Println()
 	}
