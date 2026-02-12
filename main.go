@@ -74,8 +74,6 @@ func main() {
 		return
 	case "read":
 		commandErr = commands.HandleReadCommand(commandArgs)
-	case "list":
-		commandErr = commands.HandleListCommand()
 	case "config":
 		commandErr = commands.HandleConfigCommand(commandArgs, cfg)
 	case "act":
@@ -86,13 +84,8 @@ func main() {
 		commandErr = commands.HandleAskCommand(commandArgs, cfg, systemprompt.Ask)
 	case "plan":
 		commandErr = commands.HandleAskCommand(commandArgs, cfg, systemprompt.Plan)
-	case "clear":
-		commandErr = commands.HandleClearCommand()
 	case "new":
 		commandErr = commands.HandleNewCommand()
-		if commandErr == nil {
-			commandErr = commands.HandleClearCommand()
-		}
 	case "last":
 		commandErr = commands.HandleLastCommand()
 	default:

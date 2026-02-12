@@ -60,6 +60,33 @@ func SaveContext(messages []api.Message) error {
 	return os.WriteFile(contextPath, data, 0644)
 }
 
+func getFileContentAsCodeBlock(filePath string) (string, error) {
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return "", err
+	}
+
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	contentStr := strings.TrimRight(string(content), "\n")
+	return fmt.Sprintf("````\n// %s\n%s\n````", filePath, contentStr), nil
+}
+
+func AddFileToPrompt(filePath string) error {
+	messages, err := LoadContext()
+	if err != nil {
+		return err
+	}
+	content, err := getFileContentAsCodeBlock(filePath)
+	if err != nil {
+		return err
+	}
+	messages = append(messages, api.Message{Role: "user", Content: content})
+	return SaveContext(messages)
+}
+
 func ClearContext() error {
 	contextPath, err := GetContextFilePath()
 	if err != nil {
@@ -79,21 +106,9 @@ func BuildMessages(prompt string) ([]api.Message, error) {
 		contextMessages = []api.Message{}
 	}
 
-	attachments, err := GetAttachments()
-	if err != nil {
-		return nil, fmt.Errorf("error getting attachments: %w", err)
-	}
-
-	var content string
-	if len(attachments) > 0 {
-		content = prompt + "\n\n" + strings.Join(attachments, "\n")
-	} else {
-		content = prompt
-	}
-
 	userMessage := api.Message{
 		Role:    "user",
-		Content: content,
+		Content: prompt,
 	}
 
 	return append(contextMessages, userMessage), nil

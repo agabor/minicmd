@@ -45,14 +45,6 @@ func HandleReadCommand(args []string) error {
 	return nil
 }
 
-func HandleListCommand() error {
-	return logic.ListAttachments()
-}
-
-func HandleClearCommand() error {
-	return logic.ClearPrompt()
-}
-
 func HandleLastCommand() error {
 	contextMessages, err := logic.LoadContext()
 	if err != nil {
