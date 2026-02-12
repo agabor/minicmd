@@ -16,6 +16,7 @@ func ShowHelp() {
 	fmt.Println("  y clear                 # Clear prompt and attachments")
 	fmt.Println("  y context               # List all messages in context")
 	fmt.Println("  y context pop [num]     # Remove last num messages (default: 1)")
+	fmt.Println("  y context popto <idx>   # Keep messages up to index, remove rest")
 	fmt.Println("  y context del <idx>     # Remove message at index")
 	fmt.Println("  y context reload        # Reload file contents from disk")
 	fmt.Println("  y new                   # Create a new context")
