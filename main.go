@@ -90,6 +90,20 @@ func main() {
 		commandErr = commands.HandleNewCommand()
 	case "last":
 		commandErr = commands.HandleLastCommand()
+	case "step":
+		if len(commandArgs) != 1 {
+			fmt.Fprintf(os.Stderr, "Error: step index required\n")
+			os.Exit(1)
+		}
+		stepArgs := append([]string{"implement", "step"}, commandArgs...)
+		stepArgs = append(stepArgs, ". Make no other changes.")
+		commandErr = commands.HandleActCommand(stepArgs, *safeFlag, cfg, systemprompt.Act)
+	case "go":
+		if len(commandArgs) != 0 {
+			fmt.Fprintf(os.Stderr, "Error: the go command takes no arguments\n")
+			os.Exit(1)
+		}
+		commandErr = commands.HandleVerbalCommand([]string{"Do it."}, cfg, systemprompt.Plan, "plan")
 	default:
 		fmt.Printf("Error: Unknown command '%s'\n", command)
 		fmt.Println("Run 'y --help' for usage information.")
