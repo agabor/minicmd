@@ -7,6 +7,7 @@ import (
 type Message struct {
 	Role    string
 	Type    string
+	Path    string
 	Content string
 }
 

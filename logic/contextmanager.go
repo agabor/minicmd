@@ -81,7 +81,7 @@ func AddFileToPrompt(filePath string) error {
 	if err != nil {
 		return err
 	}
-	messages = append(messages, api.Message{Role: "user", Type: "file", Content: content})
+	messages = append(messages, api.Message{Role: "user", Type: "file", Path: filePath, Content: content})
 	return SaveContext(messages)
 }
 
