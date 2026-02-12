@@ -15,6 +15,8 @@ func ShowHelp() {
 	fmt.Println("  y list                  # List current attachments")
 	fmt.Println("  y clear                 # Clear prompt and attachments")
 	fmt.Println("  y context               # List all messages in context")
+	fmt.Println("  y context pop [num]     # Remove last num messages (default: 1)")
+	fmt.Println("  y context del <idx>     # Remove message at index")
 	fmt.Println("  y new                   # Create a new context")
 	fmt.Println("  y last                  # Show last AI response")
 	fmt.Println("  y config                # Show current configuration")
