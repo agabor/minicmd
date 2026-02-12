@@ -76,6 +76,8 @@ func main() {
 		commandErr = commands.HandleReadCommand(commandArgs)
 	case "config":
 		commandErr = commands.HandleConfigCommand(commandArgs, cfg)
+	case "context":
+		commandErr = commands.HandleContextCommand(commandArgs)
 	case "act":
 		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, systemprompt.Act)
 	case "bash":
