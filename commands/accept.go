@@ -2,15 +2,11 @@ package commands
 
 import (
 	"fmt"
+	"yact/api"
 	"yact/logic"
 )
 
-func HandleAcceptCommand() error {
-	messages, err := logic.LoadContext()
-	if err != nil {
-		return err
-	}
-
+func validatePlanAndMessage(messages []api.Message) error {
 	if len(messages) < 2 {
 		return fmt.Errorf("not enough messages in context (need at least 2)")
 	}
@@ -26,10 +22,30 @@ func HandleAcceptCommand() error {
 		return fmt.Errorf("second last message is not a message (type: %s)", messages[secondLastIdx].Type)
 	}
 
+	return nil
+}
+
+func convertPlanToMessage(messages []api.Message) []api.Message {
+	lastIdx := len(messages) - 1
+	secondLastIdx := len(messages) - 2
+
 	messages[lastIdx].Role = "user"
 	messages[lastIdx].Type = "message"
 
-	messages = append(messages[:secondLastIdx], messages[secondLastIdx+1:]...)
+	return append(messages[:secondLastIdx], messages[secondLastIdx+1:]...)
+}
+
+func HandleAcceptCommand() error {
+	messages, err := logic.LoadContext()
+	if err != nil {
+		return err
+	}
+
+	if err := validatePlanAndMessage(messages); err != nil {
+		return err
+	}
+
+	messages = convertPlanToMessage(messages)
 
 	if err := logic.SaveContext(messages); err != nil {
 		return err
