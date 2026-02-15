@@ -14,6 +14,7 @@ func ShowHelp() {
 	fmt.Println("  y plan [prompt]         # Get a plan for implementation")
 	fmt.Println("  y step <index>          # Implement a specific step from the plan")
 	fmt.Println("  y go                    # Execute the plan (alias for 'act Do it.')")
+	fmt.Println("  y accept                # Accept last plan as user message")
 	fmt.Println("  y read <file>           # Add file reference to prompt")
 	fmt.Println("  y list                  # List current attachments")
 	fmt.Println("  y clear                 # Clear prompt and attachments")

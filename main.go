@@ -78,6 +78,8 @@ func main() {
 		commandErr = commands.HandleConfigCommand(commandArgs, cfg)
 	case "context":
 		commandErr = commands.HandleContextCommand(commandArgs)
+	case "accept":
+		commandErr = commands.HandleAcceptCommand()
 	case "act":
 		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, systemprompt.Act)
 	case "bash":
