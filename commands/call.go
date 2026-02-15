@@ -67,11 +67,10 @@ func HandleGoCommand(cfg *config.Config, systemPrompt string) error {
 		return err
 	}
 
-	if err := validatePlanAndMessage(messages); err != nil {
+	messages, err = processPlanToMessage(messages)
+	if err != nil {
 		return err
 	}
-
-	messages = convertPlanToMessage(messages)
 
 	if err := logic.SaveContext(messages); err != nil {
 		return err
