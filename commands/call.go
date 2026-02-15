@@ -61,6 +61,78 @@ func HandleNewCommand() error {
 	return nil
 }
 
+func HandleGoCommand(cfg *config.Config, systemPrompt string) error {
+	messages, err := logic.LoadContext()
+	if err != nil {
+		return err
+	}
+
+	if len(messages) < 2 {
+		return fmt.Errorf("not enough messages in context (need at least 2)")
+	}
+
+	lastIdx := len(messages) - 1
+	secondLastIdx := len(messages) - 2
+
+	if messages[lastIdx].Type != "plan" {
+		return fmt.Errorf("last message is not a plan (type: %s)", messages[lastIdx].Type)
+	}
+
+	if messages[secondLastIdx].Type != "message" {
+		return fmt.Errorf("second last message is not a message (type: %s)", messages[secondLastIdx].Type)
+	}
+
+	messages[lastIdx].Role = "user"
+	messages[lastIdx].Type = "message"
+
+	messages = append(messages[:secondLastIdx], messages[secondLastIdx+1:]...)
+
+	if err := logic.SaveContext(messages); err != nil {
+		return err
+	}
+
+	fmt.Printf("Sending request to Claude...\n")
+
+	var client api.APIClient
+	client = &api.ClaudeClient{}
+	client.Init(cfg)
+
+	fmt.Printf("Model: %s\n", client.GetModelName())
+
+	done := make(chan bool)
+	go showProgress(done)
+
+	response, err := client.Call(messages, systemPrompt)
+
+	done <- true
+	close(done)
+
+	if err != nil {
+		return err
+	}
+
+	responseContent := response.Content
+
+	if strings.TrimSpace(responseContent) == "" {
+		return fmt.Errorf("error: empty response from Claude API")
+	}
+
+	response.Type = "act"
+
+	updatedMessages := append(messages, response)
+	if err := logic.SaveContext(updatedMessages); err != nil {
+		fmt.Printf("Warning: could not save context: %v\n", err)
+	}
+
+	fmt.Println("Processing response...")
+	if err := logic.ProcessCodeBlocks(responseContent, false); err != nil {
+		return fmt.Errorf("error processing code blocks: %w", err)
+	}
+
+	fmt.Println("Done!")
+	return nil
+}
+
 func HandleCall(args []string, cfg *config.Config, systemPrompt string, promptType string) (string, error) {
 	prompt := strings.Join(args, " ")
 
