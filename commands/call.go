@@ -27,18 +27,15 @@ func showProgress(done chan bool) {
 }
 
 func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt string) error {
-
 	responseContent, err := HandleCall(args, cfg, systemPrompt, "act")
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Processing response...")
-	if err := logic.ProcessCodeBlocks(responseContent, safe); err != nil {
-		return fmt.Errorf("error processing code blocks: %w", err)
+	if err := processCodeBlocks(responseContent, safe); err != nil {
+		return err
 	}
 
-	fmt.Println("Done!")
 	return nil
 }
 
@@ -62,65 +59,41 @@ func HandleNewCommand() error {
 }
 
 func HandleGoCommand(cfg *config.Config, systemPrompt string) error {
-	messages, err := logic.LoadContext()
+
+	messages, err := HandleAcceptCommand()
 	if err != nil {
 		return err
 	}
 
-	messages, err = processPlanToMessage(messages)
+	responseContent, err := callClaudeAPI(messages, cfg, systemPrompt)
 	if err != nil {
 		return err
 	}
 
-	if err := logic.SaveContext(messages); err != nil {
-		return err
-	}
+	saveContext(messages, responseContent, "act")
 
-	fmt.Printf("Sending request to Claude...\n")
-
-	var client api.APIClient
-	client = &api.ClaudeClient{}
-	client.Init(cfg)
-
-	fmt.Printf("Model: %s\n", client.GetModelName())
-
-	done := make(chan bool)
-	go showProgress(done)
-
-	response, err := client.Call(messages, systemPrompt)
-
-	done <- true
-	close(done)
-
-	if err != nil {
-		return err
-	}
-
-	responseContent := response.Content
-
-	if strings.TrimSpace(responseContent) == "" {
-		return fmt.Errorf("error: empty response from Claude API")
-	}
-
-	response.Type = "act"
-
-	updatedMessages := append(messages, response)
-	if err := logic.SaveContext(updatedMessages); err != nil {
-		fmt.Printf("Warning: could not save context: %v\n", err)
-	}
-
-	fmt.Println("Processing response...")
-	if err := logic.ProcessCodeBlocks(responseContent, false); err != nil {
-		return fmt.Errorf("error processing code blocks: %w", err)
-	}
-
-	fmt.Println("Done!")
-	return nil
+	return processCodeBlocks(responseContent, false)
 }
 
 func HandleCall(args []string, cfg *config.Config, systemPrompt string, promptType string) (string, error) {
 	prompt := strings.Join(args, " ")
 
+	messages, err := logic.BuildMessages(prompt)
+	if err != nil {
+		return "", err
+	}
+
+	responseContent, err := callClaudeAPI(messages, cfg, systemPrompt)
+	if err != nil {
+		return "", err
+	}
+
+	saveContext(messages, responseContent, promptType)
+
+	return responseContent, nil
+}
+
+func callClaudeAPI(messages []api.Message, cfg *config.Config, systemPrompt string) (string, error) {
 	fmt.Printf("Sending request to Claude...\n")
 
 	var client api.APIClient
@@ -128,12 +101,6 @@ func HandleCall(args []string, cfg *config.Config, systemPrompt string, promptTy
 	client.Init(cfg)
 
 	fmt.Printf("Model: %s\n", client.GetModelName())
-
-	messages, err := logic.BuildMessages(prompt)
-
-	if err != nil {
-		return "", err
-	}
 
 	done := make(chan bool)
 	go showProgress(done)
@@ -153,11 +120,27 @@ func HandleCall(args []string, cfg *config.Config, systemPrompt string, promptTy
 		return "", fmt.Errorf("error: empty response from Claude API")
 	}
 
-	response.Type = promptType
+	return responseContent, nil
+}
+
+func saveContext(messages []api.Message, content string, messageType string) {
+	response := api.Message{
+		Content: content,
+		Type:    messageType,
+	}
 
 	updatedMessages := append(messages, response)
 	if err := logic.SaveContext(updatedMessages); err != nil {
 		fmt.Printf("Warning: could not save context: %v\n", err)
 	}
-	return responseContent, nil
+}
+
+func processCodeBlocks(content string, safe bool) error {
+	fmt.Println("Processing response...")
+	if err := logic.ProcessCodeBlocks(content, safe); err != nil {
+		return fmt.Errorf("error processing code blocks: %w", err)
+	}
+
+	fmt.Println("Done!")
+	return nil
 }

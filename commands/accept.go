@@ -6,7 +6,12 @@ import (
 	"yact/logic"
 )
 
-func processPlanToMessage(messages []api.Message) ([]api.Message, error) {
+func HandleAcceptCommand() ([]api.Message, error) {
+	messages, err := logic.LoadContext()
+	if err != nil {
+		return nil, err
+	}
+
 	if len(messages) < 2 {
 		return nil, fmt.Errorf("not enough messages in context (need at least 2)")
 	}
@@ -25,24 +30,12 @@ func processPlanToMessage(messages []api.Message) ([]api.Message, error) {
 	messages[lastIdx].Role = "user"
 	messages[lastIdx].Type = "message"
 
-	return append(messages[:secondLastIdx], messages[secondLastIdx+1:]...), nil
-}
-
-func HandleAcceptCommand() error {
-	messages, err := logic.LoadContext()
-	if err != nil {
-		return err
-	}
-
-	messages, err = processPlanToMessage(messages)
-	if err != nil {
-		return err
-	}
+	messages = append(messages[:secondLastIdx], messages[secondLastIdx+1:]...)
 
 	if err := logic.SaveContext(messages); err != nil {
-		return err
+		return nil, err
 	}
 
 	fmt.Println("Plan accepted and converted to message")
-	return nil
+	return messages, nil
 }
