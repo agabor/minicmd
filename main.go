@@ -91,7 +91,15 @@ func main() {
 	case "new":
 		commandErr = commands.HandleNewCommand()
 	case "last":
-		commandErr = commands.HandleLastCommand()
+		if len(commandArgs) > 1 {
+			fmt.Fprintf(os.Stderr, "Error: last command takes at most one argument\n")
+			os.Exit(1)
+		}
+		lastFilePath := ""
+		if len(commandArgs) == 1 {
+			lastFilePath = commandArgs[0]
+		}
+		commandErr = commands.HandleLastCommand(lastFilePath)
 	case "step":
 		if len(commandArgs) != 1 {
 			fmt.Fprintf(os.Stderr, "Error: step index required\n")
