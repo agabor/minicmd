@@ -32,11 +32,7 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 		return err
 	}
 
-	if err := processCodeBlocks(responseContent, safe); err != nil {
-		return err
-	}
-
-	return nil
+	return processCodeBlocks(responseContent, safe)
 }
 
 func HandleVerbalCommand(args []string, cfg *config.Config, systemPrompt string, promptType string) error {
@@ -49,28 +45,16 @@ func HandleVerbalCommand(args []string, cfg *config.Config, systemPrompt string,
 	return nil
 }
 
-func HandleNewCommand() error {
-	if err := logic.ClearContext(); err != nil {
-		return fmt.Errorf("error clearing context: %w", err)
-	}
-
-	fmt.Println("New context created")
-	return nil
-}
-
 func HandleGoCommand(cfg *config.Config, systemPrompt string) error {
-
 	messages, err := HandleAcceptCommand()
 	if err != nil {
 		return err
 	}
 
-	responseContent, err := callClaudeAPI(messages, cfg, systemPrompt)
+	responseContent, err := callClaudeAPI(messages, cfg, systemPrompt, "act")
 	if err != nil {
 		return err
 	}
-
-	saveContext(messages, responseContent, "act")
 
 	return processCodeBlocks(responseContent, false)
 }
@@ -78,22 +62,29 @@ func HandleGoCommand(cfg *config.Config, systemPrompt string) error {
 func HandleCall(args []string, cfg *config.Config, systemPrompt string, promptType string) (string, error) {
 	prompt := strings.Join(args, " ")
 
-	messages, err := logic.BuildMessages(prompt)
+	contextMessages, err := logic.LoadContext()
+	if err != nil {
+		fmt.Printf("Warning: could not load context: %v\n", err)
+		contextMessages = []api.Message{}
+	}
+
+	userMessage := api.Message{
+		Role:    "user",
+		Type:    "message",
+		Content: prompt,
+	}
+
+	messages := append(contextMessages, userMessage)
+
+	responseContent, err := callClaudeAPI(messages, cfg, systemPrompt, promptType)
 	if err != nil {
 		return "", err
 	}
-
-	responseContent, err := callClaudeAPI(messages, cfg, systemPrompt)
-	if err != nil {
-		return "", err
-	}
-
-	saveContext(messages, responseContent, promptType)
 
 	return responseContent, nil
 }
 
-func callClaudeAPI(messages []api.Message, cfg *config.Config, systemPrompt string) (string, error) {
+func callClaudeAPI(messages []api.Message, cfg *config.Config, systemPrompt string, messageType string) (string, error) {
 	fmt.Printf("Sending request to Claude...\n")
 
 	var client api.APIClient
@@ -120,20 +111,18 @@ func callClaudeAPI(messages []api.Message, cfg *config.Config, systemPrompt stri
 		return "", fmt.Errorf("error: empty response from Claude API")
 	}
 
-	return responseContent, nil
-}
-
-func saveContext(messages []api.Message, content string, messageType string) {
-	response := api.Message{
-		Content: content,
+	message := api.Message{
+		Content: responseContent,
 		Role:    "assistant",
 		Type:    messageType,
 	}
 
-	updatedMessages := append(messages, response)
+	updatedMessages := append(messages, message)
 	if err := logic.SaveContext(updatedMessages); err != nil {
 		fmt.Printf("Warning: could not save context: %v\n", err)
 	}
+
+	return responseContent, nil
 }
 
 func processCodeBlocks(content string, safe bool) error {

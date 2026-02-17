@@ -2,7 +2,6 @@ package logic
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"yact/api"
@@ -77,33 +76,4 @@ func AddFileToPrompt(filePath string) error {
 	}
 	messages = append(messages, api.Message{Role: "user", Type: "file", Path: filePath, Content: content})
 	return SaveContext(messages)
-}
-
-func ClearContext() error {
-	contextPath, err := GetContextFilePath()
-	if err != nil {
-		return err
-	}
-
-	if err := os.Remove(contextPath); err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	return nil
-}
-
-func BuildMessages(prompt string) ([]api.Message, error) {
-	contextMessages, err := LoadContext()
-	if err != nil {
-		fmt.Printf("Warning: could not load context: %v\n", err)
-		contextMessages = []api.Message{}
-	}
-
-	userMessage := api.Message{
-		Role:    "user",
-		Type:    "message",
-		Content: prompt,
-	}
-
-	return append(contextMessages, userMessage), nil
 }
