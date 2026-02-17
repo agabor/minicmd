@@ -32,7 +32,7 @@ func ParseCodeBlocks(response string) []CodeBlock {
 		codeBlocks = append(codeBlocks, *currentBlock)
 	}
 
-	return nil
+	return codeBlocks
 }
 
 func ProcessCodeBlocks(response string, safe bool) error {
