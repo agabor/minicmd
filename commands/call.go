@@ -126,6 +126,7 @@ func callClaudeAPI(messages []api.Message, cfg *config.Config, systemPrompt stri
 func saveContext(messages []api.Message, content string, messageType string) {
 	response := api.Message{
 		Content: content,
+		Role:    "assistant",
 		Type:    messageType,
 	}
 

@@ -5,7 +5,8 @@ import (
 	"strings"
 )
 
-func processMarkdownBlocks(lines []string, safe bool) error {
+func ProcessCodeBlocks(response string, safe bool) error {
+	lines := strings.Split(response, "\n")
 	inCodeBlock := false
 	var currentBlock *CodeBlock
 
@@ -37,9 +38,4 @@ func processMarkdownBlocks(lines []string, safe bool) error {
 	}
 
 	return nil
-}
-
-func ProcessCodeBlocks(response string, safe bool) error {
-	lines := strings.Split(response, "\n")
-	return processMarkdownBlocks(lines, safe)
 }
