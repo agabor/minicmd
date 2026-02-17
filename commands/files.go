@@ -51,24 +51,14 @@ func HandleLastCommand(filePath string) error {
 		return fmt.Errorf("error loading context: %w", err)
 	}
 
-	if len(contextMessages) == 0 {
-		return fmt.Errorf("no previous messages found")
-	}
+	lastIndex := len(contextMessages) - 1
 
-	lastAssistantIndex := -1
-	for i := len(contextMessages) - 1; i >= 0; i-- {
-		if contextMessages[i].Role == "assistant" {
-			lastAssistantIndex = i
-			break
-		}
-	}
-
-	if lastAssistantIndex == -1 {
+	if lastIndex == -1 {
 		return fmt.Errorf("no previous assistant message found")
 	}
 
 	if filePath == "" {
-		fmt.Print(contextMessages[lastAssistantIndex].Content)
+		fmt.Print(contextMessages[lastIndex].Content)
 		return nil
 	}
 
@@ -77,7 +67,7 @@ func HandleLastCommand(filePath string) error {
 		return fmt.Errorf("error reading file %s: %w", filePath, err)
 	}
 
-	contextMessages[lastAssistantIndex].Content = string(content)
+	contextMessages[lastIndex].Content = string(content)
 
 	if err := logic.SaveContext(contextMessages); err != nil {
 		return fmt.Errorf("error saving context: %w", err)
