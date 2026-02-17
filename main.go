@@ -77,7 +77,19 @@ func main() {
 	case "config":
 		commandErr = commands.HandleConfigCommand(commandArgs, cfg)
 	case "context":
-		commandErr = commands.HandleContextCommand(commandArgs)
+		if len(commandArgs) != 0 {
+			fmt.Fprintf(os.Stderr, "Error: the go command takes no arguments\n")
+			os.Exit(1)
+		}
+		commandErr = commands.HandleContextCommand()
+	case "pop":
+		commandErr = commands.HandleContextPop(commandArgs)
+	case "popto":
+		commandErr = commands.HandleContextPopto(commandArgs)
+	case "del":
+		commandErr = commands.HandleContextDel(commandArgs)
+	case "reload":
+		commandErr = commands.HandleContextReload()
 	case "accept":
 		_, commandErr = commands.HandleAcceptCommand()
 	case "act":

@@ -8,28 +8,7 @@ import (
 	"yact/logic"
 )
 
-func HandleContextCommand(args []string) error {
-	if len(args) == 0 {
-		return handleContextList()
-	}
-
-	subcommand := args[0]
-
-	switch subcommand {
-	case "pop":
-		return handleContextPop(args[1:])
-	case "popto":
-		return handleContextPopto(args[1:])
-	case "del":
-		return handleContextDel(args[1:])
-	case "reload":
-		return handleContextReload()
-	default:
-		return fmt.Errorf("unknown context subcommand: %s", subcommand)
-	}
-}
-
-func handleContextList() error {
+func HandleContextCommand() error {
 	messages, err := logic.LoadContext()
 	if err != nil {
 		return err
@@ -59,7 +38,7 @@ func handleContextList() error {
 	return nil
 }
 
-func handleContextPop(args []string) error {
+func HandleContextPop(args []string) error {
 	messages, err := logic.LoadContext()
 	if err != nil {
 		return err
@@ -88,7 +67,7 @@ func handleContextPop(args []string) error {
 	return nil
 }
 
-func handleContextPopto(args []string) error {
+func HandleContextPopto(args []string) error {
 	if len(args) == 0 {
 		return fmt.Errorf("index required for popto subcommand")
 	}
@@ -118,7 +97,7 @@ func handleContextPopto(args []string) error {
 	return nil
 }
 
-func handleContextDel(args []string) error {
+func HandleContextDel(args []string) error {
 	if len(args) == 0 {
 		return fmt.Errorf("index required for del subcommand")
 	}
@@ -147,7 +126,7 @@ func handleContextDel(args []string) error {
 	return nil
 }
 
-func handleContextReload() error {
+func HandleContextReload() error {
 	if err := logic.ReloadContextFiles(); err != nil {
 		return err
 	}
