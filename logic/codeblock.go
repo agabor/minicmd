@@ -11,6 +11,8 @@ import (
 
 var unknownFileCounter = 0
 
+const BlockDelimiter = "``" + "``"
+
 type CodeBlock struct {
 	blockHeader string
 	lines       []string
@@ -88,7 +90,7 @@ func (cb *CodeBlock) getFilePath() string {
 }
 
 func (cb *CodeBlock) getContent() string {
-	return "````\n" + strings.Join(cb.lines, "\n") + "\n````"
+	return BlockDelimiter + "\n" + strings.Join(cb.lines, "\n") + "\n" + BlockDelimiter
 }
 
 func (cb *CodeBlock) write(safe bool) error {
