@@ -59,17 +59,12 @@ func SaveContext(messages []api.Message) error {
 }
 
 func getFileContentAsCodeBlock(filePath string) (string, error) {
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		return "", err
-	}
-
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return "", err
 	}
 
-	contentStr := strings.TrimRight(string(content), "\n")
-	return fmt.Sprintf("````\n// %s\n%s\n````", filePath, contentStr), nil
+	return asCodeBlock(filePath, string(content)), nil
 }
 
 func AddFileToPrompt(filePath string) error {
@@ -140,13 +135,12 @@ func ReloadContextFiles() error {
 			seenPaths[message.Path] = true
 		} else if message.Type == "act" {
 			for _, block := range ParseCodeBlocks(message.Content) {
-				filePath := block.getFilePath()
-				if seenPaths[filePath] {
+				if seenPaths[block.path] {
 					continue
 				}
 
-				newMessages = append(newMessages, api.Message{Role: "user", Type: "file", Path: filePath, Content: block.getContent()})
-				seenPaths[filePath] = true
+				newMessages = append(newMessages, api.Message{Role: "user", Type: "file", Path: block.path, Content: block.serialize()})
+				seenPaths[block.path] = true
 			}
 		} else {
 			newMessages = append(newMessages, message)

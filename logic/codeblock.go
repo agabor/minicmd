@@ -14,8 +14,8 @@ var unknownFileCounter = 0
 const BlockDelimiter = "``" + "``"
 
 type CodeBlock struct {
-	blockHeader string
-	lines       []string
+	path    string
+	content string
 }
 
 func extractFilenameFromComment(line string) string {
@@ -43,28 +43,24 @@ func extractFilenameFromComment(line string) string {
 	return ""
 }
 
-func (cb *CodeBlock) getFilePath() string {
+func linesToCodeBlock(lines []string) CodeBlock {
 	filePath := ""
 	lineIndex := 0
 
-	for lineIndex < len(cb.lines) && strings.TrimSpace(cb.lines[lineIndex]) == "" {
+	for lineIndex < len(lines) && strings.TrimSpace(lines[lineIndex]) == "" {
 		lineIndex++
 	}
 
-	if lineIndex < len(cb.lines) && strings.HasPrefix(strings.TrimSpace(cb.lines[lineIndex]), "#!") {
+	if lineIndex < len(lines) && strings.HasPrefix(strings.TrimSpace(lines[lineIndex]), "#!") {
 		lineIndex++
 	}
 
-	if lineIndex < len(cb.lines) {
-		extractedPath := extractFilenameFromComment(cb.lines[lineIndex])
+	if lineIndex < len(lines) {
+		extractedPath := extractFilenameFromComment(lines[lineIndex])
 		if extractedPath != "" {
 			filePath = extractedPath
-			cb.lines = append(cb.lines[:lineIndex], cb.lines[lineIndex+1:]...)
+			lines = append(lines[:lineIndex], lines[lineIndex+1:]...)
 		}
-	}
-
-	if filePath == "" {
-		filePath = cb.blockHeader
 	}
 
 	if filePath == "" {
@@ -85,16 +81,23 @@ func (cb *CodeBlock) getFilePath() string {
 		}
 	}
 
-	return filePath
-
+	return CodeBlock{path: filePath, content: joinLines(lines)}
 }
 
-func (cb *CodeBlock) getContent() string {
-	return BlockDelimiter + "\n" + strings.Join(cb.lines, "\n") + "\n" + BlockDelimiter
+func joinLines(lines []string) string {
+	return strings.Join(lines, "\n")
+}
+
+func (cb *CodeBlock) serialize() string {
+	return asCodeBlock(cb.path, cb.content)
+}
+
+func asCodeBlock(path string, content string) string {
+	return joinLines([]string{BlockDelimiter, "//" + path, content, BlockDelimiter})
 }
 
 func (cb *CodeBlock) write(safe bool) error {
-	filePath := cb.getFilePath()
+	filePath := cb.path
 	if safe {
 		filePath += ".new"
 	}
@@ -103,7 +106,7 @@ func (cb *CodeBlock) write(safe bool) error {
 		return fmt.Errorf("error creating directory %s: %w", dir, err)
 	}
 
-	if err := os.WriteFile(filePath, []byte(strings.Join(cb.lines, "\n")), 0644); err != nil {
+	if err := os.WriteFile(filePath, []byte(cb.content), 0644); err != nil {
 		return fmt.Errorf("error writing file %s: %w", filePath, err)
 	}
 

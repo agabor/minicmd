@@ -6,27 +6,27 @@ import (
 
 func ParseCodeBlocks(response string) []CodeBlock {
 	lines := strings.Split(response, "\n")
-	var currentBlock *CodeBlock
 	var codeBlocks = make([]CodeBlock, 0)
-
+	var lineBuffer = make([]string, 0)
+	inBlock := false
 	for _, line := range lines {
 		if strings.HasPrefix(strings.TrimSpace(line), BlockDelimiter) {
-			if currentBlock != nil {
-				if len(currentBlock.lines) > 0 {
-					codeBlocks = append(codeBlocks, *currentBlock)
+			if inBlock {
+				if len(lineBuffer) > 0 {
+					codeBlocks = append(codeBlocks, linesToCodeBlock(lineBuffer))
 				}
-				currentBlock = nil
+				inBlock = false
+				lineBuffer = make([]string, 0)
 			} else {
-				blockHeader := strings.TrimSpace(strings.Replace(line, BlockDelimiter, "", 1))
-				currentBlock = &CodeBlock{blockHeader: blockHeader}
+				inBlock = true
 			}
-		} else if currentBlock != nil {
-			currentBlock.lines = append(currentBlock.lines, line)
+		} else if inBlock {
+			lineBuffer = append(lineBuffer, line)
 		}
 	}
 
-	if currentBlock != nil && len(currentBlock.lines) > 0 {
-		codeBlocks = append(codeBlocks, *currentBlock)
+	if inBlock && len(lineBuffer) > 0 {
+		codeBlocks = append(codeBlocks, linesToCodeBlock(lineBuffer))
 	}
 
 	return codeBlocks
