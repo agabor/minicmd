@@ -14,8 +14,8 @@ var unknownFileCounter = 0
 const BlockDelimiter = "``" + "``"
 
 type CodeBlock struct {
-	path    string
-	content string
+	Path    string
+	Content string
 }
 
 func extractFilenameFromComment(line string) string {
@@ -81,23 +81,19 @@ func linesToCodeBlock(lines []string) CodeBlock {
 		}
 	}
 
-	return CodeBlock{path: filePath, content: joinLines(lines)}
+	return CodeBlock{Path: filePath, Content: joinLines(lines)}
 }
 
 func joinLines(lines []string) string {
 	return strings.Join(lines, "\n")
 }
 
-func (cb *CodeBlock) serialize() string {
-	return asCodeBlock(cb.path, cb.content)
-}
-
-func asCodeBlock(path string, content string) string {
+func AsCodeBlock(path string, content string) string {
 	return joinLines([]string{BlockDelimiter, "//" + path, content, BlockDelimiter})
 }
 
-func (cb *CodeBlock) write(safe bool) error {
-	filePath := cb.path
+func (cb *CodeBlock) Write(safe bool) error {
+	filePath := cb.Path
 	if safe {
 		filePath += ".new"
 	}
@@ -106,7 +102,7 @@ func (cb *CodeBlock) write(safe bool) error {
 		return fmt.Errorf("error creating directory %s: %w", dir, err)
 	}
 
-	if err := os.WriteFile(filePath, []byte(cb.content), 0644); err != nil {
+	if err := os.WriteFile(filePath, []byte(cb.Content), 0644); err != nil {
 		return fmt.Errorf("error writing file %s: %w", filePath, err)
 	}
 

@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"yact/logic"
@@ -35,102 +34,5 @@ func HandleContextCommand() error {
 		fmt.Println()
 	}
 
-	return nil
-}
-
-func HandleContextPop(args []string) error {
-	messages, err := logic.LoadContext()
-	if err != nil {
-		return err
-	}
-
-	numToPop := 1
-	if len(args) > 0 {
-		num, err := strconv.Atoi(args[0])
-		if err != nil {
-			return fmt.Errorf("invalid number: %s", args[0])
-		}
-		numToPop = num
-	}
-
-	if numToPop > len(messages) {
-		numToPop = len(messages)
-	}
-
-	messages = messages[:len(messages)-numToPop]
-
-	if err := logic.SaveContext(messages); err != nil {
-		return err
-	}
-
-	fmt.Printf("Removed %d message(s)\n", numToPop)
-	return nil
-}
-
-func HandleContextPopto(args []string) error {
-	if len(args) == 0 {
-		return fmt.Errorf("index required for popto subcommand")
-	}
-
-	idx, err := strconv.Atoi(args[0])
-	if err != nil {
-		return fmt.Errorf("invalid index: %s", args[0])
-	}
-
-	messages, err := logic.LoadContext()
-	if err != nil {
-		return err
-	}
-
-	if idx < 0 || idx >= len(messages) {
-		return fmt.Errorf("index out of range: %d", idx)
-	}
-
-	numRemoved := len(messages) - idx - 1
-	messages = messages[:idx+1]
-
-	if err := logic.SaveContext(messages); err != nil {
-		return err
-	}
-
-	fmt.Printf("Removed %d message(s)\n", numRemoved)
-	return nil
-}
-
-func HandleContextDel(args []string) error {
-	if len(args) == 0 {
-		return fmt.Errorf("index required for del subcommand")
-	}
-
-	idx, err := strconv.Atoi(args[0])
-	if err != nil {
-		return fmt.Errorf("invalid index: %s", args[0])
-	}
-
-	messages, err := logic.LoadContext()
-	if err != nil {
-		return err
-	}
-
-	if idx < 0 || idx >= len(messages) {
-		return fmt.Errorf("index out of range: %d", idx)
-	}
-
-	messages = append(messages[:idx], messages[idx+1:]...)
-
-	if err := logic.SaveContext(messages); err != nil {
-		return err
-	}
-
-	fmt.Printf("Removed message at index %d\n", idx)
-	return nil
-}
-
-func HandleContextReload() error {
-	if err := logic.ReloadContextFiles(); err != nil {
-		return err
-	}
-
-	fmt.Println("Context files reloaded")
 	return nil
 }

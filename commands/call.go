@@ -138,8 +138,16 @@ func saveContext(messages []api.Message, content string, messageType string) {
 
 func processCodeBlocks(content string, safe bool) error {
 	fmt.Println("Processing response...")
-	if err := logic.ProcessCodeBlocks(content, safe); err != nil {
-		return fmt.Errorf("error processing code blocks: %w", err)
+	var parseErrors []string
+	for _, codeBlock := range logic.ParseCodeBlocks(content) {
+		err := codeBlock.Write(safe)
+		if err != nil {
+			parseErrors = append(parseErrors, fmt.Sprintf("%v", err))
+		}
+	}
+
+	if len(parseErrors) > 0 {
+		return fmt.Errorf("error processing code blocks: %s", strings.Join(parseErrors, "; "))
 	}
 
 	fmt.Println("Done!")

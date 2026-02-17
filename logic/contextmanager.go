@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"yact/api"
 )
 
@@ -58,13 +57,13 @@ func SaveContext(messages []api.Message) error {
 	return os.WriteFile(contextPath, data, 0644)
 }
 
-func getFileContentAsCodeBlock(filePath string) (string, error) {
+func ReadAsCodeBlock(filePath string) (string, error) {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return "", err
 	}
 
-	return asCodeBlock(filePath, string(content)), nil
+	return AsCodeBlock(filePath, string(content)), nil
 }
 
 func AddFileToPrompt(filePath string) error {
@@ -72,7 +71,7 @@ func AddFileToPrompt(filePath string) error {
 	if err != nil {
 		return err
 	}
-	content, err := getFileContentAsCodeBlock(filePath)
+	content, err := ReadAsCodeBlock(filePath)
 	if err != nil {
 		return err
 	}
@@ -107,53 +106,4 @@ func BuildMessages(prompt string) ([]api.Message, error) {
 	}
 
 	return append(contextMessages, userMessage), nil
-}
-
-func ReloadContextFiles() error {
-	messages, err := LoadContext()
-	if err != nil {
-		return err
-	}
-
-	newMessages := []api.Message{}
-	seenPaths := make(map[string]bool)
-	var reloadErrors []string
-
-	for _, message := range messages {
-		if message.Type == "file" {
-			if seenPaths[message.Path] {
-				continue
-			}
-
-			content, err := getFileContentAsCodeBlock(message.Path)
-			if err != nil {
-				reloadErrors = append(reloadErrors, fmt.Sprintf("could not reload %s: %v", message.Path, err))
-				continue
-			}
-
-			newMessages = append(newMessages, api.Message{Role: "user", Type: "file", Path: message.Path, Content: content})
-			seenPaths[message.Path] = true
-		} else if message.Type == "act" {
-			for _, block := range ParseCodeBlocks(message.Content) {
-				if seenPaths[block.path] {
-					continue
-				}
-
-				newMessages = append(newMessages, api.Message{Role: "user", Type: "file", Path: block.path, Content: block.serialize()})
-				seenPaths[block.path] = true
-			}
-		} else {
-			newMessages = append(newMessages, message)
-		}
-	}
-
-	if err := SaveContext(newMessages); err != nil {
-		return err
-	}
-
-	if len(reloadErrors) > 0 {
-		return fmt.Errorf("reloaded context with errors: %s", strings.Join(reloadErrors, "; "))
-	}
-
-	return nil
 }

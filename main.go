@@ -83,13 +83,13 @@ func main() {
 		}
 		commandErr = commands.HandleContextCommand()
 	case "pop":
-		commandErr = commands.HandleContextPop(commandArgs)
+		commandErr = commands.HandlePop(commandArgs)
 	case "popto":
-		commandErr = commands.HandleContextPopto(commandArgs)
+		commandErr = commands.HandlePopto(commandArgs)
 	case "del":
-		commandErr = commands.HandleContextDel(commandArgs)
+		commandErr = commands.HandleDelete(commandArgs)
 	case "reload":
-		commandErr = commands.HandleContextReload()
+		commandErr = commands.HandleReload()
 	case "accept":
 		_, commandErr = commands.HandleAcceptCommand()
 	case "act":

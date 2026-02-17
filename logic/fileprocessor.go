@@ -31,11 +31,3 @@ func ParseCodeBlocks(response string) []CodeBlock {
 
 	return codeBlocks
 }
-
-func ProcessCodeBlocks(response string, safe bool) error {
-	var err error
-	for _, codeBlock := range ParseCodeBlocks(response) {
-		err = codeBlock.write(safe)
-	}
-	return err
-}
