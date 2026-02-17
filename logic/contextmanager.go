@@ -120,15 +120,23 @@ func ReloadContextFiles() error {
 		return err
 	}
 
+	var newMessages = []api.Message{}
 	var reloadErrors []string
-	for i, message := range messages {
+	for _, message := range messages {
 		if message.Type == "file" {
 			content, err := getFileContentAsCodeBlock(message.Path)
 			if err != nil {
 				reloadErrors = append(reloadErrors, fmt.Sprintf("could not reload %s: %v", message.Path, err))
 				continue
 			}
-			messages[i].Content = content
+
+			newMessages = append(newMessages, api.Message{Role: "user", Type: "file", Path: message.Path, Content: content})
+		} else if message.Type == "act" {
+			for _, block := range ParseCodeBlocks(message.Content) {
+				newMessages = append(newMessages, api.Message{Role: "user", Type: "file", Path: block.getFilePath(), Content: block.getContent()})
+			}
+		} else {
+			newMessages = append(newMessages, message)
 		}
 	}
 

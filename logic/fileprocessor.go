@@ -1,22 +1,20 @@
 package logic
 
 import (
-	"fmt"
 	"strings"
 )
 
-func ProcessCodeBlocks(response string, safe bool) error {
+func ParseCodeBlocks(response string) []CodeBlock {
 	lines := strings.Split(response, "\n")
 	inCodeBlock := false
 	var currentBlock *CodeBlock
+	var codeBlocks = make([]CodeBlock, 0)
 
 	for _, line := range lines {
 		if strings.HasPrefix(strings.TrimSpace(line), "````") {
 			if inCodeBlock {
 				if len(currentBlock.lines) > 0 {
-					if err := currentBlock.write(safe); err != nil {
-						return err
-					}
+					codeBlocks = append(codeBlocks, *currentBlock)
 				}
 				inCodeBlock = false
 				currentBlock = nil
@@ -31,11 +29,16 @@ func ProcessCodeBlocks(response string, safe bool) error {
 	}
 
 	if inCodeBlock && currentBlock != nil && len(currentBlock.lines) > 0 {
-		if err := currentBlock.write(safe); err != nil {
-			return err
-		}
-		return fmt.Errorf("incomplete code block: file %s was written but no closing backticks found", currentBlock.filePath)
+		codeBlocks = append(codeBlocks, *currentBlock)
 	}
 
 	return nil
+}
+
+func ProcessCodeBlocks(response string, safe bool) error {
+	var err error
+	for _, codeBlock := range ParseCodeBlocks(response) {
+		err = codeBlock.write(safe)
+	}
+	return err
 }

@@ -13,7 +13,6 @@ var unknownFileCounter = 0
 
 type CodeBlock struct {
 	blockHeader string
-	filePath    string
 	lines       []string
 }
 
@@ -42,7 +41,7 @@ func extractFilenameFromComment(line string) string {
 	return ""
 }
 
-func (cb *CodeBlock) getFilePath(safe bool) string {
+func (cb *CodeBlock) getFilePath() string {
 	filePath := ""
 	lineIndex := 0
 
@@ -84,26 +83,28 @@ func (cb *CodeBlock) getFilePath(safe bool) string {
 		}
 	}
 
-	if safe {
-		filePath += ".new"
-	}
 	return filePath
 
 }
 
+func (cb *CodeBlock) getContent() string {
+	return "````\n" + strings.Join(cb.lines, "\n") + "\n````"
+}
+
 func (cb *CodeBlock) write(safe bool) error {
-
-	cb.filePath = cb.getFilePath(safe)
-
-	dir := filepath.Dir(cb.filePath)
+	filePath := cb.getFilePath()
+	if safe {
+		filePath += ".new"
+	}
+	dir := filepath.Dir(filePath)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return fmt.Errorf("error creating directory %s: %w", dir, err)
 	}
 
-	if err := os.WriteFile(cb.filePath, []byte(strings.Join(cb.lines, "\n")), 0644); err != nil {
-		return fmt.Errorf("error writing file %s: %w", cb.filePath, err)
+	if err := os.WriteFile(filePath, []byte(strings.Join(cb.lines, "\n")), 0644); err != nil {
+		return fmt.Errorf("error writing file %s: %w", filePath, err)
 	}
 
-	fmt.Printf("Written: %s\n", cb.filePath)
+	fmt.Printf("Written: %s\n", filePath)
 	return nil
 }
