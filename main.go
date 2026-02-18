@@ -84,8 +84,6 @@ func main() {
 		commandErr = commands.HandleContextCommand()
 	case "pop":
 		commandErr = commands.HandlePop(commandArgs)
-	case "popto":
-		commandErr = commands.HandlePopto(commandArgs)
 	case "del":
 		commandErr = commands.HandleDelete(commandArgs)
 	case "reload":
