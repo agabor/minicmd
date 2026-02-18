@@ -14,7 +14,22 @@ const (
 	MessageTypeAction    MessageType = "Action"
 	MessageTypeObjective MessageType = "Objective"
 	MessageTypePlan      MessageType = "Plan"
+	MessageTypeRevision  MessageType = "Revision"
 )
+
+func ResponseType(messageType MessageType) MessageType {
+
+	switch messageType {
+	case MessageTypeCommand:
+		return MessageTypeAction
+	case MessageTypeQuestion:
+		return MessageTypeAnswer
+	case MessageTypeObjective:
+		return MessageTypePlan
+	default:
+		return messageType
+	}
+}
 
 type Message struct {
 	Type    MessageType

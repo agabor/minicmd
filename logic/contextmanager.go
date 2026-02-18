@@ -36,23 +36,23 @@ func LoadContext() ([]api.Message, error) {
 	return messages, nil
 }
 
-func LoadContextFor(messageType api.MessageType) ([]api.Message, error) {
+func LoadContextForMessageType(messageType api.MessageType) ([]api.Message, error) {
 	messages, err := LoadContext()
 	if err != nil {
 		return nil, err
 	}
 
-	return filterMessagesByType(messages, messageType), nil
+	return filterMessagesForMessageType(messages, messageType), nil
 }
 
-func filterMessagesByType(messages []api.Message, messageType api.MessageType) []api.Message {
+func filterMessagesForMessageType(messages []api.Message, messageType api.MessageType) []api.Message {
 	var allowedTypes []api.MessageType
 
 	switch messageType {
 	case api.MessageTypeCommand:
-		allowedTypes = []api.MessageType{api.MessageTypeFile, api.MessageTypeCommand, api.MessageTypeAction, api.MessageTypePlan}
+		allowedTypes = []api.MessageType{api.MessageTypeFile, api.MessageTypeCommand, api.MessageTypeAction}
 	case api.MessageTypeObjective:
-		allowedTypes = []api.MessageType{api.MessageTypeFile, api.MessageTypeQuestion, api.MessageTypeAnswer, api.MessageTypeObjective, api.MessageTypePlan}
+		allowedTypes = []api.MessageType{api.MessageTypeFile, api.MessageTypeQuestion, api.MessageTypeAnswer, api.MessageTypeObjective, api.MessageTypePlan, api.MessageTypeRevision}
 	case api.MessageTypeQuestion:
 		allowedTypes = []api.MessageType{api.MessageTypeFile, api.MessageTypeQuestion, api.MessageTypeAnswer, api.MessageTypeObjective, api.MessageTypePlan}
 	default:
@@ -63,7 +63,11 @@ func filterMessagesByType(messages []api.Message, messageType api.MessageType) [
 	for _, msg := range messages {
 		for _, allowed := range allowedTypes {
 			if msg.Type == allowed {
-				filtered = append(filtered, msg)
+				if messageType == api.MessageTypeObjective && msg.Type == api.MessageTypePlan {
+					filtered = append(filtered, api.Message{Type: api.MessageTypeRevision, Content: msg.Content})
+				} else {
+					filtered = append(filtered, msg)
+				}
 				break
 			}
 		}
@@ -101,7 +105,7 @@ func ReadAsCodeBlock(filePath string) (string, error) {
 }
 
 func AddFileToPrompt(filePath string) error {
-	messages, err := LoadContextFor(api.MessageTypeFile)
+	messages, err := LoadContextForMessageType(api.MessageTypeFile)
 	if err != nil {
 		return err
 	}

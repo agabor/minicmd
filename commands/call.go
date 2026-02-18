@@ -47,7 +47,7 @@ func HandleVerbalCommand(args []string, cfg *config.Config, systemPrompt string,
 
 func HandleGoCommand(cfg *config.Config, systemPrompt string) error {
 
-	messages, err := logic.LoadContextFor(api.MessageTypeCommand)
+	messages, err := logic.LoadContextForMessageType(api.MessageTypeCommand)
 	if err != nil {
 		fmt.Printf("Warning: could not load context: %v\n", err)
 		messages = []api.Message{}
@@ -64,7 +64,7 @@ func HandleGoCommand(cfg *config.Config, systemPrompt string) error {
 func HandleCall(args []string, cfg *config.Config, systemPrompt string, messageType api.MessageType) (string, error) {
 	prompt := strings.Join(args, " ")
 
-	contextMessages, err := logic.LoadContextFor(messageType)
+	contextMessages, err := logic.LoadContextForMessageType(messageType)
 	if err != nil {
 		fmt.Printf("Warning: could not load context: %v\n", err)
 		contextMessages = []api.Message{}
@@ -114,7 +114,7 @@ func callClaudeAPI(messages []api.Message, cfg *config.Config, systemPrompt stri
 
 	message := api.Message{
 		Content: responseContent,
-		Type:    messageType,
+		Type:    api.ResponseType(messageType),
 	}
 
 	updatedMessages := append(messages, message)
