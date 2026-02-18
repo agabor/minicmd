@@ -2,20 +2,11 @@ package commands
 
 import (
 	"fmt"
-	"os"
 	"yact/logic"
 )
 
 func HandleNewCommand() error {
-	contextPath, err := logic.GetContextFilePath()
-	if err != nil {
-		return err
-	}
-
-	if err := os.Remove(contextPath); err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
+	err := logic.SaveContext(make([]logic.Message, 0))
 	fmt.Println("New context created")
-	return nil
+	return err
 }

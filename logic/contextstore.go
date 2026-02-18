@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-func GetContextFilePath() (string, error) {
+func getContextFilePath() (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
@@ -14,7 +14,7 @@ func GetContextFilePath() (string, error) {
 	return filepath.Join(homeDir, ".yact", "context.json"), nil
 }
 func LoadContext() ([]Message, error) {
-	contextPath, err := GetContextFilePath()
+	contextPath, err := getContextFilePath()
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func LoadContext() ([]Message, error) {
 }
 
 func SaveContext(messages []Message) error {
-	contextPath, err := GetContextFilePath()
+	contextPath, err := getContextFilePath()
 	if err != nil {
 		return err
 	}
