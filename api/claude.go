@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"yact/logic"
 
 	"yact/config"
 
@@ -50,9 +51,9 @@ func (c *ClaudeClient) calculateCost(inputTokens int64, outputTokens int64) floa
 	return inputCost + outputCost
 }
 
-func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (Message, error) {
+func (c *ClaudeClient) Call(messages []logic.Message, systemPrompt string) (logic.Message, error) {
 	if c.apiKey == "" {
-		return Message{}, fmt.Errorf("Claude API key not configured. Please set your API key with: y config anthropic_api_key YOUR_API_KEY")
+		return logic.Message{}, fmt.Errorf("Claude API key not configured. Please set your API key with: y config anthropic_api_key YOUR_API_KEY")
 	}
 
 	startTime := time.Now()
@@ -61,7 +62,7 @@ func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (Message, e
 
 	messageParams := make([]anthropic.MessageParam, len(messages))
 	for i, msg := range messages {
-		if msg.Type == MessageTypeAction {
+		if msg.Type == logic.MessageTypeAction {
 			messageParams[i] = anthropic.NewAssistantMessage(anthropic.NewTextBlock(msg.Content))
 		} else {
 			messageParams[i] = anthropic.NewUserMessage(anthropic.NewTextBlock(msg.Content))
@@ -85,7 +86,7 @@ func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (Message, e
 	message, err := client.Messages.New(context.Background(), params)
 
 	if err != nil {
-		return Message{}, fmt.Errorf("error calling Claude API: %w", err)
+		return logic.Message{}, fmt.Errorf("error calling Claude API: %w", err)
 	}
 
 	duration := time.Since(startTime)
@@ -106,7 +107,7 @@ func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (Message, e
 		responseText += block.Text
 	}
 
-	return Message{
+	return logic.Message{
 		Content: responseText,
 	}, nil
 }

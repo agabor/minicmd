@@ -2,43 +2,11 @@ package api
 
 import (
 	"yact/config"
+	"yact/logic"
 )
 
-type MessageType string
-
-const (
-	MessageTypeFile      MessageType = "File"
-	MessageTypeQuestion  MessageType = "Question"
-	MessageTypeAnswer    MessageType = "Answer"
-	MessageTypeCommand   MessageType = "Command"
-	MessageTypeAction    MessageType = "Action"
-	MessageTypeObjective MessageType = "Objective"
-	MessageTypePlan      MessageType = "Plan"
-	MessageTypeRevision  MessageType = "Revision"
-)
-
-func ResponseType(messageType MessageType) MessageType {
-
-	switch messageType {
-	case MessageTypeCommand:
-		return MessageTypeAction
-	case MessageTypeQuestion:
-		return MessageTypeAnswer
-	case MessageTypeObjective:
-		return MessageTypePlan
-	default:
-		return messageType
-	}
-}
-
-type Message struct {
-	Type    MessageType
-	Path    string
-	Content string
-}
-
-type APIClient interface {
+type Client interface {
 	Init(cfg *config.Config)
 	GetModelName() string
-	Call(messages []Message, systemPrompt string) (Message, error)
+	Call(messages []logic.Message, systemPrompt string) (logic.Message, error)
 }

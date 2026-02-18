@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"yact/api"
 )
 
 func GetContextFilePath() (string, error) {
@@ -14,7 +13,7 @@ func GetContextFilePath() (string, error) {
 	}
 	return filepath.Join(homeDir, ".yact", "context.json"), nil
 }
-func LoadContext() ([]api.Message, error) {
+func LoadContext() ([]Message, error) {
 	contextPath, err := GetContextFilePath()
 	if err != nil {
 		return nil, err
@@ -23,12 +22,12 @@ func LoadContext() ([]api.Message, error) {
 	data, err := os.ReadFile(contextPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return []api.Message{}, nil
+			return []Message{}, nil
 		}
 		return nil, err
 	}
 
-	var messages []api.Message
+	var messages []Message
 	if err := json.Unmarshal(data, &messages); err != nil {
 		return nil, err
 	}
@@ -36,47 +35,7 @@ func LoadContext() ([]api.Message, error) {
 	return messages, nil
 }
 
-func LoadContextForMessageType(messageType api.MessageType) ([]api.Message, error) {
-	messages, err := LoadContext()
-	if err != nil {
-		return nil, err
-	}
-
-	return filterMessagesForMessageType(messages, messageType), nil
-}
-
-func filterMessagesForMessageType(messages []api.Message, messageType api.MessageType) []api.Message {
-	var allowedTypes []api.MessageType
-
-	switch messageType {
-	case api.MessageTypeCommand:
-		allowedTypes = []api.MessageType{api.MessageTypeFile, api.MessageTypeCommand, api.MessageTypeAction}
-	case api.MessageTypeObjective:
-		allowedTypes = []api.MessageType{api.MessageTypeFile, api.MessageTypeQuestion, api.MessageTypeAnswer, api.MessageTypeObjective, api.MessageTypePlan, api.MessageTypeRevision}
-	case api.MessageTypeQuestion:
-		allowedTypes = []api.MessageType{api.MessageTypeFile, api.MessageTypeQuestion, api.MessageTypeAnswer, api.MessageTypeObjective, api.MessageTypePlan}
-	default:
-		return make([]api.Message, 0)
-	}
-
-	var filtered []api.Message
-	for _, msg := range messages {
-		for _, allowed := range allowedTypes {
-			if msg.Type == allowed {
-				if messageType == api.MessageTypeObjective && msg.Type == api.MessageTypePlan {
-					filtered = append(filtered, api.Message{Type: api.MessageTypeRevision, Content: msg.Content})
-				} else {
-					filtered = append(filtered, msg)
-				}
-				break
-			}
-		}
-	}
-
-	return filtered
-}
-
-func SaveContext(messages []api.Message) error {
+func SaveContext(messages []Message) error {
 	contextPath, err := GetContextFilePath()
 	if err != nil {
 		return err
@@ -105,7 +64,7 @@ func ReadAsCodeBlock(filePath string) (string, error) {
 }
 
 func AddFileToPrompt(filePath string) error {
-	messages, err := LoadContextForMessageType(api.MessageTypeFile)
+	messages, err := LoadContextForMessageType(MessageTypeFile)
 	if err != nil {
 		return err
 	}
@@ -113,6 +72,6 @@ func AddFileToPrompt(filePath string) error {
 	if err != nil {
 		return err
 	}
-	messages = append(messages, api.Message{Type: api.MessageTypeFile, Path: filePath, Content: content})
+	messages = append(messages, Message{Type: MessageTypeFile, Path: filePath, Content: content})
 	return SaveContext(messages)
 }
