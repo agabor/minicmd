@@ -6,10 +6,10 @@ import (
 	"yact/logic"
 )
 
-func HandleReload() error {
+func HandleReload() ([]logic.Message, error) {
 	messages, err := logic.LoadContext()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var newMessages []logic.Message
@@ -17,7 +17,7 @@ func HandleReload() error {
 	var reloadErrors []string
 
 	for _, message := range messages {
-		if message.Type == "file" {
+		if message.Type == logic.MessageTypeFile {
 			if seenPaths[message.Path] {
 				continue
 			}
@@ -30,7 +30,7 @@ func HandleReload() error {
 
 			newMessages = append(newMessages, logic.Message{Type: logic.MessageTypeFile, Path: message.Path, Content: content})
 			seenPaths[message.Path] = true
-		} else if message.Type == "act" {
+		} else if message.Type == logic.MessageTypeAction {
 			for _, block := range logic.ParseCodeBlocks(message.Content) {
 				if seenPaths[block.Path] {
 					continue
@@ -45,12 +45,12 @@ func HandleReload() error {
 	}
 
 	if err := logic.SaveContext(newMessages); err != nil {
-		return err
+		return nil, err
 	}
 
 	if len(reloadErrors) > 0 {
-		return fmt.Errorf("reloaded context with errors: %s", strings.Join(reloadErrors, "; "))
+		return nil, fmt.Errorf("reloaded context with errors: %s", strings.Join(reloadErrors, "; "))
 	}
 	fmt.Println("Context files reloaded")
-	return nil
+	return newMessages, nil
 }

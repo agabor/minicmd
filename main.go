@@ -88,7 +88,7 @@ func main() {
 	case "del":
 		commandErr = commands.HandleDelete(commandArgs)
 	case "reload":
-		commandErr = commands.HandleReload()
+		_, commandErr = commands.HandleReload()
 	case "reset":
 		if len(commandArgs) != 0 {
 			fmt.Fprintf(os.Stderr, "Error: the reset command takes no arguments\n")
