@@ -20,6 +20,6 @@ func HandleResetCommand() error {
 
 	err = logic.SaveContext(fileMessages)
 
-	fmt.Println("Context reset and files reloaded")
+	fmt.Println("Context reset")
 	return err
 }
