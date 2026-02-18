@@ -159,19 +159,20 @@ echo "fix the database connection" | y bash
 
 ## Workflow
 
-The following diagram illustrates how YACT message types can follow each other:
+The following diagram illustrates YACT message types as nodes YACT commands as edges:
 
 ```mermaid
 graph TD
-    File* --> Question
-    File* --> Command
-    File* --> Objective
-    Question --> Answer
-    Answer --> Question
-    Command --> Action
-    Action --> Command
-    Objective --> Plan
-    Plan --> Command
+    File -->|read| File
+    File -->|ask| Question
+    File -->|act| Command
+    File -->|plan| Objective
+    Question -->|assistant| Answer
+    Answer -->|ask| Question
+    Command -->|assistant| Action
+    Action -->|act| Command
+    Objective -->|assistant| Plan
+    Plan -->|act| Command
 ```
 
 ## Help
