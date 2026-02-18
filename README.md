@@ -168,8 +168,6 @@ graph TD
     File* --> Objective
     Question --> Answer
     Answer --> Question
-    Answer --> Command
-    Answer --> Objective
     Command --> Action
     Action --> Command
     Objective --> Plan
