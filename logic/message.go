@@ -6,10 +6,6 @@ func LoadContextForMessageType(messageType MessageType) ([]Message, error) {
 		return nil, err
 	}
 
-	return filterMessagesForMessageType(messages, messageType), nil
-}
-
-func filterMessagesForMessageType(messages []Message, messageType MessageType) []Message {
 	var allowedTypes []MessageType
 
 	switch messageType {
@@ -20,7 +16,7 @@ func filterMessagesForMessageType(messages []Message, messageType MessageType) [
 	case MessageTypeQuestion:
 		allowedTypes = []MessageType{MessageTypeFile, MessageTypeQuestion, MessageTypeAnswer, MessageTypeObjective, MessageTypePlan}
 	default:
-		return make([]Message, 0)
+		return make([]Message, 0), nil
 	}
 
 	var filtered []Message
@@ -37,7 +33,7 @@ func filterMessagesForMessageType(messages []Message, messageType MessageType) [
 		}
 	}
 
-	return filtered
+	return filtered, nil
 }
 
 type MessageType string
