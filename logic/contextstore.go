@@ -53,25 +53,3 @@ func SaveContext(messages []Message) error {
 
 	return os.WriteFile(contextPath, data, 0644)
 }
-
-func ReadAsCodeBlock(filePath string) (string, error) {
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		return "", err
-	}
-
-	return AsCodeBlock(filePath, string(content)), nil
-}
-
-func AddFileToPrompt(filePath string) error {
-	messages, err := LoadContextForMessageType(MessageTypeFile)
-	if err != nil {
-		return err
-	}
-	content, err := ReadAsCodeBlock(filePath)
-	if err != nil {
-		return err
-	}
-	messages = append(messages, Message{Type: MessageTypeFile, Path: filePath, Content: content})
-	return SaveContext(messages)
-}

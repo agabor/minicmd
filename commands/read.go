@@ -35,12 +35,39 @@ func HandleReadCommand(args []string) error {
 				fmt.Printf("Skipping directory: %s\n", filePath)
 				continue
 			}
-
-			if err := logic.AddFileToPrompt(filePath); err != nil {
+			messages, err := logic.LoadContext()
+			if err != nil {
 				return err
+			}
+			content, err := logic.ReadAsCodeBlock(filePath)
+			if err != nil {
+				return err
+			}
+
+			if hasMessageWithPath(messages, filePath) {
+				fmt.Printf("Skipping: %s\n", filePath)
+				continue
+			} else {
+				fmt.Printf("Reading: %s\n", filePath)
+			}
+
+			messages = append(messages, logic.Message{Type: logic.MessageTypeFile, Path: filePath, Content: content})
+			err2 := logic.SaveContext(messages)
+			if err2 != nil {
+				return err2
 			}
 		}
 	}
 
 	return nil
+}
+
+func hasMessageWithPath(messages []logic.Message, path string) bool {
+
+	for _, message := range messages {
+		if message.Path == path {
+			return true
+		}
+	}
+	return false
 }

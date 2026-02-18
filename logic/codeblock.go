@@ -92,6 +92,15 @@ func AsCodeBlock(path string, content string) string {
 	return joinLines([]string{BlockDelimiter, "//" + path, content, BlockDelimiter})
 }
 
+func ReadAsCodeBlock(filePath string) (string, error) {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return AsCodeBlock(filePath, string(content)), nil
+}
+
 func (cb *CodeBlock) Write(safe bool) error {
 	filePath := cb.Path
 	if safe {
