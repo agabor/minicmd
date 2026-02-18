@@ -10,7 +10,7 @@ func LoadContextForMessageType(messageType MessageType) ([]Message, error) {
 
 	switch messageType {
 	case MessageTypeCommand:
-		allowedTypes = []MessageType{MessageTypeFile, MessageTypeCommand, MessageTypeAction}
+		allowedTypes = []MessageType{MessageTypeFile, MessageTypeCommand, MessageTypeAction, MessageTypePlan}
 	case MessageTypeObjective:
 		allowedTypes = []MessageType{MessageTypeFile, MessageTypeQuestion, MessageTypeAnswer, MessageTypeObjective, MessageTypePlan, MessageTypeRevision}
 	case MessageTypeQuestion:

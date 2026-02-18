@@ -20,6 +20,7 @@ func ShowHelp() {
 	fmt.Println("  y pop [num]             # Remove last num messages (default: 1)")
 	fmt.Println("  y del <idx>             # Remove message at index")
 	fmt.Println("  y reload                # Reload file contents from disk")
+	fmt.Println("  y reset                 # Remove all messages except files and reload them")
 	fmt.Println("  y new                   # Create a new context")
 	fmt.Println("  y last                  # Show last AI response")
 	fmt.Println("  y config                # Show current configuration")

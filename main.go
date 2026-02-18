@@ -89,6 +89,12 @@ func main() {
 		commandErr = commands.HandleDelete(commandArgs)
 	case "reload":
 		commandErr = commands.HandleReload()
+	case "reset":
+		if len(commandArgs) != 0 {
+			fmt.Fprintf(os.Stderr, "Error: the reset command takes no arguments\n")
+			os.Exit(1)
+		}
+		commandErr = commands.HandleResetCommand()
 	case "act":
 		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, systemprompt.Act)
 	case "bash":
