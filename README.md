@@ -163,7 +163,6 @@ The following diagram illustrates YACT message types as nodes YACT commands as e
 
 ```mermaid
 graph TD
-    Start-->|read| File
     File -->|ask| Question
     File -->|act| Command
     File -->|plan| Objective
