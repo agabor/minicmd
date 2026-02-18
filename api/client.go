@@ -4,9 +4,20 @@ import (
 	"yact/config"
 )
 
+type MessageType string
+
+const (
+	MessageTypeFile      MessageType = "File"
+	MessageTypeQuestion  MessageType = "Question"
+	MessageTypeAnswer    MessageType = "Answer"
+	MessageTypeCommand   MessageType = "Command"
+	MessageTypeAction    MessageType = "Action"
+	MessageTypeObjective MessageType = "Objective"
+	MessageTypePlan      MessageType = "Plan"
+)
+
 type Message struct {
-	Role    string
-	Type    string
+	Type    MessageType
 	Path    string
 	Content string
 }

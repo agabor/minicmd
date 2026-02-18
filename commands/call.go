@@ -27,7 +27,7 @@ func showProgress(done chan bool) {
 }
 
 func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt string) error {
-	responseContent, err := HandleCall(args, cfg, systemPrompt, "act")
+	responseContent, err := HandleCall(args, cfg, systemPrompt, api.MessageTypeCommand)
 	if err != nil {
 		return err
 	}
@@ -35,8 +35,8 @@ func HandleActCommand(args []string, safe bool, cfg *config.Config, systemPrompt
 	return processCodeBlocks(responseContent, safe)
 }
 
-func HandleVerbalCommand(args []string, cfg *config.Config, systemPrompt string, promptType string) error {
-	responseContent, err := HandleCall(args, cfg, systemPrompt, promptType)
+func HandleVerbalCommand(args []string, cfg *config.Config, systemPrompt string, messageType api.MessageType) error {
+	responseContent, err := HandleCall(args, cfg, systemPrompt, messageType)
 	if err != nil {
 		return err
 	}
@@ -46,12 +46,14 @@ func HandleVerbalCommand(args []string, cfg *config.Config, systemPrompt string,
 }
 
 func HandleGoCommand(cfg *config.Config, systemPrompt string) error {
-	messages, err := HandleAcceptCommand()
+
+	messages, err := logic.LoadContextFor(api.MessageTypeCommand)
 	if err != nil {
-		return err
+		fmt.Printf("Warning: could not load context: %v\n", err)
+		messages = []api.Message{}
 	}
 
-	responseContent, err := callClaudeAPI(messages, cfg, systemPrompt, "act")
+	responseContent, err := callClaudeAPI(messages, cfg, systemPrompt, api.MessageTypeCommand)
 	if err != nil {
 		return err
 	}
@@ -59,24 +61,23 @@ func HandleGoCommand(cfg *config.Config, systemPrompt string) error {
 	return processCodeBlocks(responseContent, false)
 }
 
-func HandleCall(args []string, cfg *config.Config, systemPrompt string, promptType string) (string, error) {
+func HandleCall(args []string, cfg *config.Config, systemPrompt string, messageType api.MessageType) (string, error) {
 	prompt := strings.Join(args, " ")
 
-	contextMessages, err := logic.LoadContext()
+	contextMessages, err := logic.LoadContextFor(messageType)
 	if err != nil {
 		fmt.Printf("Warning: could not load context: %v\n", err)
 		contextMessages = []api.Message{}
 	}
 
 	userMessage := api.Message{
-		Role:    "user",
-		Type:    "message",
+		Type:    messageType,
 		Content: prompt,
 	}
 
 	messages := append(contextMessages, userMessage)
 
-	responseContent, err := callClaudeAPI(messages, cfg, systemPrompt, promptType)
+	responseContent, err := callClaudeAPI(messages, cfg, systemPrompt, messageType)
 	if err != nil {
 		return "", err
 	}
@@ -84,7 +85,7 @@ func HandleCall(args []string, cfg *config.Config, systemPrompt string, promptTy
 	return responseContent, nil
 }
 
-func callClaudeAPI(messages []api.Message, cfg *config.Config, systemPrompt string, messageType string) (string, error) {
+func callClaudeAPI(messages []api.Message, cfg *config.Config, systemPrompt string, messageType api.MessageType) (string, error) {
 	fmt.Printf("Sending request to Claude...\n")
 
 	var client api.APIClient
@@ -113,7 +114,6 @@ func callClaudeAPI(messages []api.Message, cfg *config.Config, systemPrompt stri
 
 	message := api.Message{
 		Content: responseContent,
-		Role:    "assistant",
 		Type:    messageType,
 	}
 

@@ -14,7 +14,6 @@ func GetContextFilePath() (string, error) {
 	}
 	return filepath.Join(homeDir, ".yact", "context.json"), nil
 }
-
 func LoadContext() ([]api.Message, error) {
 	contextPath, err := GetContextFilePath()
 	if err != nil {
@@ -35,6 +34,42 @@ func LoadContext() ([]api.Message, error) {
 	}
 
 	return messages, nil
+}
+
+func LoadContextFor(messageType api.MessageType) ([]api.Message, error) {
+	messages, err := LoadContext()
+	if err != nil {
+		return nil, err
+	}
+
+	return filterMessagesByType(messages, messageType), nil
+}
+
+func filterMessagesByType(messages []api.Message, messageType api.MessageType) []api.Message {
+	var allowedTypes []api.MessageType
+
+	switch messageType {
+	case api.MessageTypeCommand:
+		allowedTypes = []api.MessageType{api.MessageTypeFile, api.MessageTypeCommand, api.MessageTypeAction, api.MessageTypePlan}
+	case api.MessageTypeObjective:
+		allowedTypes = []api.MessageType{api.MessageTypeFile, api.MessageTypeQuestion, api.MessageTypeAnswer, api.MessageTypeObjective, api.MessageTypePlan}
+	case api.MessageTypeQuestion:
+		allowedTypes = []api.MessageType{api.MessageTypeFile, api.MessageTypeQuestion, api.MessageTypeAnswer, api.MessageTypeObjective, api.MessageTypePlan}
+	default:
+		return make([]api.Message, 0)
+	}
+
+	var filtered []api.Message
+	for _, msg := range messages {
+		for _, allowed := range allowedTypes {
+			if msg.Type == allowed {
+				filtered = append(filtered, msg)
+				break
+			}
+		}
+	}
+
+	return filtered
 }
 
 func SaveContext(messages []api.Message) error {
@@ -66,7 +101,7 @@ func ReadAsCodeBlock(filePath string) (string, error) {
 }
 
 func AddFileToPrompt(filePath string) error {
-	messages, err := LoadContext()
+	messages, err := LoadContextFor(api.MessageTypeFile)
 	if err != nil {
 		return err
 	}
@@ -74,6 +109,6 @@ func AddFileToPrompt(filePath string) error {
 	if err != nil {
 		return err
 	}
-	messages = append(messages, api.Message{Role: "user", Type: "file", Path: filePath, Content: content})
+	messages = append(messages, api.Message{Type: api.MessageTypeFile, Path: filePath, Content: content})
 	return SaveContext(messages)
 }

@@ -19,7 +19,7 @@ func HandleContextCommand() error {
 	}
 
 	for i, message := range messages {
-		fmt.Printf("[%d] %s (%s)", i, message.Role, message.Type)
+		fmt.Printf("[%d] %s", i, message.Type)
 		if message.Path != "" {
 			fmt.Printf(" - %s", message.Path)
 		} else {

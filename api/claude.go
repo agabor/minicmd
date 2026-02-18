@@ -61,10 +61,10 @@ func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (Message, e
 
 	messageParams := make([]anthropic.MessageParam, len(messages))
 	for i, msg := range messages {
-		if msg.Role == "user" {
-			messageParams[i] = anthropic.NewUserMessage(anthropic.NewTextBlock(msg.Content))
-		} else if msg.Role == "assistant" {
+		if msg.Type == MessageTypeAction {
 			messageParams[i] = anthropic.NewAssistantMessage(anthropic.NewTextBlock(msg.Content))
+		} else {
+			messageParams[i] = anthropic.NewUserMessage(anthropic.NewTextBlock(msg.Content))
 		}
 	}
 
@@ -107,7 +107,6 @@ func (c *ClaudeClient) Call(messages []Message, systemPrompt string) (Message, e
 	}
 
 	return Message{
-		Role:    "assistant",
 		Content: responseText,
 	}, nil
 }

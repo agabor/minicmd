@@ -29,7 +29,7 @@ func HandleReload() error {
 				continue
 			}
 
-			newMessages = append(newMessages, api.Message{Role: "user", Type: "file", Path: message.Path, Content: content})
+			newMessages = append(newMessages, api.Message{Type: api.MessageTypeFile, Path: message.Path, Content: content})
 			seenPaths[message.Path] = true
 		} else if message.Type == "act" {
 			for _, block := range logic.ParseCodeBlocks(message.Content) {
@@ -37,7 +37,7 @@ func HandleReload() error {
 					continue
 				}
 
-				newMessages = append(newMessages, api.Message{Role: "user", Type: "file", Path: block.Path, Content: logic.AsCodeBlock(block.Path, block.Content)})
+				newMessages = append(newMessages, api.Message{Type: api.MessageTypeFile, Path: block.Path, Content: logic.AsCodeBlock(block.Path, block.Content)})
 				seenPaths[block.Path] = true
 			}
 		} else {

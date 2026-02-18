@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"yact/api"
 	"yact/config/systemprompt"
 
 	"yact/commands"
@@ -88,16 +89,14 @@ func main() {
 		commandErr = commands.HandleDelete(commandArgs)
 	case "reload":
 		commandErr = commands.HandleReload()
-	case "accept":
-		_, commandErr = commands.HandleAcceptCommand()
 	case "act":
 		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, systemprompt.Act)
 	case "bash":
 		commandErr = commands.HandleActCommand(commandArgs, *safeFlag, cfg, systemprompt.Bash)
 	case "ask":
-		commandErr = commands.HandleVerbalCommand(commandArgs, cfg, systemprompt.Ask, "ask")
+		commandErr = commands.HandleVerbalCommand(commandArgs, cfg, systemprompt.Ask, api.MessageTypeQuestion)
 	case "plan":
-		commandErr = commands.HandleVerbalCommand(commandArgs, cfg, systemprompt.Plan, "plan")
+		commandErr = commands.HandleVerbalCommand(commandArgs, cfg, systemprompt.Plan, api.MessageTypeObjective)
 	case "new":
 		commandErr = commands.HandleNewCommand()
 	case "last":
