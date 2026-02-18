@@ -163,19 +163,17 @@ The following diagram illustrates how YACT message types can follow each other:
 
 ```mermaid
 graph TD
-    File -->|provides context| Question
-    File -->|provides context| Command
-    File -->|provides context| Objective
-    Question -->|generates| Answer
-    Answer -->|refines| Question
-    Answer -->|triggers| Command
-    Answer -->|refines| Objective
-    Command -->|executes| Action
-    Action -->|refines| Command
-    Objective -->|breaks down into| Plan
-    Plan -->|executes| Objective
-    Plan -->|informs| Question
-    Plan -->|generates| Command
+    File* --> Question
+    File* --> Command
+    File* --> Objective
+    Question --> Answer
+    Answer --> Question
+    Answer --> Command
+    Answer --> Objective
+    Command --> Action
+    Action --> Command
+    Objective --> Plan
+    Plan --> Command
 ```
 
 ## Help
