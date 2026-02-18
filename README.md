@@ -157,6 +157,27 @@ echo "fix the database connection" | y bash
 - **Conversation flow**: Use multi-step conversations - ask for a plan first, then generate code
 - **Cost tracking**: The tool displays token usage and estimated costs for each API call
 
+## Workflow
+
+The following diagram illustrates how YACT message types can follow each other:
+
+```mermaid
+graph TD
+    File -->|provides context| Question
+    File -->|provides context| Command
+    File -->|provides context| Objective
+    Question -->|generates| Answer
+    Answer -->|refines| Question
+    Answer -->|triggers| Command
+    Answer -->|refines| Objective
+    Command -->|executes| Action
+    Action -->|refines| Command
+    Objective -->|breaks down into| Plan
+    Plan -->|executes| Objective
+    Plan -->|informs| Question
+    Plan -->|generates| Command
+```
+
 ## Help
 
 Display command reference:
